@@ -8,9 +8,9 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import ProfilePage from "./pages/ProfilePage";
 
 import DashboardLayout from "@/components/DashboardLayout";
-import PlaceholderPage from "@/components/PlaceholderPage";
 
 // Super Admin
 import SuperAdminHome from "./pages/superadmin/SuperAdminHome";
@@ -24,10 +24,36 @@ import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
+import DirectorClasses from "./pages/director/DirectorClasses";
+import DirectorTeachers from "./pages/director/DirectorTeachers";
+import DirectorStudents from "./pages/director/DirectorStudents";
+
+// Zavuch
+import ZavuchHome from "./pages/zavuch/ZavuchHome";
+
+// Teacher
+import TeacherHome from "./pages/teacher/TeacherHome";
+
+// Student
+import StudentHome from "./pages/student/StudentHome";
+
+// Parent
+import ParentHome from "./pages/parent/ParentHome";
+
+// Shared pages
+import SchedulePage from "./pages/shared/SchedulePage";
+import GradesPage from "./pages/shared/GradesPage";
+import HomeworkPage from "./pages/shared/HomeworkPage";
+import AttendancePage from "./pages/shared/AttendancePage";
+import MaterialsPage from "./pages/shared/MaterialsPage";
+import MessagesPage from "./pages/shared/MessagesPage";
+import AchievementsPage from "./pages/shared/AchievementsPage";
+
+import PlaceholderPage from "@/components/PlaceholderPage";
 
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar, Upload, FileCheck,
-  BookMarked, CheckCircle, UserCheck,
+  BookMarked, CheckCircle,
 } from "lucide-react";
 
 const superAdminNav = [
@@ -119,65 +145,71 @@ const App = () => (
             <Route path="/super-admin/analytics" element={<SuperAdminAnalytics />} />
             <Route path="/super-admin/logs" element={<SuperAdminLogs />} />
             <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
+            <Route path="/super-admin/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Director */}
           <Route element={<DashboardLayout roleName="Директор" navItems={directorNav} userName="Ахметова А." />}>
             <Route path="/director" element={<DirectorHome />} />
-            <Route path="/director/classes" element={<PlaceholderPage title="Сыныптар" />} />
-            <Route path="/director/teachers" element={<PlaceholderPage title="Мұғалімдер" />} />
-            <Route path="/director/students" element={<PlaceholderPage title="Оқушылар" />} />
-            <Route path="/director/schedule" element={<PlaceholderPage title="Сабақ кесте" />} />
+            <Route path="/director/classes" element={<DirectorClasses />} />
+            <Route path="/director/teachers" element={<DirectorTeachers />} />
+            <Route path="/director/students" element={<DirectorStudents />} />
+            <Route path="/director/schedule" element={<SchedulePage />} />
             <Route path="/director/import" element={<PlaceholderPage title="Excel импорт" />} />
             <Route path="/director/documents" element={<PlaceholderPage title="Құжаттар" />} />
             <Route path="/director/analytics" element={<PlaceholderPage title="Аналитика" />} />
             <Route path="/director/settings" element={<PlaceholderPage title="Баптаулар" />} />
+            <Route path="/director/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Zavuch */}
           <Route element={<DashboardLayout roleName="Завуч" navItems={zavuchNav} userName="Мұхтарова Д." />}>
-            <Route path="/zavuch" element={<PlaceholderPage title="Завуч панелі" />} />
+            <Route path="/zavuch" element={<ZavuchHome />} />
             <Route path="/zavuch/class" element={<PlaceholderPage title="Сынып" />} />
             <Route path="/zavuch/journal" element={<PlaceholderPage title="Журнал мониторинг" />} />
             <Route path="/zavuch/documents" element={<PlaceholderPage title="Құжаттар" />} />
-            <Route path="/zavuch/schedule" element={<PlaceholderPage title="Сабақ кесте" />} />
-            <Route path="/zavuch/performance" element={<PlaceholderPage title="Үлгерім аналитика" />} />
-            <Route path="/zavuch/attendance" element={<PlaceholderPage title="Қатысулар" />} />
-            <Route path="/zavuch/teachers" element={<PlaceholderPage title="Мұғалімдер" />} />
+            <Route path="/zavuch/schedule" element={<SchedulePage />} />
+            <Route path="/zavuch/performance" element={<GradesPage />} />
+            <Route path="/zavuch/attendance" element={<AttendancePage />} />
+            <Route path="/zavuch/teachers" element={<DirectorTeachers />} />
+            <Route path="/zavuch/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Teacher */}
           <Route element={<DashboardLayout roleName="Мұғалім" navItems={teacherNav} userName="Сейітов Қ." />}>
-            <Route path="/teacher" element={<PlaceholderPage title="Мұғалім панелі" />} />
+            <Route path="/teacher" element={<TeacherHome />} />
             <Route path="/teacher/journal" element={<PlaceholderPage title="Электронды журнал" />} />
             <Route path="/teacher/class" element={<PlaceholderPage title="Сынып" />} />
-            <Route path="/teacher/homework" element={<PlaceholderPage title="Үй тапсырма" />} />
-            <Route path="/teacher/schedule" element={<PlaceholderPage title="Сабақ кесте" />} />
+            <Route path="/teacher/homework" element={<HomeworkPage />} />
+            <Route path="/teacher/schedule" element={<SchedulePage />} />
             <Route path="/teacher/tests" element={<PlaceholderPage title="Тесттер" />} />
-            <Route path="/teacher/materials" element={<PlaceholderPage title="Материалдар" />} />
+            <Route path="/teacher/materials" element={<MaterialsPage />} />
             <Route path="/teacher/documents" element={<PlaceholderPage title="Құжаттар" />} />
             <Route path="/teacher/stats" element={<PlaceholderPage title="Статистика" />} />
+            <Route path="/teacher/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Student */}
           <Route element={<DashboardLayout roleName="Оқушы" navItems={studentNav} userName="Назарбекова А." />}>
-            <Route path="/student" element={<PlaceholderPage title="Оқушы панелі" />} />
-            <Route path="/student/grades" element={<PlaceholderPage title="Бағалар" />} />
-            <Route path="/student/homework" element={<PlaceholderPage title="Үй тапсырма" />} />
+            <Route path="/student" element={<StudentHome />} />
+            <Route path="/student/grades" element={<GradesPage />} />
+            <Route path="/student/homework" element={<HomeworkPage canUpload />} />
             <Route path="/student/tests" element={<PlaceholderPage title="Тесттер" />} />
-            <Route path="/student/schedule" element={<PlaceholderPage title="Сабақ кесте" />} />
-            <Route path="/student/materials" element={<PlaceholderPage title="Материалдар" />} />
-            <Route path="/student/achievements" element={<PlaceholderPage title="Жетістіктер" />} />
+            <Route path="/student/schedule" element={<SchedulePage />} />
+            <Route path="/student/materials" element={<MaterialsPage />} />
+            <Route path="/student/achievements" element={<AchievementsPage />} />
+            <Route path="/student/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Parent */}
           <Route element={<DashboardLayout roleName="Ата-ана" navItems={parentNav} userName="Назарбеков Б." />}>
-            <Route path="/parent" element={<PlaceholderPage title="Ата-ана панелі" />} />
-            <Route path="/parent/grades" element={<PlaceholderPage title="Бағалар" />} />
-            <Route path="/parent/attendance" element={<PlaceholderPage title="Қатысулар" />} />
-            <Route path="/parent/homework" element={<PlaceholderPage title="Үй тапсырмалар" />} />
-            <Route path="/parent/messages" element={<PlaceholderPage title="Хабарламалар" />} />
-            <Route path="/parent/schedule" element={<PlaceholderPage title="Сабақ кесте" />} />
+            <Route path="/parent" element={<ParentHome />} />
+            <Route path="/parent/grades" element={<GradesPage />} />
+            <Route path="/parent/attendance" element={<AttendancePage />} />
+            <Route path="/parent/homework" element={<HomeworkPage />} />
+            <Route path="/parent/messages" element={<MessagesPage />} />
+            <Route path="/parent/schedule" element={<SchedulePage />} />
+            <Route path="/parent/profile" element={<ProfilePage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
