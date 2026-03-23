@@ -4,23 +4,59 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GraduationCap, Eye, EyeOff, ScanFace } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn } = useAuth();
+  const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const roleRoutes: Record<string, string> = {
+    super_admin: "/super-admin",
+    director: "/director",
+    zavuch: "/zavuch",
+    teacher: "/teacher",
+    student: "/student",
+    parent: "/parent",
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Demo: navigate based on simple logic
-    if (email.includes("admin")) navigate("/super-admin");
-    else if (email.includes("director")) navigate("/director");
-    else if (email.includes("zavuch")) navigate("/zavuch");
-    else if (email.includes("teacher")) navigate("/teacher");
-    else if (email.includes("student")) navigate("/student");
-    else if (email.includes("parent")) navigate("/parent");
-    else navigate("/super-admin");
+    setLoading(true);
+
+    const { error } = await signIn(email, password);
+
+    if (error) {
+      toast({
+        title: "Қате",
+        description: error.message === "Invalid login credentials"
+          ? "Email немесе құпия сөз қате"
+          : error.message,
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Fetch role after login to redirect
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+
+      const userRole = roles?.[0]?.role || "student";
+      navigate(roleRoutes[userRole] || "/student");
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -79,8 +115,8 @@ export default function Login() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              Кіру
+            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              {loading ? "Кіру..." : "Кіру"}
             </Button>
 
             <Button type="button" variant="outline" className="w-full gap-2" size="lg">
