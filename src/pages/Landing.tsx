@@ -147,7 +147,7 @@ const content = {
       subtitle: "Application reviewed within 1–2 business days",
       button: "Register",
     },
-    footer: "© 2025 BilimApp. All rights reserved.",
+    footer: "© 2026 BilimApp. All rights reserved.",
   },
 };
 
