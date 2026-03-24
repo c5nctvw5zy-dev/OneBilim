@@ -137,7 +137,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
 
           {/* Super Admin */}
-          <Route element={<DashboardLayout roleName="Super Admin" navItems={superAdminNav} userName="Admin" />}>
+          <Route element={<ProtectedRoute allowedRoles={["super_admin"]}><DashboardLayout roleName="Super Admin" navItems={superAdminNav} userName="Admin" /></ProtectedRoute>}>
             <Route path="/super-admin" element={<SuperAdminHome />} />
             <Route path="/super-admin/schools" element={<SuperAdminSchools />} />
             <Route path="/super-admin/applications" element={<SuperAdminApplications />} />
@@ -150,7 +150,7 @@ const App = () => (
           </Route>
 
           {/* Director */}
-          <Route element={<DashboardLayout roleName="Директор" navItems={directorNav} userName="Ахметова А." />}>
+          <Route element={<ProtectedRoute allowedRoles={["director"]}><DashboardLayout roleName="Директор" navItems={directorNav} userName="Ахметова А." /></ProtectedRoute>}>
             <Route path="/director" element={<DirectorHome />} />
             <Route path="/director/classes" element={<DirectorClasses />} />
             <Route path="/director/teachers" element={<DirectorTeachers />} />
@@ -164,7 +164,7 @@ const App = () => (
           </Route>
 
           {/* Zavuch */}
-          <Route element={<DashboardLayout roleName="Завуч" navItems={zavuchNav} userName="Мұхтарова Д." />}>
+          <Route element={<ProtectedRoute allowedRoles={["zavuch"]}><DashboardLayout roleName="Завуч" navItems={zavuchNav} userName="Мұхтарова Д." /></ProtectedRoute>}>
             <Route path="/zavuch" element={<ZavuchHome />} />
             <Route path="/zavuch/class" element={<PlaceholderPage title="Сынып" />} />
             <Route path="/zavuch/journal" element={<PlaceholderPage title="Журнал мониторинг" />} />
@@ -177,7 +177,7 @@ const App = () => (
           </Route>
 
           {/* Teacher */}
-          <Route element={<DashboardLayout roleName="Мұғалім" navItems={teacherNav} userName="Сейітов Қ." />}>
+          <Route element={<ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout roleName="Мұғалім" navItems={teacherNav} userName="Сейітов Қ." /></ProtectedRoute>}>
             <Route path="/teacher" element={<TeacherHome />} />
             <Route path="/teacher/journal" element={<PlaceholderPage title="Электронды журнал" />} />
             <Route path="/teacher/class" element={<PlaceholderPage title="Сынып" />} />
@@ -191,7 +191,7 @@ const App = () => (
           </Route>
 
           {/* Student */}
-          <Route element={<DashboardLayout roleName="Оқушы" navItems={studentNav} userName="Назарбекова А." />}>
+          <Route element={<ProtectedRoute allowedRoles={["student"]}><DashboardLayout roleName="Оқушы" navItems={studentNav} userName="Назарбекова А." /></ProtectedRoute>}>
             <Route path="/student" element={<StudentHome />} />
             <Route path="/student/grades" element={<GradesPage />} />
             <Route path="/student/homework" element={<HomeworkPage canUpload />} />
@@ -203,7 +203,7 @@ const App = () => (
           </Route>
 
           {/* Parent */}
-          <Route element={<DashboardLayout roleName="Ата-ана" navItems={parentNav} userName="Назарбеков Б." />}>
+          <Route element={<ProtectedRoute allowedRoles={["parent"]}><DashboardLayout roleName="Ата-ана" navItems={parentNav} userName="Назарбеков Б." /></ProtectedRoute>}>
             <Route path="/parent" element={<ParentHome />} />
             <Route path="/parent/grades" element={<GradesPage />} />
             <Route path="/parent/attendance" element={<AttendancePage />} />
