@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 
 import DashboardLayout from "@/components/DashboardLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Super Admin
 import SuperAdminHome from "./pages/superadmin/SuperAdminHome";
