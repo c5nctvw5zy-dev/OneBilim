@@ -103,7 +103,7 @@ const content = {
       subtitle: "Заявка рассматривается в течение 1–2 рабочих дней",
       button: "Регистрация",
     },
-    footer: "© 2025 BilimApp. Все права защищены.",
+    footer: "© 2026 BilimApp. Все права защищены.",
   },
   en: {
     nav: { login: "Log in", register: "Register School" },
