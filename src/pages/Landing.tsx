@@ -59,7 +59,7 @@ const content = {
       subtitle: "1–2 жұмыс күні ішінде өтінім қаралады",
       button: "Тіркелу",
     },
-    footer: "© 2025 BilimApp. Барлық құқықтар қорғалған.",
+    footer: "© 2026 BilimApp. Барлық құқықтар қорғалған.",
   },
   ru: {
     nav: { login: "Войти", register: "Регистрация школы" },
@@ -103,7 +103,7 @@ const content = {
       subtitle: "Заявка рассматривается в течение 1–2 рабочих дней",
       button: "Регистрация",
     },
-    footer: "© 2025 BilimApp. Все права защищены.",
+    footer: "© 2026 BilimApp. Все права защищены.",
   },
   en: {
     nav: { login: "Log in", register: "Register School" },
@@ -147,7 +147,7 @@ const content = {
       subtitle: "Application reviewed within 1–2 business days",
       button: "Register",
     },
-    footer: "© 2025 BilimApp. All rights reserved.",
+    footer: "© 2026 BilimApp. All rights reserved.",
   },
 };
 
