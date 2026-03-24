@@ -19,19 +19,36 @@ Deno.serve(async (req) => {
     { email: "teacher@bilimapp.kz", password: "Demo123!", fullName: "Мұғалім Сабақов", role: "teacher" },
     { email: "student@bilimapp.kz", password: "Demo123!", fullName: "Оқушы Білімов", role: "student" },
     { email: "parent@bilimapp.kz", password: "Demo123!", fullName: "Ата-ана Балаев", role: "parent" },
-  ];
+  ] as const;
 
   const results = [];
+  const { data: existing, error: listError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+
+  if (listError) {
+    return new Response(JSON.stringify({ success: false, error: listError.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   for (const u of demoUsers) {
-    // Check if user exists
-    const { data: existing } = await admin.auth.admin.listUsers();
-    const found = existing?.users?.find((x: any) => x.email === u.email);
-    
+    const found = existing.users.find((x) => x.email === u.email);
+
     let userId: string;
     if (found) {
-      userId = found.id;
-      results.push({ email: u.email, status: "exists", role: u.role });
+      const { data: updatedUser, error: updateUserError } = await admin.auth.admin.updateUserById(found.id, {
+        password: u.password,
+        email_confirm: true,
+        user_metadata: { full_name: u.fullName },
+      });
+
+      if (updateUserError) {
+        results.push({ email: u.email, status: "error", error: updateUserError.message });
+        continue;
+      }
+
+      userId = updatedUser.user.id;
+      results.push({ email: u.email, status: "updated", role: u.role });
     } else {
       const { data, error } = await admin.auth.admin.createUser({
         email: u.email,
@@ -39,15 +56,16 @@ Deno.serve(async (req) => {
         email_confirm: true,
         user_metadata: { full_name: u.fullName },
       });
+
       if (error) {
         results.push({ email: u.email, status: "error", error: error.message });
         continue;
       }
+
       userId = data.user.id;
       results.push({ email: u.email, status: "created", role: u.role });
     }
 
-    // Ensure role exists
     const { data: roleExists } = await admin.from("user_roles").select("id").eq("user_id", userId).eq("role", u.role);
     if (!roleExists || roleExists.length === 0) {
       await admin.from("user_roles").insert({ user_id: userId, role: u.role });
