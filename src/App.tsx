@@ -28,12 +28,17 @@ import DirectorHome from "./pages/director/DirectorHome";
 import DirectorClasses from "./pages/director/DirectorClasses";
 import DirectorTeachers from "./pages/director/DirectorTeachers";
 import DirectorStudents from "./pages/director/DirectorStudents";
+import DirectorImport from "./pages/director/DirectorImport";
+import DirectorDocuments from "./pages/director/DirectorDocuments";
+import DirectorAnalytics from "./pages/director/DirectorAnalytics";
+import DirectorSettings from "./pages/director/DirectorSettings";
 
 // Zavuch
 import ZavuchHome from "./pages/zavuch/ZavuchHome";
 
 // Teacher
 import TeacherHome from "./pages/teacher/TeacherHome";
+import TeacherStats from "./pages/teacher/TeacherStats";
 
 // Student
 import StudentHome from "./pages/student/StudentHome";
@@ -49,8 +54,10 @@ import AttendancePage from "./pages/shared/AttendancePage";
 import MaterialsPage from "./pages/shared/MaterialsPage";
 import MessagesPage from "./pages/shared/MessagesPage";
 import AchievementsPage from "./pages/shared/AchievementsPage";
-
-import PlaceholderPage from "@/components/PlaceholderPage";
+import JournalPage from "./pages/shared/JournalPage";
+import TestsPage from "./pages/shared/TestsPage";
+import DocumentsPage from "./pages/shared/DocumentsPage";
+import ClassPage from "./pages/shared/ClassPage";
 
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar, Upload, FileCheck,
@@ -98,7 +105,7 @@ const teacherNav = [
   { title: "Үй тапсырма", path: "/teacher/homework", icon: ClipboardList },
   { title: "Сабақ кесте", path: "/teacher/schedule", icon: Calendar },
   { title: "Тесттер", path: "/teacher/tests", icon: FileText },
-  { title: "Материалдар", path: "/teacher/materials", icon: Upload },
+  { title: "Материалдар", path: "/teacher/materials", icon: MaterialsPage ? Upload : Upload },
   { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
   { title: "Статистика", path: "/teacher/stats", icon: BarChart3 },
 ];
@@ -156,19 +163,19 @@ const App = () => (
             <Route path="/director/teachers" element={<DirectorTeachers />} />
             <Route path="/director/students" element={<DirectorStudents />} />
             <Route path="/director/schedule" element={<SchedulePage />} />
-            <Route path="/director/import" element={<PlaceholderPage title="Excel импорт" />} />
-            <Route path="/director/documents" element={<PlaceholderPage title="Құжаттар" />} />
-            <Route path="/director/analytics" element={<PlaceholderPage title="Аналитика" />} />
-            <Route path="/director/settings" element={<PlaceholderPage title="Баптаулар" />} />
+            <Route path="/director/import" element={<DirectorImport />} />
+            <Route path="/director/documents" element={<DirectorDocuments />} />
+            <Route path="/director/analytics" element={<DirectorAnalytics />} />
+            <Route path="/director/settings" element={<DirectorSettings />} />
             <Route path="/director/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Zavuch */}
           <Route element={<ProtectedRoute allowedRoles={["zavuch"]}><DashboardLayout roleName="Завуч" navItems={zavuchNav} userName="Мұхтарова Д." /></ProtectedRoute>}>
             <Route path="/zavuch" element={<ZavuchHome />} />
-            <Route path="/zavuch/class" element={<PlaceholderPage title="Сынып" />} />
-            <Route path="/zavuch/journal" element={<PlaceholderPage title="Журнал мониторинг" />} />
-            <Route path="/zavuch/documents" element={<PlaceholderPage title="Құжаттар" />} />
+            <Route path="/zavuch/class" element={<ClassPage />} />
+            <Route path="/zavuch/journal" element={<JournalPage />} />
+            <Route path="/zavuch/documents" element={<DocumentsPage />} />
             <Route path="/zavuch/schedule" element={<SchedulePage />} />
             <Route path="/zavuch/performance" element={<GradesPage />} />
             <Route path="/zavuch/attendance" element={<AttendancePage />} />
@@ -179,14 +186,14 @@ const App = () => (
           {/* Teacher */}
           <Route element={<ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout roleName="Мұғалім" navItems={teacherNav} userName="Сейітов Қ." /></ProtectedRoute>}>
             <Route path="/teacher" element={<TeacherHome />} />
-            <Route path="/teacher/journal" element={<PlaceholderPage title="Электронды журнал" />} />
-            <Route path="/teacher/class" element={<PlaceholderPage title="Сынып" />} />
+            <Route path="/teacher/journal" element={<JournalPage />} />
+            <Route path="/teacher/class" element={<ClassPage />} />
             <Route path="/teacher/homework" element={<HomeworkPage />} />
             <Route path="/teacher/schedule" element={<SchedulePage />} />
-            <Route path="/teacher/tests" element={<PlaceholderPage title="Тесттер" />} />
+            <Route path="/teacher/tests" element={<TestsPage isTeacher />} />
             <Route path="/teacher/materials" element={<MaterialsPage />} />
-            <Route path="/teacher/documents" element={<PlaceholderPage title="Құжаттар" />} />
-            <Route path="/teacher/stats" element={<PlaceholderPage title="Статистика" />} />
+            <Route path="/teacher/documents" element={<DocumentsPage />} />
+            <Route path="/teacher/stats" element={<TeacherStats />} />
             <Route path="/teacher/profile" element={<ProfilePage />} />
           </Route>
 
@@ -195,7 +202,7 @@ const App = () => (
             <Route path="/student" element={<StudentHome />} />
             <Route path="/student/grades" element={<GradesPage />} />
             <Route path="/student/homework" element={<HomeworkPage canUpload />} />
-            <Route path="/student/tests" element={<PlaceholderPage title="Тесттер" />} />
+            <Route path="/student/tests" element={<TestsPage />} />
             <Route path="/student/schedule" element={<SchedulePage />} />
             <Route path="/student/materials" element={<MaterialsPage />} />
             <Route path="/student/achievements" element={<AchievementsPage />} />
