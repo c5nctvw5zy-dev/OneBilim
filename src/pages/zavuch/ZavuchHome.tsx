@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import { Home, Calendar, FileCheck, BookOpen, ClipboardList } from "lucide-react";
 
 export default function ZavuchHome() {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -15,9 +18,9 @@ export default function ZavuchHome() {
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <h3 className="mb-4 text-base font-semibold text-card-foreground">Жылдам әрекеттер</h3>
           <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start gap-2"><Calendar className="h-4 w-4" /> Кестені тексеру</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><FileCheck className="h-4 w-4" /> Құжаттарға қол қою</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><ClipboardList className="h-4 w-4" /> Журнал мониторинг қарау</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/schedule")}><Calendar className="h-4 w-4" /> Кестені тексеру</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/documents")}><FileCheck className="h-4 w-4" /> Құжаттарға қол қою</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/journal")}><ClipboardList className="h-4 w-4" /> Журнал мониторинг қарау</Button>
           </div>
         </div>
         <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5 shadow-sm">

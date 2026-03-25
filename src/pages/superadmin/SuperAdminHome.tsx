@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import { School, Users, Activity, FileText, Plus, Bell, ClipboardList } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const recentActions = [
   { text: "№45 мектеп тіркелу өтінімін жіберді", time: "2 сағат бұрын" },
@@ -10,6 +12,9 @@ const recentActions = [
 ];
 
 export default function SuperAdminHome() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -20,23 +25,21 @@ export default function SuperAdminHome() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Quick actions */}
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <h3 className="mb-4 text-base font-semibold text-card-foreground">Жылдам әрекеттер</h3>
           <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start gap-2">
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/super-admin/schools")}>
               <Plus className="h-4 w-4" /> Мектеп қосу
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-2">
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/super-admin/applications")}>
               <ClipboardList className="h-4 w-4" /> Өтінімдерді қабылдау
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-2">
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => toast({ title: "Хабарландыру жіберілді!", description: "Барлық мектептерге жаңа хабарландыру жіберілді." })}>
               <Bell className="h-4 w-4" /> Хабарландыру жіберу
             </Button>
           </div>
         </div>
 
-        {/* Recent actions */}
         <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5 shadow-sm">
           <h3 className="mb-4 text-base font-semibold text-card-foreground">Соңғы әрекеттер</h3>
           <div className="space-y-3">

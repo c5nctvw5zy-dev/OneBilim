@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import { Users, GraduationCap, TrendingUp, CheckCircle, BarChart3, Bell, Eye, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const topStudents = [
   { name: "Назарбекова Айым", class: "11А", avg: 4.9 },
@@ -11,6 +13,9 @@ const topStudents = [
 ];
 
 export default function DirectorHome() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -24,15 +29,15 @@ export default function DirectorHome() {
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <h3 className="mb-4 text-base font-semibold text-card-foreground">Жылдам әрекеттер</h3>
           <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start gap-2"><BarChart3 className="h-4 w-4" /> Жалпы статистика қарау</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><Bell className="h-4 w-4" /> Хабарландыруларды оқу</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><Eye className="h-4 w-4" /> Оқушыларды бақылау</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><FileText className="h-4 w-4" /> Бұйрық шығару</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/analytics")}><BarChart3 className="h-4 w-4" /> Жалпы статистика қарау</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => toast({ title: "Хабарландырулар", description: "3 жаңа хабарландыру бар." })}><Bell className="h-4 w-4" /> Хабарландыруларды оқу</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/students")}><Eye className="h-4 w-4" /> Оқушыларды бақылау</Button>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/documents")}><FileText className="h-4 w-4" /> Бұйрық шығару</Button>
           </div>
         </div>
 
         <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="mb-4 text-base font-semibold text-card-foreground">ТОП-10 үздік оқушы</h3>
+          <h3 className="mb-4 text-base font-semibold text-card-foreground">ТОП-5 үздік оқушы</h3>
           <div className="space-y-2">
             {topStudents.map((s, i) => (
               <div key={s.name} className="flex items-center justify-between rounded-lg border border-border p-3">
