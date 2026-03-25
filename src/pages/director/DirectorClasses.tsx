@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-const demoClasses = [
+const initialClasses = [
   { id: 1, name: "1А", grade: 1, section: "А", teacher: "Сейітова Г.", students: 28 },
   { id: 2, name: "1Б", grade: 1, section: "Б", teacher: "Мұхтарова Д.", students: 30 },
   { id: 3, name: "5А", grade: 5, section: "А", teacher: "Қасымов Б.", students: 32 },
@@ -13,8 +14,28 @@ const demoClasses = [
 ];
 
 export default function DirectorClasses() {
+  const [classes, setClasses] = useState(initialClasses);
   const [searchQuery, setSearchQuery] = useState("");
-  const filtered = demoClasses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.teacher.toLowerCase().includes(searchQuery.toLowerCase()));
+  const [showAdd, setShowAdd] = useState(false);
+  const [newGrade, setNewGrade] = useState("");
+  const [newSection, setNewSection] = useState("");
+  const [newTeacher, setNewTeacher] = useState("");
+  const { toast } = useToast();
+
+  const filtered = classes.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.teacher.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const handleAdd = () => {
+    if (!newGrade || !newSection) return;
+    const name = `${newGrade}${newSection}`;
+    setClasses([...classes, { id: Date.now(), name, grade: parseInt(newGrade), section: newSection, teacher: newTeacher || "—", students: 0 }]);
+    setNewGrade(""); setNewSection(""); setNewTeacher(""); setShowAdd(false);
+    toast({ title: "Сынып қосылды!", description: name });
+  };
+
+  const handleDelete = (id: number) => {
+    setClasses(classes.filter(c => c.id !== id));
+    toast({ title: "Сынып жойылды", variant: "destructive" });
+  };
 
   return (
     <div className="space-y-6">
@@ -25,9 +46,25 @@ export default function DirectorClasses() {
             <Search className="h-4 w-4 text-muted-foreground" />
             <input placeholder="Іздеу..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-40 bg-transparent text-sm outline-none" />
           </div>
-          <Button className="gap-2"><Plus className="h-4 w-4" /> Сынып қосу</Button>
+          <Button className="gap-2" onClick={() => setShowAdd(!showAdd)}><Plus className="h-4 w-4" /> Сынып қосу</Button>
         </div>
       </div>
+
+      {showAdd && (
+        <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-4">
+          <h3 className="font-semibold text-card-foreground">Жаңа сынып</h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Input placeholder="Сынып (мыс: 5)" value={newGrade} onChange={e => setNewGrade(e.target.value)} />
+            <Input placeholder="Бөлім (мыс: А)" value={newSection} onChange={e => setNewSection(e.target.value)} />
+            <Input placeholder="Сынып жетекшісі" value={newTeacher} onChange={e => setNewTeacher(e.target.value)} />
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleAdd}>Қосу</Button>
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Болдырмау</Button>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -48,8 +85,8 @@ export default function DirectorClasses() {
                 <td className="px-4 py-3 text-muted-foreground">{c.students} оқушы</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => toast({ title: "Өңдеу", description: `${c.name} сыныбы өңделуде...` })}><Edit className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </div>
                 </td>
               </tr>
