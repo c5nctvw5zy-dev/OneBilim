@@ -258,6 +258,43 @@ export default function Login() {
                 </Button>
               </form>
 
+              <div className="mt-6 space-y-3">
+                <p className="text-xs text-center text-muted-foreground font-medium uppercase tracking-wider">Демо кіру</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Админ", alias: "superadmin", icon: "👑" },
+                    { label: "Директор", alias: "director", icon: "🏫" },
+                    { label: "Завуч", alias: "zavuch", icon: "📋" },
+                    { label: "Мұғалім", alias: "teacher", icon: "👨‍🏫" },
+                    { label: "Оқушы", alias: "student", icon: "🎓" },
+                    { label: "Ата-ана", alias: "parent", icon: "👪" },
+                  ].map((demo) => (
+                    <Button
+                      key={demo.alias}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={loading}
+                      className="text-xs gap-1"
+                      onClick={async () => {
+                        setLoading(true);
+                        const demoEmail = demoLoginAliases[demo.alias]!;
+                        const { error, user } = await signIn(demoEmail, "Demo123!");
+                        if (error) {
+                          toast({ title: "Қате", description: error.message, variant: "destructive" });
+                          setLoading(false);
+                          return;
+                        }
+                        await navigateByRole(user?.id);
+                        setLoading(false);
+                      }}
+                    >
+                      <span>{demo.icon}</span> {demo.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Мектебіңіз тіркелмеген бе?{" "}
                 <Link to="/register" className="text-primary font-medium hover:underline">
