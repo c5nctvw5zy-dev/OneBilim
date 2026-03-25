@@ -7,6 +7,22 @@ import { GraduationCap, Eye, EyeOff, ScanFace, Camera, XCircle } from "lucide-re
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
+const demoLoginAliases: Record<string, string> = {
+  admin: "superadmin@bilimapp.kz",
+  superadmin: "superadmin@bilimapp.kz",
+  director: "director@bilimapp.kz",
+  zavuch: "zavuch@bilimapp.kz",
+  teacher: "teacher@bilimapp.kz",
+  student: "student@bilimapp.kz",
+  parent: "parent@bilimapp.kz",
+};
+
+const normalizeLoginIdentifier = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  if (normalized.includes("@")) return normalized;
+  return demoLoginAliases[normalized] ?? normalized;
+};
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,23 +46,29 @@ export default function Login() {
     parent: "/parent",
   };
 
-  const navigateByRole = async () => {
+  const navigateByRole = async (userId?: string | null) => {
     const { supabase } = await import("@/integrations/supabase/client");
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-      const userRole = roles?.[0]?.role || "student";
-      navigate(roleRoutes[userRole] || "/student");
+    const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
+
+    if (!resolvedUserId) {
+      navigate("/login");
+      return;
     }
+
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", resolvedUserId)
+      .maybeSingle();
+
+    const userRole = roleRow?.role || "student";
+    navigate(roleRoutes[userRole] || "/student", { replace: true });
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error, user } = await signIn(normalizeLoginIdentifier(email), password);
     if (error) {
       toast({
         title: "Қате",
@@ -56,7 +78,7 @@ export default function Login() {
       setLoading(false);
       return;
     }
-    await navigateByRole();
+    await navigateByRole(user?.id);
     setLoading(false);
   };
 
