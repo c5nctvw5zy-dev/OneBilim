@@ -105,7 +105,7 @@ const teacherNav = [
   { title: "Үй тапсырма", path: "/teacher/homework", icon: ClipboardList },
   { title: "Сабақ кесте", path: "/teacher/schedule", icon: Calendar },
   { title: "Тесттер", path: "/teacher/tests", icon: FileText },
-  { title: "Материалдар", path: "/teacher/materials", icon: MaterialsPage ? Upload : Upload },
+  { title: "Материалдар", path: "/teacher/materials", icon: Upload },
   { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
   { title: "Статистика", path: "/teacher/stats", icon: BarChart3 },
 ];
