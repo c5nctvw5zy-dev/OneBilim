@@ -1,21 +1,52 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GraduationCap, ChevronRight, ChevronLeft, CheckCircle2, Upload } from "lucide-react";
+import { GraduationCap, ChevronRight, ChevronLeft, CheckCircle2, Upload, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const steps = ["Мектеп туралы", "Директор", "Құжаттар", "Растау"];
 
 export default function Register() {
   const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     schoolName: "", bin: "", schoolType: "", region: "", city: "", address: "", phone: "", email: "",
-    dirLastName: "", dirFirstName: "", dirMiddleName: "", dirIIN: "", dirPhone: "", dirEmail: "", dirPassword: "",
+    dirName: "", dirIIN: "", dirPhone: "", dirEmail: "",
     agreed: false,
   });
 
   const set = (key: string, val: string | boolean) => setForm({ ...form, [key]: val });
+
+  const handleSubmit = async () => {
+    if (!form.agreed) return;
+    setSubmitting(true);
+    const { error } = await supabase.from("applications").insert({
+      school_name: form.schoolName,
+      bin: form.bin,
+      school_type: form.schoolType,
+      region: form.region,
+      city: form.city,
+      address: form.address,
+      phone: form.phone,
+      email: form.email,
+      director_name: form.dirName,
+      director_iin: form.dirIIN,
+      director_phone: form.dirPhone,
+      director_email: form.dirEmail,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast({ title: "Қате!", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Өтінім жіберілді!", description: "1-2 жұмыс күні ішінде тексеріледі." });
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,7 +63,6 @@ export default function Register() {
         <h1 className="mb-2 text-2xl font-bold text-foreground animate-fade-in">Мектепті тіркеу</h1>
         <p className="mb-8 text-sm text-muted-foreground animate-fade-in">Анкетаны толтырып, өтінім жіберіңіз</p>
 
-        {/* Steps */}
         <div className="mb-10 flex items-center gap-2 animate-fade-in" style={{ animationDelay: "100ms" }}>
           {steps.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
@@ -47,7 +77,6 @@ export default function Register() {
           ))}
         </div>
 
-        {/* Step content */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm animate-scale-in">
           {step === 0 && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -61,19 +90,14 @@ export default function Register() {
               <div className="space-y-2"><Label>Email *</Label><Input value={form.email} onChange={e => set("email", e.target.value)} placeholder="school@mail.kz" /></div>
             </div>
           )}
-
           {step === 1 && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2"><Label>Тегі *</Label><Input value={form.dirLastName} onChange={e => set("dirLastName", e.target.value)} /></div>
-              <div className="space-y-2"><Label>Аты *</Label><Input value={form.dirFirstName} onChange={e => set("dirFirstName", e.target.value)} /></div>
-              <div className="space-y-2"><Label>Әкесінің аты</Label><Input value={form.dirMiddleName} onChange={e => set("dirMiddleName", e.target.value)} /></div>
+              <div className="sm:col-span-2 space-y-2"><Label>Аты-жөні *</Label><Input value={form.dirName} onChange={e => set("dirName", e.target.value)} placeholder="Сейтова Гүлнар Мұхтарқызы" /></div>
               <div className="space-y-2"><Label>ЖСН *</Label><Input value={form.dirIIN} onChange={e => set("dirIIN", e.target.value)} placeholder="123456789012" /></div>
               <div className="space-y-2"><Label>Телефон *</Label><Input value={form.dirPhone} onChange={e => set("dirPhone", e.target.value)} placeholder="+7 (777) 123-45-67" /></div>
-              <div className="space-y-2"><Label>Email *</Label><Input value={form.dirEmail} onChange={e => set("dirEmail", e.target.value)} /></div>
-              <div className="sm:col-span-2 space-y-2"><Label>Құпия сөз *</Label><Input type="password" value={form.dirPassword} onChange={e => set("dirPassword", e.target.value)} /></div>
+              <div className="sm:col-span-2 space-y-2"><Label>Email *</Label><Input value={form.dirEmail} onChange={e => set("dirEmail", e.target.value)} /></div>
             </div>
           )}
-
           {step === 2 && (
             <div className="space-y-6">
               {[
@@ -91,16 +115,16 @@ export default function Register() {
                   </label>
                 </div>
               ))}
+              <p className="text-xs text-muted-foreground">* Құжаттарды жүктеу міндетті емес, кейін қоса аласыз</p>
             </div>
           )}
-
           {step === 3 && (
             <div className="space-y-6">
               <div className="rounded-lg bg-muted p-4 text-sm space-y-2">
                 <p><strong>Мектеп:</strong> {form.schoolName || "—"}</p>
                 <p><strong>БИН:</strong> {form.bin || "—"}</p>
-                <p><strong>Облыс:</strong> {form.region || "—"}</p>
-                <p><strong>Директор:</strong> {form.dirLastName} {form.dirFirstName}</p>
+                <p><strong>Облыс/Қала:</strong> {form.region}, {form.city}</p>
+                <p><strong>Директор:</strong> {form.dirName || "—"}</p>
                 <p><strong>Email:</strong> {form.dirEmail || "—"}</p>
               </div>
               <div className="rounded-lg border border-warning/30 bg-warning/5 p-4 text-sm text-foreground">
@@ -114,18 +138,16 @@ export default function Register() {
           )}
         </div>
 
-        {/* Navigation */}
         <div className="mt-6 flex justify-between">
           <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
             <ChevronLeft className="h-4 w-4" /> Артқа
           </Button>
           {step < 3 ? (
-            <Button onClick={() => setStep(step + 1)}>
-              Келесі <ChevronRight className="h-4 w-4" />
-            </Button>
+            <Button onClick={() => setStep(step + 1)}>Келесі <ChevronRight className="h-4 w-4" /></Button>
           ) : (
-            <Button disabled={!form.agreed} variant="success">
-              Өтінім жіберу <CheckCircle2 className="h-4 w-4" />
+            <Button disabled={!form.agreed || submitting} variant="success" onClick={handleSubmit}>
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Өтінім жіберу
             </Button>
           )}
         </div>
