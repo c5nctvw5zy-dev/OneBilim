@@ -90,7 +90,7 @@ const directorNav = [
 const zavuchNav = [
   { title: "Басты бет", path: "/zavuch", icon: Home },
   { title: "Сынып", path: "/zavuch/class", icon: BookMarked },
-  { title: "Журнал мониторинг", path: "/zavuch/journal", icon: BookOpen },
+  { title: "Электронды журнал", path: "/zavuch/journal", icon: BookOpen },
   { title: "Құжаттар", path: "/zavuch/documents", icon: FileCheck },
   { title: "Сабақ кесте", path: "/zavuch/schedule", icon: Calendar },
   { title: "Үлгерім", path: "/zavuch/performance", icon: BarChart3 },
