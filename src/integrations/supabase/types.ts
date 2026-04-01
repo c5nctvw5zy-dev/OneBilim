@@ -187,6 +187,54 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          category: string | null
+          created_at: string
+          file_name: string | null
+          file_size: string | null
+          file_url: string | null
+          id: string
+          school_id: string
+          signature_url: string | null
+          signed_at: string | null
+          signed_by: string | null
+          status: string | null
+          title: string
+          uploaded_by: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: string | null
+          file_url?: string | null
+          id?: string
+          school_id: string
+          signature_url?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string | null
+          title: string
+          uploaded_by: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: string | null
+          file_url?: string | null
+          id?: string
+          school_id?: string
+          signature_url?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string | null
+          title?: string
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
       grades: {
         Row: {
           created_at: string
@@ -345,6 +393,45 @@ export type Database = {
           },
         ]
       }
+      materials: {
+        Row: {
+          created_at: string
+          file_name: string | null
+          file_size: string | null
+          file_type: string | null
+          file_url: string | null
+          id: string
+          school_id: string
+          subject_id: string | null
+          title: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name?: string | null
+          file_size?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          school_id: string
+          subject_id?: string | null
+          title: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string | null
+          file_size?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          school_id?: string
+          subject_id?: string | null
+          title?: string
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
       parent_students: {
         Row: {
           id: string
@@ -424,6 +511,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      schedules: {
+        Row: {
+          class_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string | null
+          id: string
+          lesson_order: number
+          school_id: string
+          start_time: string | null
+          subject_id: string
+          teacher_id: string | null
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          day_of_week: number
+          end_time?: string | null
+          id?: string
+          lesson_order: number
+          school_id: string
+          start_time?: string | null
+          subject_id: string
+          teacher_id?: string | null
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string | null
+          id?: string
+          lesson_order?: number
+          school_id?: string
+          start_time?: string | null
+          subject_id?: string
+          teacher_id?: string | null
+        }
+        Relationships: []
       }
       schools: {
         Row: {
@@ -539,6 +665,83 @@ export type Database = {
           name?: string
           name_en?: string | null
           name_ru?: string | null
+        }
+        Relationships: []
+      }
+      test_questions: {
+        Row: {
+          correct_answer: string | null
+          id: string
+          option_a: string | null
+          option_b: string | null
+          option_c: string | null
+          option_d: string | null
+          question_order: number | null
+          question_text: string
+          test_id: string
+        }
+        Insert: {
+          correct_answer?: string | null
+          id?: string
+          option_a?: string | null
+          option_b?: string | null
+          option_c?: string | null
+          option_d?: string | null
+          question_order?: number | null
+          question_text: string
+          test_id: string
+        }
+        Update: {
+          correct_answer?: string | null
+          id?: string
+          option_a?: string | null
+          option_b?: string | null
+          option_c?: string | null
+          option_d?: string | null
+          question_order?: number | null
+          question_text?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tests: {
+        Row: {
+          class_id: string | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          status: string
+          subject_id: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          status?: string
+          subject_id: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          status?: string
+          subject_id?: string
+          teacher_id?: string
+          title?: string
         }
         Relationships: []
       }
