@@ -1,70 +1,229 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Upload, Download, Eye, Trash2, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { FileText, Download, Eye, Trash2, Plus, Loader2, PenTool, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-const initialDocs = [
-  { id: 1, name: "Сабақ жоспары - Математика 9А.docx", size: "180 KB", date: "2026-03-20", category: "Жоспар" },
-  { id: 2, name: "Бақылау жұмысы №3.pdf", size: "95 KB", date: "2026-03-18", category: "Тест" },
-  { id: 3, name: "КТЖ (күнтізбелік-тақырыптық жоспар).xlsx", size: "320 KB", date: "2026-02-15", category: "Жоспар" },
-  { id: 4, name: "Оқушылар тізімі - 10Б.pdf", size: "45 KB", date: "2026-03-01", category: "Тізім" },
-  { id: 5, name: "Сабақ конспектісі - Ньютон заңдары.pdf", size: "250 KB", date: "2026-03-22", category: "Конспект" },
-];
-
-const categoryColors: Record<string, string> = {
-  "Жоспар": "bg-primary/10 text-primary",
-  "Тест": "bg-warning/10 text-warning",
-  "Тізім": "bg-success/10 text-success",
-  "Конспект": "bg-muted text-muted-foreground",
-};
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function DocumentsPage() {
-  const [docs, setDocs] = useState(initialDocs);
+  const { user, role } = useAuth();
   const { toast } = useToast();
+  const [docs, setDocs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
+  const [showSign, setShowSign] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("ҚМЖ");
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
-  const handleUpload = () => {
-    const newDoc = { id: Date.now(), name: `Жаңа құжат_${docs.length + 1}.pdf`, size: "100 KB", date: new Date().toISOString().split("T")[0], category: "Конспект" };
-    setDocs([newDoc, ...docs]);
-    toast({ title: "Құжат жүктелді", description: newDoc.name });
+  const canManage = role === "zavuch" || role === "director";
+  const canUpload = role === "teacher" || canManage;
+
+  useEffect(() => { if (user) loadData(); }, [user]);
+
+  const loadData = async () => {
+    const { data: prof } = await supabase.from("profiles").select("id, school_id").eq("user_id", user!.id).single();
+    if (!prof?.school_id) { setLoading(false); return; }
+    setProfileId(prof.id);
+    setSchoolId(prof.school_id);
+    const { data } = await supabase.from("documents").select("*, uploader:uploaded_by(full_name), signer:signed_by(full_name)").eq("school_id", prof.school_id).order("created_at", { ascending: false });
+    setDocs(data || []);
+    setLoading(false);
   };
 
-  const handleDelete = (id: number) => {
-    setDocs(docs.filter(d => d.id !== id));
-    toast({ title: "Құжат жойылды", variant: "destructive" });
+  const handleUpload = async () => {
+    if (!file || !title || !profileId || !schoolId) { toast({ title: "Толтырыңыз", variant: "destructive" }); return; }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${schoolId}/${Date.now()}.${ext}`;
+    const { error: uploadErr } = await supabase.storage.from("documents").upload(path, file);
+    if (uploadErr) { toast({ title: "Қате", description: uploadErr.message, variant: "destructive" }); setUploading(false); return; }
+    const { data: { publicUrl } } = supabase.storage.from("documents").getPublicUrl(path);
+
+    const { error } = await supabase.from("documents").insert({
+      title, category, file_url: publicUrl, file_name: file.name,
+      file_size: `${(file.size / 1024).toFixed(0)} KB`,
+      uploaded_by: profileId, school_id: schoolId, status: "pending",
+    });
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); }
+    else { toast({ title: "Құжат жүктелді!" }); }
+    setShowUpload(false); setTitle(""); setFile(null);
+    setUploading(false);
+    loadData();
+  };
+
+  const handleDelete = async (id: string) => {
+    await supabase.from("documents").delete().eq("id", id);
+    setDocs(p => p.filter(d => d.id !== id));
+    toast({ title: "Жойылды" });
+  };
+
+  // Canvas signature
+  const startDraw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+    const rect = canvasRef.current!.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }, []);
+
+  const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+    const rect = canvasRef.current!.getBoundingClientRect();
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.strokeStyle = "#1a1a2e";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }, [isDrawing]);
+
+  const stopDraw = useCallback(() => setIsDrawing(false), []);
+
+  const clearCanvas = () => {
+    const ctx = canvasRef.current?.getContext("2d");
+    if (ctx) ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+  };
+
+  const handleSign = async (docId: string) => {
+    if (!canvasRef.current || !profileId || !schoolId) return;
+    const blob = await new Promise<Blob | null>(r => canvasRef.current!.toBlob(r, "image/png"));
+    if (!blob) return;
+    const path = `${schoolId}/sign_${Date.now()}.png`;
+    const { error: upErr } = await supabase.storage.from("signatures").upload(path, blob);
+    if (upErr) { toast({ title: "Қате", description: upErr.message, variant: "destructive" }); return; }
+    const { data: { publicUrl } } = supabase.storage.from("signatures").getPublicUrl(path);
+
+    await supabase.from("documents").update({ status: "signed", signed_by: profileId, signature_url: publicUrl, signed_at: new Date().toISOString() }).eq("id", docId);
+    toast({ title: "Қол қойылды!" });
+    setShowSign(null);
+    loadData();
+  };
+
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+
+  const categoryColors: Record<string, string> = { "ҚМЖ": "bg-primary/10 text-primary", "КТЖ": "bg-warning/10 text-warning", "Жоспар": "bg-success/10 text-success", "Тізім": "bg-muted text-muted-foreground" };
+  const statusLabels: Record<string, { label: string; cls: string }> = {
+    pending: { label: "Тексерілмеген", cls: "bg-warning/10 text-warning" },
+    signed: { label: "Қол қойылған", cls: "bg-success/10 text-success" },
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-xl font-bold text-foreground">Құжаттар</h2>
-        <Button onClick={handleUpload} className="gap-2"><Plus className="h-4 w-4" /> Құжат жүктеу</Button>
-      </div>
-      <div className="space-y-3">
-        {docs.map(d => (
-          <div key={d.id} className="rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted shrink-0">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
+        {canUpload && (
+          <Dialog open={showUpload} onOpenChange={setShowUpload}>
+            <DialogTrigger asChild>
+              <Button className="gap-2"><Plus className="h-4 w-4" /> Құжат жүктеу</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Құжат жүктеу</DialogTitle></DialogHeader>
+              <div className="space-y-3">
+                <Input placeholder="Атауы" value={title} onChange={e => setTitle(e.target.value)} />
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["ҚМЖ", "КТЖ", "Жоспар", "Тізім", "Жалпы"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <div>
+                  <input ref={fileRef} type="file" onChange={e => setFile(e.target.files?.[0] || null)} className="hidden" />
+                  <Button variant="outline" className="w-full" onClick={() => fileRef.current?.click()}>
+                    {file ? file.name : "Файл таңдау"}
+                  </Button>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{d.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${categoryColors[d.category] || "bg-muted text-muted-foreground"}`}>{d.category}</span>
-                    <span className="text-xs text-muted-foreground">{d.size}</span>
-                    <span className="text-xs text-muted-foreground">{d.date}</span>
+                <Button className="w-full" onClick={handleUpload} disabled={uploading}>
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Жүктеу
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+
+      {docs.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">Құжаттар жоқ</div>
+      ) : (
+        <div className="space-y-3">
+          {docs.map(d => {
+            const st = statusLabels[d.status] || statusLabels.pending;
+            return (
+              <div key={d.id} className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted shrink-0">
+                      <FileText className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{d.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${categoryColors[d.category] || "bg-muted text-muted-foreground"}`}>{d.category}</span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${st.cls}`}>{st.label}</span>
+                        <span className="text-xs text-muted-foreground">{d.file_size}</span>
+                        {d.uploader?.full_name && <span className="text-xs text-muted-foreground">{d.uploader.full_name}</span>}
+                      </div>
+                      {d.status === "signed" && d.signer?.full_name && (
+                        <p className="text-xs text-success mt-1">✓ {d.signer.full_name} қол қойды</p>
+                      )}
+                      {d.signature_url && (
+                        <img src={d.signature_url} alt="Қол" className="h-8 mt-1" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {d.file_url && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <a href={d.file_url} target="_blank" rel="noopener"><Download className="h-4 w-4" /></a>
+                      </Button>
+                    )}
+                    {canManage && d.status === "pending" && (
+                      <Dialog open={showSign === d.id} onOpenChange={v => { setShowSign(v ? d.id : null); if (!v) clearCanvas(); }}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="gap-1"><PenTool className="h-3.5 w-3.5" /> Қол қою</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader><DialogTitle>Онлайн қол қою</DialogTitle></DialogHeader>
+                          <p className="text-sm text-muted-foreground">Мышкамен қол қойыңыз:</p>
+                          <canvas
+                            ref={canvasRef}
+                            width={400}
+                            height={150}
+                            className="border border-border rounded-lg w-full cursor-crosshair bg-white"
+                            onMouseDown={startDraw}
+                            onMouseMove={draw}
+                            onMouseUp={stopDraw}
+                            onMouseLeave={stopDraw}
+                          />
+                          <div className="flex gap-2">
+                            <Button variant="outline" onClick={clearCanvas}>Тазалау</Button>
+                            <Button className="flex-1 gap-2" onClick={() => handleSign(d.id)}><Check className="h-4 w-4" /> Қол қою</Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                    {canManage && (
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(d.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <Button variant="ghost" size="icon" onClick={() => toast({ title: "Құжат ашылды", description: d.name })}><Eye className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => toast({ title: "Жүктелуде...", description: d.name })}><Download className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(d.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
