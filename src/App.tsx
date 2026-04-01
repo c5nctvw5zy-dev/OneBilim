@@ -181,6 +181,7 @@ const App = () => (
             <Route path="/zavuch/performance" element={<GradesPage />} />
             <Route path="/zavuch/attendance" element={<AttendancePage />} />
             <Route path="/zavuch/teachers" element={<DirectorTeachers />} />
+            <Route path="/zavuch/import" element={<DirectorImport />} />
             <Route path="/zavuch/profile" element={<ProfilePage />} />
           </Route>
 
