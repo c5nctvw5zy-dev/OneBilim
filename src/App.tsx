@@ -96,6 +96,7 @@ const zavuchNav = [
   { title: "Үлгерім", path: "/zavuch/performance", icon: BarChart3 },
   { title: "Қатысулар", path: "/zavuch/attendance", icon: CheckCircle },
   { title: "Мұғалімдер", path: "/zavuch/teachers", icon: Users },
+  { title: "Excel импорт", path: "/zavuch/import", icon: Upload },
 ];
 
 const teacherNav = [
