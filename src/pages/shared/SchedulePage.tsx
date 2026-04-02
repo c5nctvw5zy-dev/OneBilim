@@ -63,8 +63,10 @@ export default function SchedulePage() {
     setSubjects(subs || []);
 
     if (canManage) {
-      const { data: t } = await supabase.from("profiles").select("id, full_name").eq("school_id", prof.school_id);
-      setTeachers(t || []);
+      const { data: teacherRoles } = await supabase.from("user_roles").select("user_id").eq("role", "teacher");
+      const teacherUserIds = (teacherRoles || []).map(r => r.user_id);
+      const { data: allProfs } = await supabase.from("profiles").select("id, full_name, user_id").eq("school_id", prof.school_id);
+      setTeachers((allProfs || []).filter(p => teacherUserIds.includes(p.user_id)));
     }
     setLoading(false);
   };
