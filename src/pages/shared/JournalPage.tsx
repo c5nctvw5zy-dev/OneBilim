@@ -69,33 +69,28 @@ export default function JournalPage() {
     setProfileId(prof.id);
     setSchoolId(prof.school_id);
 
-    const { data: journalData } = await supabase
-      .from("journals")
-      .select("*, classes(*), subjects(*)")
-      .eq(role === "teacher" ? "teacher_id" : "class_id", role === "teacher" ? prof.id : prof.id);
+    // Load all classes for this school and all subjects first
+    const [classesRes, subsRes] = await Promise.all([
+      prof.school_id ? supabase.from("classes").select("*").eq("school_id", prof.school_id).order("name") : Promise.resolve({ data: [] }),
+      supabase.from("subjects").select("*").order("name"),
+    ]);
+    setClasses(classesRes.data || []);
+    setSubjects(subsRes.data || []);
 
-    // For teacher: fetch their journals. For zavuch/director: fetch school journals
+    // Load journals based on role
     let jData: any[] = [];
     if (role === "teacher") {
       const { data } = await supabase.from("journals").select("*, classes(*), subjects(*)").eq("teacher_id", prof.id);
       jData = data || [];
     } else {
       // Zavuch/Director see all school journals
-      const { data: schoolClasses } = await supabase.from("classes").select("id").eq("school_id", prof.school_id!);
-      if (schoolClasses && schoolClasses.length > 0) {
-        const classIds = schoolClasses.map(c => c.id);
+      const classIds = (classesRes.data || []).map((c: any) => c.id);
+      if (classIds.length > 0) {
         const { data } = await supabase.from("journals").select("*, classes(*), subjects(*)").in("class_id", classIds);
         jData = data || [];
       }
     }
     setJournals(jData);
-
-    if (prof.school_id) {
-      const { data: cls } = await supabase.from("classes").select("*").eq("school_id", prof.school_id);
-      setClasses(cls || []);
-    }
-    const { data: subs } = await supabase.from("subjects").select("*");
-    setSubjects(subs || []);
     setLoading(false);
   };
 
