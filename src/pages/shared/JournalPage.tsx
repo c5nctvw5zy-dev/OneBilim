@@ -213,7 +213,7 @@ export default function JournalPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h2 className="text-xl font-bold text-foreground">Электронды журнал</h2>
-        {role === "teacher" && (
+        {(role === "teacher" || role === "zavuch" || role === "director") && (
           <Dialog open={showCreate} onOpenChange={setShowCreate}>
             <DialogTrigger asChild>
               <Button className="gap-2"><Plus className="h-4 w-4" /> Журнал ашу</Button>
