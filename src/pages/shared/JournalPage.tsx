@@ -282,7 +282,7 @@ export default function JournalPage() {
         <div className="rounded-xl border border-border bg-card p-12 text-center">
           <BookOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-muted-foreground mb-4">Журналдар жоқ</p>
-          {role === "teacher" && (
+          {(role === "teacher" || role === "zavuch" || role === "director") && (
             <Button onClick={() => setShowCreate(true)} className="gap-2">
               <Plus className="h-4 w-4" /> Журнал ашу
             </Button>
