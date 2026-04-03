@@ -112,6 +112,20 @@ export default function SuperAdminApplications() {
     setReviewNote("");
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const { error } = await supabase.from("applications").delete().eq("id", deleteTarget.id);
+    if (error) {
+      toast({ title: "Қате", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Өтінім жойылды" });
+      setApplications(prev => prev.filter(a => a.id !== deleteTarget.id));
+    }
+    setDeleting(false);
+    setDeleteTarget(null);
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const pendingCount = applications.filter(a => a.status === "pending").length;
