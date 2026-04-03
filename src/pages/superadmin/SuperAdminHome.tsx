@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
-import { School, Users, Activity, FileText, Plus, Bell, ClipboardList, Loader2 } from "lucide-react";
+import { School, Users, Activity, FileText, Plus, Bell, ClipboardList, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function SuperAdminHome() {
   const navigate = useNavigate();
