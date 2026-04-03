@@ -1,0 +1,1 @@
+DROP VIEW IF EXISTS public.test_questions_student_view;

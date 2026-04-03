@@ -9,6 +9,17 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
+function SignatureImage({ path }: { path: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.storage.from("signatures").createSignedUrl(path, 3600).then(({ data }) => {
+      if (data?.signedUrl) setUrl(data.signedUrl);
+    });
+  }, [path]);
+  if (!url) return null;
+  return <img src={url} alt="Қол" className="h-8 mt-1" />;
+}
+
 export default function DocumentsPage() {
   const { user, role } = useAuth();
   const { toast } = useToast();
@@ -48,10 +59,9 @@ export default function DocumentsPage() {
     const path = `${schoolId}/${Date.now()}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from("documents").upload(path, file);
     if (uploadErr) { toast({ title: "Қате", description: uploadErr.message, variant: "destructive" }); setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("documents").getPublicUrl(path);
 
     const { error } = await supabase.from("documents").insert({
-      title, category, file_url: publicUrl, file_name: file.name,
+      title, category, file_url: path, file_name: file.name,
       file_size: `${(file.size / 1024).toFixed(0)} KB`,
       uploaded_by: profileId, school_id: schoolId, status: "pending",
     });
@@ -103,9 +113,8 @@ export default function DocumentsPage() {
     const path = `${schoolId}/sign_${Date.now()}.png`;
     const { error: upErr } = await supabase.storage.from("signatures").upload(path, blob);
     if (upErr) { toast({ title: "Қате", description: upErr.message, variant: "destructive" }); return; }
-    const { data: { publicUrl } } = supabase.storage.from("signatures").getPublicUrl(path);
 
-    await supabase.from("documents").update({ status: "signed", signed_by: profileId, signature_url: publicUrl, signed_at: new Date().toISOString() }).eq("id", docId);
+    await supabase.from("documents").update({ status: "signed", signed_by: profileId, signature_url: path, signed_at: new Date().toISOString() }).eq("id", docId);
     toast({ title: "Қол қойылды!" });
     setShowSign(null);
     loadData();
@@ -179,14 +188,17 @@ export default function DocumentsPage() {
                         <p className="text-xs text-success mt-1">✓ {d.signer.full_name} қол қойды</p>
                       )}
                       {d.signature_url && (
-                        <img src={d.signature_url} alt="Қол" className="h-8 mt-1" />
+                        <SignatureImage path={d.signature_url} />
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {d.file_url && (
-                      <Button variant="ghost" size="icon" asChild>
-                        <a href={d.file_url} target="_blank" rel="noopener"><Download className="h-4 w-4" /></a>
+                      <Button variant="ghost" size="icon" onClick={async () => {
+                        const { data } = await supabase.storage.from("documents").createSignedUrl(d.file_url, 3600);
+                        if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                      }}>
+                        <Download className="h-4 w-4" />
                       </Button>
                     )}
                     {canManage && d.status === "pending" && (

@@ -49,10 +49,9 @@ export default function MaterialsPage() {
     const path = `${schoolId}/${Date.now()}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from("materials").upload(path, file);
     if (uploadErr) { toast({ title: "Файл жүктеу қатесі", description: uploadErr.message, variant: "destructive" }); setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("materials").getPublicUrl(path);
 
     const { error } = await supabase.from("materials").insert({
-      title, subject_id: subjectId || null, file_url: publicUrl, file_name: file.name,
+      title, subject_id: subjectId || null, file_url: path, file_name: file.name,
       file_type: ext?.toUpperCase() || "FILE", file_size: `${(file.size / 1024).toFixed(0)} KB`,
       uploaded_by: profileId, school_id: schoolId,
     });
@@ -127,8 +126,11 @@ export default function MaterialsPage() {
               </div>
               <div className="flex gap-2 mt-3">
                 {m.file_url && (
-                  <Button variant="outline" size="sm" className="flex-1 gap-2" asChild>
-                    <a href={m.file_url} target="_blank" rel="noopener"><Download className="h-3.5 w-3.5" /> Жүктеу</a>
+                  <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={async () => {
+                    const { data } = await supabase.storage.from("materials").createSignedUrl(m.file_url, 3600);
+                    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                  }}>
+                    <Download className="h-3.5 w-3.5" /> Жүктеу
                   </Button>
                 )}
                 {isTeacher && (
