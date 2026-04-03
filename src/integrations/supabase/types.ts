@@ -765,47 +765,7 @@ export type Database = {
       }
     }
     Views: {
-      test_questions_student_view: {
-        Row: {
-          id: string | null
-          option_a: string | null
-          option_b: string | null
-          option_c: string | null
-          option_d: string | null
-          question_order: number | null
-          question_text: string | null
-          test_id: string | null
-        }
-        Insert: {
-          id?: string | null
-          option_a?: string | null
-          option_b?: string | null
-          option_c?: string | null
-          option_d?: string | null
-          question_order?: number | null
-          question_text?: string | null
-          test_id?: string | null
-        }
-        Update: {
-          id?: string | null
-          option_a?: string | null
-          option_b?: string | null
-          option_c?: string | null
-          option_d?: string | null
-          question_order?: number | null
-          question_text?: string | null
-          test_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "test_questions_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "tests"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       get_my_school_id: { Args: never; Returns: string }
