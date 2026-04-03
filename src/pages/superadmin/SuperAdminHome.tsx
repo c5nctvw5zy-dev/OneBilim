@@ -22,7 +22,7 @@ export default function SuperAdminHome() {
         supabase.from("schools").select("*", { count: "exact", head: true }),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("applications").select("*", { count: "exact", head: true }).eq("status", "pending"),
-        supabase.from("applications").select("school_name, status, created_at").order("created_at", { ascending: false }).limit(5),
+        supabase.from("applications").select("id, school_name, status, created_at").order("created_at", { ascending: false }).limit(5),
       ]);
       setStats({
         schools: schoolCount || 0,
