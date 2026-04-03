@@ -169,6 +169,9 @@ export default function SuperAdminApplications() {
                       <Button size="sm" variant="ghost" onClick={() => { setExpandedId(isExpanded ? null : app.id); setReviewNote(app.review_note || ""); }}>
                         {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
+                      <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(app)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
