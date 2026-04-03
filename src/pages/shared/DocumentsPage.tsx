@@ -48,10 +48,9 @@ export default function DocumentsPage() {
     const path = `${schoolId}/${Date.now()}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from("documents").upload(path, file);
     if (uploadErr) { toast({ title: "Қате", description: uploadErr.message, variant: "destructive" }); setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("documents").getPublicUrl(path);
 
     const { error } = await supabase.from("documents").insert({
-      title, category, file_url: publicUrl, file_name: file.name,
+      title, category, file_url: path, file_name: file.name,
       file_size: `${(file.size / 1024).toFixed(0)} KB`,
       uploaded_by: profileId, school_id: schoolId, status: "pending",
     });
