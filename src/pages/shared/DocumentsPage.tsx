@@ -9,6 +9,17 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
+function SignatureImage({ path }: { path: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.storage.from("signatures").createSignedUrl(path, 3600).then(({ data }) => {
+      if (data?.signedUrl) setUrl(data.signedUrl);
+    });
+  }, [path]);
+  if (!url) return null;
+  return <img src={url} alt="Қол" className="h-8 mt-1" />;
+}
+
 export default function DocumentsPage() {
   const { user, role } = useAuth();
   const { toast } = useToast();
