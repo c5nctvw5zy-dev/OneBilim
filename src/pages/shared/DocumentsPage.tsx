@@ -183,8 +183,11 @@ export default function DocumentsPage() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {d.file_url && (
-                      <Button variant="ghost" size="icon" asChild>
-                        <a href={d.file_url} target="_blank" rel="noopener"><Download className="h-4 w-4" /></a>
+                      <Button variant="ghost" size="icon" onClick={async () => {
+                        const { data } = await supabase.storage.from("documents").createSignedUrl(d.file_url, 3600);
+                        if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                      }}>
+                        <Download className="h-4 w-4" />
                       </Button>
                     )}
                     {canManage && d.status === "pending" && (
