@@ -102,9 +102,8 @@ export default function DocumentsPage() {
     const path = `${schoolId}/sign_${Date.now()}.png`;
     const { error: upErr } = await supabase.storage.from("signatures").upload(path, blob);
     if (upErr) { toast({ title: "Қате", description: upErr.message, variant: "destructive" }); return; }
-    const { data: { publicUrl } } = supabase.storage.from("signatures").getPublicUrl(path);
 
-    await supabase.from("documents").update({ status: "signed", signed_by: profileId, signature_url: publicUrl, signed_at: new Date().toISOString() }).eq("id", docId);
+    await supabase.from("documents").update({ status: "signed", signed_by: profileId, signature_url: path, signed_at: new Date().toISOString() }).eq("id", docId);
     toast({ title: "Қол қойылды!" });
     setShowSign(null);
     loadData();
