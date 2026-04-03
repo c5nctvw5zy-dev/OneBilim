@@ -126,8 +126,11 @@ export default function MaterialsPage() {
               </div>
               <div className="flex gap-2 mt-3">
                 {m.file_url && (
-                  <Button variant="outline" size="sm" className="flex-1 gap-2" asChild>
-                    <a href={m.file_url} target="_blank" rel="noopener"><Download className="h-3.5 w-3.5" /> Жүктеу</a>
+                  <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={async () => {
+                    const { data } = await supabase.storage.from("materials").createSignedUrl(m.file_url, 3600);
+                    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                  }}>
+                    <Download className="h-3.5 w-3.5" /> Жүктеу
                   </Button>
                 )}
                 {isTeacher && (

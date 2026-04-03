@@ -177,7 +177,7 @@ export default function DocumentsPage() {
                         <p className="text-xs text-success mt-1">✓ {d.signer.full_name} қол қойды</p>
                       )}
                       {d.signature_url && (
-                        <img src={d.signature_url} alt="Қол" className="h-8 mt-1" />
+                        <SignatureImage path={d.signature_url} />
                       )}
                     </div>
                   </div>
