@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, X, Loader2, Eye, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, X, Loader2, Eye, ChevronUp, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -37,6 +38,8 @@ export default function SuperAdminApplications() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [reviewNote, setReviewNote] = useState("");
   const [processing, setProcessing] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -109,6 +112,20 @@ export default function SuperAdminApplications() {
     setReviewNote("");
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const { error } = await supabase.from("applications").delete().eq("id", deleteTarget.id);
+    if (error) {
+      toast({ title: "Қате", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Өтінім жойылды" });
+      setApplications(prev => prev.filter(a => a.id !== deleteTarget.id));
+    }
+    setDeleting(false);
+    setDeleteTarget(null);
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const pendingCount = applications.filter(a => a.status === "pending").length;
@@ -151,6 +168,9 @@ export default function SuperAdminApplications() {
                       <span className={`rounded-full px-3 py-1 text-xs font-medium ${st.className}`}>{st.label}</span>
                       <Button size="sm" variant="ghost" onClick={() => { setExpandedId(isExpanded ? null : app.id); setReviewNote(app.review_note || ""); }}>
                         {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(app)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -210,6 +230,24 @@ export default function SuperAdminApplications() {
           })}
         </div>
       )}
+
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Өтінімді жою</DialogTitle>
+            <DialogDescription>
+              «{deleteTarget?.school_name}» өтінімін жойғыңыз келе ме? Бұл әрекетті қайтару мүмкін емес.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Болдырмау</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Жою
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
