@@ -83,20 +83,64 @@ export default function SuperAdminHome() {
           <div className="space-y-3">
             {recentApps.length === 0 ? (
               <p className="text-sm text-muted-foreground">Өтінімдер жоқ</p>
-            ) : recentApps.map((a, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg border border-border p-3">
+            ) : recentApps.map((a) => (
+              <div key={a.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div>
                   <span className="text-sm text-foreground">{a.school_name}</span>
                   <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${
                     a.status === "pending" ? "bg-warning/10 text-warning" : a.status === "approved" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
                   }`}>{statusLabels[a.status] || a.status}</span>
                 </div>
-                <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(a.created_at)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(a.created_at)}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-destructive hover:text-destructive"
+                    onClick={() => setDeleteTarget(a)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Өтінімді жою</DialogTitle>
+            <DialogDescription>
+              «{deleteTarget?.school_name}» өтінімін жойғыңыз келе ме? Бұл әрекетті қайтару мүмкін емес.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Болдырмау</Button>
+            <Button variant="destructive" disabled={deleting} onClick={async () => {
+              setDeleting(true);
+              const { error } = await supabase.from("applications").delete().eq("id", deleteTarget.id);
+              if (error) {
+                toast({ title: "Қате", description: error.message, variant: "destructive" });
+              } else {
+                toast({ title: "Өтінім жойылды" });
+                setRecentApps(prev => prev.filter(app => app.id !== deleteTarget.id));
+                setStats(prev => ({
+                  ...prev,
+                  pending: deleteTarget.status === "pending" ? prev.pending - 1 : prev.pending,
+                  recent: prev.recent - 1,
+                }));
+              }
+              setDeleting(false);
+              setDeleteTarget(null);
+            }}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Жою
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
