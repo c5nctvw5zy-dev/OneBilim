@@ -38,6 +38,8 @@ export default function SuperAdminApplications() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [reviewNote, setReviewNote] = useState("");
   const [processing, setProcessing] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
