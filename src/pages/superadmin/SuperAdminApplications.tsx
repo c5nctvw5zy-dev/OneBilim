@@ -230,6 +230,24 @@ export default function SuperAdminApplications() {
           })}
         </div>
       )}
+
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Өтінімді жою</DialogTitle>
+            <DialogDescription>
+              «{deleteTarget?.school_name}» өтінімін жойғыңыз келе ме? Бұл әрекетті қайтару мүмкін емес.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Болдырмау</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Жою
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
