@@ -49,10 +49,9 @@ export default function MaterialsPage() {
     const path = `${schoolId}/${Date.now()}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from("materials").upload(path, file);
     if (uploadErr) { toast({ title: "Файл жүктеу қатесі", description: uploadErr.message, variant: "destructive" }); setUploading(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("materials").getPublicUrl(path);
 
     const { error } = await supabase.from("materials").insert({
-      title, subject_id: subjectId || null, file_url: publicUrl, file_name: file.name,
+      title, subject_id: subjectId || null, file_url: path, file_name: file.name,
       file_type: ext?.toUpperCase() || "FILE", file_size: `${(file.size / 1024).toFixed(0)} KB`,
       uploaded_by: profileId, school_id: schoolId,
     });
