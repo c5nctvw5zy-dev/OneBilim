@@ -11,6 +11,8 @@ import {
   ChevronRight,
   Globe,
   CheckCircle2,
+  Newspaper,
+  Calendar,
 } from "lucide-react";
 
 const languages = { kk: "Қазақша", ru: "Русский", en: "English" } as const;
