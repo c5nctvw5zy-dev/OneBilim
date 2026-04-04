@@ -11,6 +11,8 @@ import {
   ChevronRight,
   Globe,
   CheckCircle2,
+  Newspaper,
+  Calendar,
 } from "lucide-react";
 
 const languages = { kk: "Қазақша", ru: "Русский", en: "English" } as const;
@@ -59,6 +61,16 @@ const content = {
       subtitle: "1–2 жұмыс күні ішінде өтінім қаралады",
       button: "Тіркелу",
     },
+    news: {
+      title: "Білім жаңалықтары",
+      items: [
+        { date: "2026-04-03", title: "ҰБТ-2026: жаңа форматтағы тестілеу басталды", desc: "Биыл Ұлттық бірыңғай тестілеу алғаш рет адаптивті формат бойынша өткізіледі. Оқушылар жауап деңгейіне қарай қиындығы өзгеретін сұрақтар алады." },
+        { date: "2026-04-01", title: "Қазақстанда 200-ден астам жаңа мектеп салынады", desc: "Білім министрлігі 2026 жылы елдің барлық аймақтарында 200+ жаңа мектеп салу жоспарын мақұлдады. Бұл үш ауысымды оқуды қысқартуға бағытталған." },
+        { date: "2026-03-28", title: "Цифрлық сауаттылық пәні міндетті болды", desc: "1-сыныптан бастап «Цифрлық сауаттылық» пәні міндетті оқу бағдарламасына енгізілді. Пән кодтау, кибергигиена және ақпараттық қауіпсіздік негіздерін қамтиды." },
+        { date: "2026-03-25", title: "Мұғалімдер жалақысы 25%-ға артты", desc: "Үкімет педагогтар жалақысын 2026 жылдың сәуір айынан бастап 25%-ға арттыру туралы қаулы қабылдады. Бұл шара 350 мыңнан астам мұғалімге тиесілі." },
+        { date: "2026-03-20", title: "BilimApp — жыл сайынғы EdTech марапатын жеңіп алды", desc: "BilimApp платформасы Central Asia EdTech Awards 2026 байқауында «Үздік білім платформасы» номинациясында жеңімпаз атанды." },
+      ],
+    },
     footer: "© 2026 BilimApp. Барлық құқықтар қорғалған.",
   },
   ru: {
@@ -103,6 +115,16 @@ const content = {
       subtitle: "Заявка рассматривается в течение 1–2 рабочих дней",
       button: "Регистрация",
     },
+    news: {
+      title: "Новости образования",
+      items: [
+        { date: "2026-04-03", title: "ЕНТ-2026: начинается тестирование в новом формате", desc: "В этом году ЕНТ впервые проводится в адаптивном формате. Ученики получат вопросы, сложность которых меняется в зависимости от уровня ответов." },
+        { date: "2026-04-01", title: "В Казахстане построят более 200 новых школ", desc: "Министерство образования утвердило план строительства 200+ новых школ во всех регионах страны в 2026 году." },
+        { date: "2026-03-28", title: "Цифровая грамотность стала обязательным предметом", desc: "С 1-го класса предмет «Цифровая грамотность» включён в обязательную программу. Предмет охватывает кодирование, кибергигиену и основы информационной безопасности." },
+        { date: "2026-03-25", title: "Зарплата учителей выросла на 25%", desc: "Правительство приняло постановление о повышении зарплаты педагогов на 25% с апреля 2026 года. Мера затронет более 350 тысяч учителей." },
+        { date: "2026-03-20", title: "BilimApp — победитель ежегодной премии EdTech", desc: "Платформа BilimApp стала победителем Central Asia EdTech Awards 2026 в номинации «Лучшая образовательная платформа»." },
+      ],
+    },
     footer: "© 2026 BilimApp. Все права защищены.",
   },
   en: {
@@ -146,6 +168,16 @@ const content = {
       title: "Register Your School Now",
       subtitle: "Application reviewed within 1–2 business days",
       button: "Register",
+    },
+    news: {
+      title: "Education News",
+      items: [
+        { date: "2026-04-03", title: "UNT-2026: new adaptive testing format launched", desc: "This year, the Unified National Test is conducted in an adaptive format for the first time. Students receive questions that adjust in difficulty based on their responses." },
+        { date: "2026-04-01", title: "Over 200 new schools to be built in Kazakhstan", desc: "The Ministry of Education approved a plan to build 200+ new schools across all regions of the country in 2026." },
+        { date: "2026-03-28", title: "Digital literacy becomes a mandatory subject", desc: "From 1st grade, 'Digital Literacy' is now part of the mandatory curriculum, covering coding, cyber hygiene, and information security basics." },
+        { date: "2026-03-25", title: "Teacher salaries increased by 25%", desc: "The government adopted a decree to raise teacher salaries by 25% starting April 2026. The measure affects over 350,000 teachers." },
+        { date: "2026-03-20", title: "BilimApp wins annual EdTech award", desc: "BilimApp platform won the Central Asia EdTech Awards 2026 in the 'Best Education Platform' category." },
+      ],
     },
     footer: "© 2026 BilimApp. All rights reserved.",
   },
@@ -296,6 +328,39 @@ export default function Landing() {
               </Section>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* News */}
+      <section className="mx-auto max-w-6xl px-4 py-24">
+        <Section>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+              <Newspaper className="h-4 w-4" />
+              {t.news.title}
+            </div>
+            <h2 className="text-3xl font-bold text-foreground text-balance">{t.news.title}</h2>
+          </div>
+        </Section>
+        <div className="space-y-4">
+          {t.news.items.map((n, i) => (
+            <Section key={n.title} delay={i * 80}>
+              <div className="group rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-3">
+                      <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">{n.date}</span>
+                    </div>
+                    <h3 className="mb-1 text-base font-semibold text-card-foreground leading-snug">{n.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{n.desc}</p>
+                  </div>
+                </div>
+              </div>
+            </Section>
+          ))}
         </div>
       </section>
 
