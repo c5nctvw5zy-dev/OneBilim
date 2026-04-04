@@ -169,6 +169,16 @@ const content = {
       subtitle: "Application reviewed within 1–2 business days",
       button: "Register",
     },
+    news: {
+      title: "Education News",
+      items: [
+        { date: "2026-04-03", title: "UNT-2026: new adaptive testing format launched", desc: "This year, the Unified National Test is conducted in an adaptive format for the first time. Students receive questions that adjust in difficulty based on their responses." },
+        { date: "2026-04-01", title: "Over 200 new schools to be built in Kazakhstan", desc: "The Ministry of Education approved a plan to build 200+ new schools across all regions of the country in 2026." },
+        { date: "2026-03-28", title: "Digital literacy becomes a mandatory subject", desc: "From 1st grade, 'Digital Literacy' is now part of the mandatory curriculum, covering coding, cyber hygiene, and information security basics." },
+        { date: "2026-03-25", title: "Teacher salaries increased by 25%", desc: "The government adopted a decree to raise teacher salaries by 25% starting April 2026. The measure affects over 350,000 teachers." },
+        { date: "2026-03-20", title: "BilimApp wins annual EdTech award", desc: "BilimApp platform won the Central Asia EdTech Awards 2026 in the 'Best Education Platform' category." },
+      ],
+    },
     footer: "© 2026 BilimApp. All rights reserved.",
   },
 };
