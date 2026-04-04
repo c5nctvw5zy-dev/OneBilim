@@ -331,6 +331,39 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* News */}
+      <section className="mx-auto max-w-6xl px-4 py-24">
+        <Section>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+              <Newspaper className="h-4 w-4" />
+              {t.news.title}
+            </div>
+            <h2 className="text-3xl font-bold text-foreground text-balance">{t.news.title}</h2>
+          </div>
+        </Section>
+        <div className="space-y-4">
+          {t.news.items.map((n, i) => (
+            <Section key={n.title} delay={i * 80}>
+              <div className="group rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-3">
+                      <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">{n.date}</span>
+                    </div>
+                    <h3 className="mb-1 text-base font-semibold text-card-foreground leading-snug">{n.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{n.desc}</p>
+                  </div>
+                </div>
+              </div>
+            </Section>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-4 py-24">
         <Section>
