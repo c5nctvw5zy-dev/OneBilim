@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
-import { BarChart3, CheckCircle, ClipboardList, Calendar } from "lucide-react";
+import { BarChart3, CheckCircle, ClipboardList, Calendar, MessageSquare } from "lucide-react";
 
 export default function ParentHome() {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function ParentHome() {
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="mb-4 text-base font-semibold text-card-foreground">Баланың үлгерімі</h3>
+          <h3 className="mb-4 text-base font-semibold text-card-foreground">📊 Баланың үлгерімі</h3>
           <div className="space-y-2">
             {[
               { subject: "Математика", avg: "4.5", trend: "↑" },
@@ -34,14 +34,14 @@ export default function ParentHome() {
           </div>
         </div>
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="mb-4 text-base font-semibold text-card-foreground">Хабарламалар</h3>
+          <h3 className="mb-4 text-base font-semibold text-card-foreground">📢 Хабарламалар</h3>
           <div className="space-y-2">
             {[
               { text: "Ағылшын тілі мұғалімінен хабар", time: "2 сағат бұрын" },
               { text: "Баланың қатысу есебі жаңартылды", time: "Кеше" },
-              { text: "Ата-аналар жиналысы: 28.03", time: "3 күн бұрын" },
+              { text: "Ата-аналар жиналысы: 28.04", time: "3 күн бұрын" },
             ].map((n, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate("/parent/messages")}>
+              <div key={i} className="flex items-center justify-between rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => navigate("/parent/chat")}>
                 <span className="text-sm text-foreground">{n.text}</span>
                 <span className="shrink-0 text-xs text-muted-foreground">{n.time}</span>
               </div>

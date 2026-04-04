@@ -25,12 +25,9 @@ import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
-import DirectorClasses from "./pages/director/DirectorClasses";
-import DirectorTeachers from "./pages/director/DirectorTeachers";
 import DirectorStudents from "./pages/director/DirectorStudents";
-import DirectorImport from "./pages/director/DirectorImport";
+import DirectorTeachers from "./pages/director/DirectorTeachers";
 import DirectorDocuments from "./pages/director/DirectorDocuments";
-import DirectorAnalytics from "./pages/director/DirectorAnalytics";
 import DirectorSettings from "./pages/director/DirectorSettings";
 
 // Zavuch
@@ -38,7 +35,7 @@ import ZavuchHome from "./pages/zavuch/ZavuchHome";
 
 // Teacher
 import TeacherHome from "./pages/teacher/TeacherHome";
-import TeacherStats from "./pages/teacher/TeacherStats";
+import ClassLeadershipPage from "./pages/teacher/ClassLeadershipPage";
 
 // Student
 import StudentHome from "./pages/student/StudentHome";
@@ -51,17 +48,20 @@ import SchedulePage from "./pages/shared/SchedulePage";
 import GradesPage from "./pages/shared/GradesPage";
 import HomeworkPage from "./pages/shared/HomeworkPage";
 import AttendancePage from "./pages/shared/AttendancePage";
-import MaterialsPage from "./pages/shared/MaterialsPage";
 import MessagesPage from "./pages/shared/MessagesPage";
-import AchievementsPage from "./pages/shared/AchievementsPage";
 import JournalPage from "./pages/shared/JournalPage";
-import TestsPage from "./pages/shared/TestsPage";
 import DocumentsPage from "./pages/shared/DocumentsPage";
-import ClassPage from "./pages/shared/ClassPage";
+import MonitoringBoardPage from "./pages/shared/MonitoringBoardPage";
+import ChatPage from "./pages/shared/ChatPage";
+import AssessmentGeneratorPage from "./pages/shared/AssessmentGeneratorPage";
+import SubjectsManagementPage from "./pages/shared/SubjectsManagementPage";
+import CurriculumPage from "./pages/shared/CurriculumPage";
+import PerformanceMonitoringPage from "./pages/shared/PerformanceMonitoringPage";
+import AnalyticsDetailPage from "./pages/shared/AnalyticsDetailPage";
 
 import {
-  Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar, Upload, FileCheck,
-  BookMarked, CheckCircle,
+  Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
+  FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User,
 } from "lucide-react";
 
 const superAdminNav = [
@@ -77,57 +77,70 @@ const superAdminNav = [
 
 const directorNav = [
   { title: "Басты бет", path: "/director", icon: Home },
-  { title: "Сыныптар", path: "/director/classes", icon: BookMarked },
+  { title: "Бақылау тақтасы", path: "/director/monitoring", icon: LayoutDashboard },
+  { title: "Менің кестем", path: "/director/schedule", icon: Calendar },
+  { title: "Үй тапсырмасы", path: "/director/homework", icon: ClipboardList },
+  { title: "Чат", path: "/director/chat", icon: MessageSquare },
+  { title: "БЖБ / ТЖБ", path: "/director/assessments", icon: Sparkles },
+  { title: "Пәндер", path: "/director/subjects", icon: BookOpen },
+  { title: "Оқушылар мен сыныптар", path: "/director/students", icon: GraduationCap },
   { title: "Мұғалімдер", path: "/director/teachers", icon: Users },
-  { title: "Оқушылар", path: "/director/students", icon: GraduationCap },
-  { title: "Сабақ кесте", path: "/director/schedule", icon: Calendar },
-  { title: "Excel импорт", path: "/director/import", icon: Upload },
   { title: "Құжаттар", path: "/director/documents", icon: FileCheck },
+  { title: "Оқу бағдарламасы", path: "/director/curriculum", icon: BookOpenCheck },
+  { title: "Сабақ кестесі", path: "/director/timetable", icon: BookMarked },
+  { title: "Сабақ үлгерімі", path: "/director/performance", icon: BarChart3 },
   { title: "Аналитика", path: "/director/analytics", icon: BarChart3 },
   { title: "Баптаулар", path: "/director/settings", icon: Settings },
+  { title: "Профиль", path: "/director/profile", icon: User },
 ];
 
 const zavuchNav = [
   { title: "Басты бет", path: "/zavuch", icon: Home },
-  { title: "Сынып", path: "/zavuch/class", icon: BookMarked },
-  { title: "Электронды журнал", path: "/zavuch/journal", icon: BookOpen },
-  { title: "Құжаттар", path: "/zavuch/documents", icon: FileCheck },
-  { title: "Сабақ кесте", path: "/zavuch/schedule", icon: Calendar },
-  { title: "Үлгерім", path: "/zavuch/performance", icon: BarChart3 },
-  { title: "Қатысулар", path: "/zavuch/attendance", icon: CheckCircle },
+  { title: "Бақылау тақтасы", path: "/zavuch/monitoring", icon: LayoutDashboard },
+  { title: "Менің кестем", path: "/zavuch/schedule", icon: Calendar },
+  { title: "Үй тапсырмасы", path: "/zavuch/homework", icon: ClipboardList },
+  { title: "Чат", path: "/zavuch/chat", icon: MessageSquare },
+  { title: "БЖБ / ТЖБ", path: "/zavuch/assessments", icon: Sparkles },
+  { title: "Пәндер", path: "/zavuch/subjects", icon: BookOpen },
+  { title: "Оқушылар мен сыныптар", path: "/zavuch/students", icon: GraduationCap },
   { title: "Мұғалімдер", path: "/zavuch/teachers", icon: Users },
-  { title: "Excel импорт", path: "/zavuch/import", icon: Upload },
+  { title: "Құжаттар", path: "/zavuch/documents", icon: FileCheck },
+  { title: "Оқу бағдарламасы", path: "/zavuch/curriculum", icon: BookOpenCheck },
+  { title: "Сабақ кестесі", path: "/zavuch/timetable", icon: BookMarked },
+  { title: "Сабақ үлгерімі", path: "/zavuch/performance", icon: BarChart3 },
+  { title: "Аналитика", path: "/zavuch/analytics", icon: BarChart3 },
+  { title: "Баптаулар", path: "/zavuch/settings", icon: Settings },
+  { title: "Профиль", path: "/zavuch/profile", icon: User },
 ];
 
 const teacherNav = [
   { title: "Басты бет", path: "/teacher", icon: Home },
+  { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
+  { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
+  { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
+  { title: "Үй тапсырмасы", path: "/teacher/homework", icon: ClipboardList },
+  { title: "Чат", path: "/teacher/chat", icon: MessageSquare },
+  { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
   { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
-  { title: "Сынып", path: "/teacher/class", icon: BookMarked },
-  { title: "Үй тапсырма", path: "/teacher/homework", icon: ClipboardList },
-  { title: "Сабақ кесте", path: "/teacher/schedule", icon: Calendar },
-  { title: "Тесттер", path: "/teacher/tests", icon: FileText },
-  { title: "Материалдар", path: "/teacher/materials", icon: Upload },
   { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
-  { title: "Статистика", path: "/teacher/stats", icon: BarChart3 },
+  { title: "Профиль", path: "/teacher/profile", icon: User },
 ];
 
 const studentNav = [
-  { title: "Басты бет", path: "/student", icon: Home },
-  { title: "Бағалар", path: "/student/grades", icon: BarChart3 },
-  { title: "Үй тапсырма", path: "/student/homework", icon: ClipboardList },
-  { title: "Тесттер", path: "/student/tests", icon: FileText },
-  { title: "Сабақ кесте", path: "/student/schedule", icon: Calendar },
-  { title: "Материалдар", path: "/student/materials", icon: BookOpen },
-  { title: "Жетістіктер", path: "/student/achievements", icon: GraduationCap },
+  { title: "Менің кестем", path: "/student/schedule", icon: Calendar },
+  { title: "Менің бағаларым", path: "/student/grades", icon: BarChart3 },
+  { title: "Мұғаліммен байланыс", path: "/student/chat", icon: MessageSquare },
+  { title: "Үй тапсырмасы", path: "/student/homework", icon: ClipboardList },
+  { title: "Профиль", path: "/student/profile", icon: User },
 ];
 
 const parentNav = [
   { title: "Басты бет", path: "/parent", icon: Home },
+  { title: "Сабақ кестесі", path: "/parent/schedule", icon: Calendar },
+  { title: "Мұғаліммен байланыс", path: "/parent/chat", icon: MessageSquare },
   { title: "Бағалар", path: "/parent/grades", icon: BarChart3 },
-  { title: "Қатысулар", path: "/parent/attendance", icon: CheckCircle },
-  { title: "Үй тапсырмалар", path: "/parent/homework", icon: ClipboardList },
-  { title: "Хабарламалар", path: "/parent/messages", icon: FileText },
-  { title: "Сабақ кесте", path: "/parent/schedule", icon: Calendar },
+  { title: "Үй тапсырмасы", path: "/parent/homework", icon: ClipboardList },
+  { title: "Профиль", path: "/parent/profile", icon: User },
 ];
 
 const queryClient = new QueryClient();
@@ -160,13 +173,19 @@ const App = () => (
           {/* Director */}
           <Route element={<ProtectedRoute allowedRoles={["director"]}><DashboardLayout roleName="Директор" navItems={directorNav} userName="Ахметова А." /></ProtectedRoute>}>
             <Route path="/director" element={<DirectorHome />} />
-            <Route path="/director/classes" element={<DirectorClasses />} />
-            <Route path="/director/teachers" element={<DirectorTeachers />} />
-            <Route path="/director/students" element={<DirectorStudents />} />
+            <Route path="/director/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/director/schedule" element={<SchedulePage />} />
-            <Route path="/director/import" element={<DirectorImport />} />
+            <Route path="/director/homework" element={<HomeworkPage />} />
+            <Route path="/director/chat" element={<ChatPage />} />
+            <Route path="/director/assessments" element={<AssessmentGeneratorPage />} />
+            <Route path="/director/subjects" element={<SubjectsManagementPage />} />
+            <Route path="/director/students" element={<DirectorStudents />} />
+            <Route path="/director/teachers" element={<DirectorTeachers />} />
             <Route path="/director/documents" element={<DirectorDocuments />} />
-            <Route path="/director/analytics" element={<DirectorAnalytics />} />
+            <Route path="/director/curriculum" element={<CurriculumPage />} />
+            <Route path="/director/timetable" element={<SchedulePage />} />
+            <Route path="/director/performance" element={<PerformanceMonitoringPage />} />
+            <Route path="/director/analytics" element={<AnalyticsDetailPage />} />
             <Route path="/director/settings" element={<DirectorSettings />} />
             <Route path="/director/profile" element={<ProfilePage />} />
           </Route>
@@ -174,51 +193,54 @@ const App = () => (
           {/* Zavuch */}
           <Route element={<ProtectedRoute allowedRoles={["zavuch"]}><DashboardLayout roleName="Завуч" navItems={zavuchNav} userName="Мұхтарова Д." /></ProtectedRoute>}>
             <Route path="/zavuch" element={<ZavuchHome />} />
-            <Route path="/zavuch/class" element={<ClassPage />} />
-            <Route path="/zavuch/journal" element={<JournalPage />} />
-            <Route path="/zavuch/documents" element={<DocumentsPage />} />
+            <Route path="/zavuch/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/zavuch/schedule" element={<SchedulePage />} />
-            <Route path="/zavuch/performance" element={<GradesPage />} />
-            <Route path="/zavuch/attendance" element={<AttendancePage />} />
+            <Route path="/zavuch/homework" element={<HomeworkPage />} />
+            <Route path="/zavuch/chat" element={<ChatPage />} />
+            <Route path="/zavuch/assessments" element={<AssessmentGeneratorPage />} />
+            <Route path="/zavuch/subjects" element={<SubjectsManagementPage />} />
+            <Route path="/zavuch/students" element={<DirectorStudents />} />
             <Route path="/zavuch/teachers" element={<DirectorTeachers />} />
-            <Route path="/zavuch/import" element={<DirectorImport />} />
+            <Route path="/zavuch/documents" element={<DocumentsPage />} />
+            <Route path="/zavuch/curriculum" element={<CurriculumPage />} />
+            <Route path="/zavuch/timetable" element={<SchedulePage />} />
+            <Route path="/zavuch/performance" element={<PerformanceMonitoringPage />} />
+            <Route path="/zavuch/analytics" element={<AnalyticsDetailPage />} />
+            <Route path="/zavuch/settings" element={<DirectorSettings />} />
             <Route path="/zavuch/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Teacher */}
           <Route element={<ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout roleName="Мұғалім" navItems={teacherNav} userName="Сейітов Қ." /></ProtectedRoute>}>
             <Route path="/teacher" element={<TeacherHome />} />
-            <Route path="/teacher/journal" element={<JournalPage />} />
-            <Route path="/teacher/class" element={<ClassPage />} />
-            <Route path="/teacher/homework" element={<HomeworkPage />} />
+            <Route path="/teacher/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/teacher/schedule" element={<SchedulePage />} />
-            <Route path="/teacher/tests" element={<TestsPage isTeacher />} />
-            <Route path="/teacher/materials" element={<MaterialsPage />} />
+            <Route path="/teacher/leadership" element={<ClassLeadershipPage />} />
+            <Route path="/teacher/homework" element={<HomeworkPage />} />
+            <Route path="/teacher/chat" element={<ChatPage />} />
+            <Route path="/teacher/assessments" element={<AssessmentGeneratorPage />} />
+            <Route path="/teacher/journal" element={<JournalPage />} />
             <Route path="/teacher/documents" element={<DocumentsPage />} />
-            <Route path="/teacher/stats" element={<TeacherStats />} />
             <Route path="/teacher/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Student */}
           <Route element={<ProtectedRoute allowedRoles={["student"]}><DashboardLayout roleName="Оқушы" navItems={studentNav} userName="Назарбекова А." /></ProtectedRoute>}>
             <Route path="/student" element={<StudentHome />} />
-            <Route path="/student/grades" element={<GradesPage />} />
-            <Route path="/student/homework" element={<HomeworkPage canUpload />} />
-            <Route path="/student/tests" element={<TestsPage />} />
             <Route path="/student/schedule" element={<SchedulePage />} />
-            <Route path="/student/materials" element={<MaterialsPage />} />
-            <Route path="/student/achievements" element={<AchievementsPage />} />
+            <Route path="/student/grades" element={<GradesPage />} />
+            <Route path="/student/chat" element={<ChatPage />} />
+            <Route path="/student/homework" element={<HomeworkPage canUpload />} />
             <Route path="/student/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Parent */}
           <Route element={<ProtectedRoute allowedRoles={["parent"]}><DashboardLayout roleName="Ата-ана" navItems={parentNav} userName="Назарбеков Б." /></ProtectedRoute>}>
             <Route path="/parent" element={<ParentHome />} />
-            <Route path="/parent/grades" element={<GradesPage />} />
-            <Route path="/parent/attendance" element={<AttendancePage />} />
-            <Route path="/parent/homework" element={<HomeworkPage />} />
-            <Route path="/parent/messages" element={<MessagesPage />} />
             <Route path="/parent/schedule" element={<SchedulePage />} />
+            <Route path="/parent/chat" element={<ChatPage />} />
+            <Route path="/parent/grades" element={<GradesPage />} />
+            <Route path="/parent/homework" element={<HomeworkPage />} />
             <Route path="/parent/profile" element={<ProfilePage />} />
           </Route>
 
