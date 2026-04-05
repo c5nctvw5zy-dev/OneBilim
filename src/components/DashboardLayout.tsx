@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  Menu, X, Bell, Search, ChevronDown, LogOut, GraduationCap, User, Settings,
+  Menu, X, Bell, Search, ChevronDown, ChevronRight, LogOut, GraduationCap, User, Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,9 +13,21 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
+export interface NavGroup {
+  title: string;
+  icon: LucideIcon;
+  children: NavItem[];
+}
+
+export type NavEntry = NavItem | NavGroup;
+
+function isGroup(entry: NavEntry): entry is NavGroup {
+  return "children" in entry;
+}
+
 interface DashboardLayoutProps {
   roleName: string;
-  navItems: NavItem[];
+  navItems: NavEntry[];
   userName?: string;
 }
 
@@ -23,6 +35,7 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
@@ -44,6 +57,18 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-open group that contains active route
+  useEffect(() => {
+    navItems.forEach((entry) => {
+      if (isGroup(entry)) {
+        const hasActive = entry.children.some((c) => location.pathname === c.path);
+        if (hasActive) {
+          setOpenGroups((prev) => new Set(prev).add(entry.title));
+        }
+      }
+    });
+  }, [location.pathname, navItems]);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
@@ -55,13 +80,88 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
   }, []);
 
   const isActive = (path: string) => location.pathname === path;
-
-  // Determine base path for profile
-  const basePath = navItems[0]?.path?.split("/").slice(0, 2).join("/") || "/";
+  const basePath = (() => {
+    for (const entry of navItems) {
+      if (!isGroup(entry) && entry.path) return entry.path.split("/").slice(0, 2).join("/");
+      if (isGroup(entry) && entry.children[0]) return entry.children[0].path.split("/").slice(0, 2).join("/");
+    }
+    return "/";
+  })();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
+  };
+
+  const toggleGroup = (title: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+  };
+
+  const renderNavEntry = (entry: NavEntry, idx: number) => {
+    if (isGroup(entry)) {
+      const isOpen = openGroups.has(entry.title);
+      const hasActiveChild = entry.children.some((c) => isActive(c.path));
+      return (
+        <div key={entry.title + idx}>
+          <button
+            onClick={() => toggleGroup(entry.title)}
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+              hasActiveChild
+                ? "bg-sidebar-accent/30 text-sidebar-accent-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            }`}
+          >
+            <entry.icon className="h-5 w-5 shrink-0" />
+            {sidebarOpen && (
+              <>
+                <span className="flex-1 text-left">{entry.title}</span>
+                <ChevronRight className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
+              </>
+            )}
+          </button>
+          {sidebarOpen && isOpen && (
+            <div className="ml-4 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-3">
+              {entry.children.map((child) => (
+                <Link
+                  key={child.path}
+                  to={child.path}
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
+                    isActive(child.path)
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  }`}
+                >
+                  <child.icon className="h-4 w-4 shrink-0" />
+                  <span>{child.title}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        key={entry.path}
+        to={entry.path}
+        onClick={() => setMobileSidebarOpen(false)}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+          isActive(entry.path)
+            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+        }`}
+      >
+        <entry.icon className="h-5 w-5 shrink-0" />
+        {sidebarOpen && <span>{entry.title}</span>}
+      </Link>
+    );
   };
 
   const SidebarContent = () => (
@@ -76,34 +176,7 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
         </div>
       )}
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={() => setMobileSidebarOpen(false)}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-              isActive(item.path)
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            }`}
-          >
-            <item.icon className="h-5 w-5 shrink-0" />
-            {sidebarOpen && <span>{item.title}</span>}
-          </Link>
-        ))}
-        {/* Profile link */}
-        <Link
-          to={`${basePath}/profile`}
-          onClick={() => setMobileSidebarOpen(false)}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-            isActive(`${basePath}/profile`)
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-          }`}
-        >
-          <User className="h-5 w-5 shrink-0" />
-          {sidebarOpen && <span>Профиль</span>}
-        </Link>
+        {navItems.map((entry, idx) => renderNavEntry(entry, idx))}
       </nav>
       <div className="border-t border-sidebar-border p-2">
         <button
@@ -119,12 +192,9 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Desktop sidebar */}
       <aside className={`hidden lg:flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"}`}>
         <SidebarContent />
       </aside>
-
-      {/* Mobile sidebar overlay */}
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" onClick={() => setMobileSidebarOpen(false)} />
@@ -133,26 +203,13 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
           </aside>
         </div>
       )}
-
-      {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
         <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setMobileSidebarOpen(true)}
-            >
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileSidebarOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden lg:flex"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
+            <Button variant="ghost" size="icon" className="hidden lg:flex" onClick={() => setSidebarOpen(!sidebarOpen)}>
               {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
             <div className="hidden sm:block">
@@ -186,28 +243,17 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
                     <p className="text-sm font-medium text-foreground">{displayName}</p>
                     <p className="text-xs text-muted-foreground">{profile?.email || ""}</p>
                   </div>
-                  <Link
-                    to={`${basePath}/profile`}
-                    onClick={() => setProfileMenuOpen(false)}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-                  >
-                    <User className="h-4 w-4" />
-                    Профиль
+                  <Link to={`${basePath}/profile`} onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors">
+                    <User className="h-4 w-4" /> Профиль
                   </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Шығу
+                  <button onClick={handleSignOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors">
+                    <LogOut className="h-4 w-4" /> Шығу
                   </button>
                 </div>
               )}
             </div>
           </div>
         </header>
-
-        {/* Content */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           <Outlet />
         </main>
