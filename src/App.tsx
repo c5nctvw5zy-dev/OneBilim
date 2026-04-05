@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 
 import DashboardLayout from "@/components/DashboardLayout";
+import type { NavEntry } from "@/components/DashboardLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Super Admin
@@ -64,7 +65,7 @@ import {
   FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User,
 } from "lucide-react";
 
-const superAdminNav = [
+const superAdminNav: NavEntry[] = [
   { title: "Басты бет", path: "/super-admin", icon: Home },
   { title: "Мектептер", path: "/super-admin/schools", icon: School },
   { title: "Өтінімдер", path: "/super-admin/applications", icon: ClipboardList },
@@ -75,58 +76,100 @@ const superAdminNav = [
   { title: "Баптаулар", path: "/super-admin/settings", icon: Settings },
 ];
 
-const directorNav = [
+const directorNav: NavEntry[] = [
   { title: "Басты бет", path: "/director", icon: Home },
-  { title: "Бақылау тақтасы", path: "/director/monitoring", icon: LayoutDashboard },
-  { title: "Менің кестем", path: "/director/schedule", icon: Calendar },
-  { title: "Үй тапсырмасы", path: "/director/homework", icon: ClipboardList },
-  { title: "Чат", path: "/director/chat", icon: MessageSquare },
+  {
+    title: "BilimApp",
+    icon: GraduationCap,
+    children: [
+      { title: "Бақылау тақтасы", path: "/director/monitoring", icon: LayoutDashboard },
+      { title: "Менің кестем", path: "/director/schedule", icon: Calendar },
+      { title: "Үй тапсырмасы", path: "/director/homework", icon: ClipboardList },
+      { title: "Оқушылармен байланыс", path: "/director/chat", icon: MessageSquare },
+    ],
+  },
   { title: "БЖБ / ТЖБ", path: "/director/assessments", icon: Sparkles },
   { title: "Пәндер", path: "/director/subjects", icon: BookOpen },
-  { title: "Оқушылар мен сыныптар", path: "/director/students", icon: GraduationCap },
-  { title: "Мұғалімдер", path: "/director/teachers", icon: Users },
-  { title: "Құжаттар", path: "/director/documents", icon: FileCheck },
-  { title: "Оқу бағдарламасы", path: "/director/curriculum", icon: BookOpenCheck },
-  { title: "Сабақ кестесі", path: "/director/timetable", icon: BookMarked },
-  { title: "Сабақ үлгерімі", path: "/director/performance", icon: BarChart3 },
-  { title: "Аналитика", path: "/director/analytics", icon: BarChart3 },
-  { title: "Баптаулар", path: "/director/settings", icon: Settings },
+  {
+    title: "Басқарулар",
+    icon: Settings,
+    children: [
+      { title: "Оқушылар мен сыныптар", path: "/director/students", icon: GraduationCap },
+      { title: "Мұғалімдер", path: "/director/teachers", icon: Users },
+      { title: "Құжаттар", path: "/director/documents", icon: FileCheck },
+      { title: "Оқу бағдарламасы", path: "/director/curriculum", icon: BookOpenCheck },
+      { title: "Сабақ кестесі", path: "/director/timetable", icon: BookMarked },
+      { title: "Баптаулар", path: "/director/settings", icon: Settings },
+    ],
+  },
+  {
+    title: "Мониторинг",
+    icon: BarChart3,
+    children: [
+      { title: "Сабақ үлгерімі", path: "/director/performance", icon: BarChart3 },
+      { title: "Аналитика", path: "/director/analytics", icon: BarChart3 },
+    ],
+  },
   { title: "Профиль", path: "/director/profile", icon: User },
 ];
 
-const zavuchNav = [
+const zavuchNav: NavEntry[] = [
   { title: "Басты бет", path: "/zavuch", icon: Home },
-  { title: "Бақылау тақтасы", path: "/zavuch/monitoring", icon: LayoutDashboard },
-  { title: "Менің кестем", path: "/zavuch/schedule", icon: Calendar },
-  { title: "Үй тапсырмасы", path: "/zavuch/homework", icon: ClipboardList },
-  { title: "Чат", path: "/zavuch/chat", icon: MessageSquare },
+  {
+    title: "BilimApp",
+    icon: GraduationCap,
+    children: [
+      { title: "Бақылау тақтасы", path: "/zavuch/monitoring", icon: LayoutDashboard },
+      { title: "Менің кестем", path: "/zavuch/schedule", icon: Calendar },
+      { title: "Үй тапсырмасы", path: "/zavuch/homework", icon: ClipboardList },
+      { title: "Оқушылармен байланыс", path: "/zavuch/chat", icon: MessageSquare },
+    ],
+  },
   { title: "БЖБ / ТЖБ", path: "/zavuch/assessments", icon: Sparkles },
   { title: "Пәндер", path: "/zavuch/subjects", icon: BookOpen },
-  { title: "Оқушылар мен сыныптар", path: "/zavuch/students", icon: GraduationCap },
-  { title: "Мұғалімдер", path: "/zavuch/teachers", icon: Users },
-  { title: "Құжаттар", path: "/zavuch/documents", icon: FileCheck },
-  { title: "Оқу бағдарламасы", path: "/zavuch/curriculum", icon: BookOpenCheck },
-  { title: "Сабақ кестесі", path: "/zavuch/timetable", icon: BookMarked },
-  { title: "Сабақ үлгерімі", path: "/zavuch/performance", icon: BarChart3 },
-  { title: "Аналитика", path: "/zavuch/analytics", icon: BarChart3 },
-  { title: "Баптаулар", path: "/zavuch/settings", icon: Settings },
+  {
+    title: "Басқарулар",
+    icon: Settings,
+    children: [
+      { title: "Оқушылар мен сыныптар", path: "/zavuch/students", icon: GraduationCap },
+      { title: "Мұғалімдер", path: "/zavuch/teachers", icon: Users },
+      { title: "Құжаттар", path: "/zavuch/documents", icon: FileCheck },
+      { title: "Оқу бағдарламасы", path: "/zavuch/curriculum", icon: BookOpenCheck },
+      { title: "Сабақ кестесі", path: "/zavuch/timetable", icon: BookMarked },
+      { title: "Баптаулар", path: "/zavuch/settings", icon: Settings },
+    ],
+  },
+  {
+    title: "Мониторинг",
+    icon: BarChart3,
+    children: [
+      { title: "Сабақ үлгерімі", path: "/zavuch/performance", icon: BarChart3 },
+      { title: "Аналитика", path: "/zavuch/analytics", icon: BarChart3 },
+    ],
+  },
   { title: "Профиль", path: "/zavuch/profile", icon: User },
 ];
 
-const teacherNav = [
+const teacherNav: NavEntry[] = [
   { title: "Басты бет", path: "/teacher", icon: Home },
-  { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
-  { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
+  {
+    title: "BilimApp",
+    icon: GraduationCap,
+    children: [
+      { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
+      { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
+      { title: "Үй тапсырмасы", path: "/teacher/homework", icon: ClipboardList },
+      { title: "Оқушылармен байланыс", path: "/teacher/chat", icon: MessageSquare },
+    ],
+  },
   { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
-  { title: "Үй тапсырмасы", path: "/teacher/homework", icon: ClipboardList },
-  { title: "Чат", path: "/teacher/chat", icon: MessageSquare },
   { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
   { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
   { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
   { title: "Профиль", path: "/teacher/profile", icon: User },
 ];
 
-const studentNav = [
+const studentNav: NavEntry[] = [
   { title: "Менің кестем", path: "/student/schedule", icon: Calendar },
   { title: "Менің бағаларым", path: "/student/grades", icon: BarChart3 },
   { title: "Мұғаліммен байланыс", path: "/student/chat", icon: MessageSquare },
@@ -134,7 +177,7 @@ const studentNav = [
   { title: "Профиль", path: "/student/profile", icon: User },
 ];
 
-const parentNav = [
+const parentNav: NavEntry[] = [
   { title: "Басты бет", path: "/parent", icon: Home },
   { title: "Сабақ кестесі", path: "/parent/schedule", icon: Calendar },
   { title: "Мұғаліммен байланыс", path: "/parent/chat", icon: MessageSquare },

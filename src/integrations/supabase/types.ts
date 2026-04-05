@@ -470,6 +470,8 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           email: string | null
+          face_id_data: string | null
+          face_id_registered: boolean
           full_name: string
           id: string
           iin: string | null
@@ -482,6 +484,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          face_id_data?: string | null
+          face_id_registered?: boolean
           full_name: string
           id?: string
           iin?: string | null
@@ -494,6 +498,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          face_id_data?: string | null
+          face_id_registered?: boolean
           full_name?: string
           id?: string
           iin?: string | null

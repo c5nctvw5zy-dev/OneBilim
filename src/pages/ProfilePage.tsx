@@ -11,13 +11,11 @@ export default function ProfilePage() {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
 
-  // Profile info
   const [fullName, setFullName] = useState(profile?.full_name || "");
   const [phone, setPhone] = useState(profile?.phone || "");
   const [iin, setIin] = useState(profile?.iin || "");
   const [saving, setSaving] = useState(false);
 
-  // Password
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,11 +23,12 @@ export default function ProfilePage() {
   const [showNewPass, setShowNewPass] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
 
-  // Face ID
   const [faceIdRegistered, setFaceIdRegistered] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
+  const [registeringFace, setRegisteringFace] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
@@ -37,14 +36,9 @@ export default function ProfilePage() {
       setFullName(profile.full_name || "");
       setPhone(profile.phone || "");
       setIin(profile.iin || "");
+      setFaceIdRegistered(!!profile.face_id_registered);
     }
   }, [profile]);
-
-  useEffect(() => {
-    // Check if Face ID is registered
-    const stored = localStorage.getItem(`faceid_${user?.id}`);
-    if (stored) setFaceIdRegistered(true);
-  }, [user]);
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -71,23 +65,17 @@ export default function ProfilePage() {
       toast({ title: "Қате", description: "Құпия сөз кемінде 6 таңбадан тұруы керек", variant: "destructive" });
       return;
     }
-
     setChangingPassword(true);
-
-    // Verify current password by re-signing in
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: user?.email || "",
       password: currentPassword,
     });
-
     if (signInError) {
       toast({ title: "Қате", description: "Ағымдағы құпия сөз қате", variant: "destructive" });
       setChangingPassword(false);
       return;
     }
-
     const { error } = await supabase.auth.updateUser({ password: newPassword });
-
     if (error) {
       toast({ title: "Қате", description: error.message, variant: "destructive" });
     } else {
@@ -108,11 +96,7 @@ export default function ProfilePage() {
       }
       setCameraActive(true);
       setFaceDetected(false);
-
-      // Simulate face detection after 2 seconds
-      setTimeout(() => {
-        setFaceDetected(true);
-      }, 2000);
+      setTimeout(() => setFaceDetected(true), 2000);
     } catch {
       toast({ title: "Қате", description: "Камераға қол жеткізу мүмкін болмады", variant: "destructive" });
     }
@@ -127,20 +111,55 @@ export default function ProfilePage() {
     setFaceDetected(false);
   };
 
-  const registerFaceId = () => {
-    if (!user) return;
-    // Store Face ID registration (demo - in production this would use WebAuthn)
-    localStorage.setItem(`faceid_${user.id}`, "registered");
-    setFaceIdRegistered(true);
-    stopCamera();
-    toast({ title: "Сәтті", description: "Face ID сәтті тіркелді! Енді Face ID арқылы кіре аласыз." });
+  const captureFrame = (): string | null => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return null;
+    canvas.width = video.videoWidth || 320;
+    canvas.height = video.videoHeight || 240;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.6);
   };
 
-  const removeFaceId = () => {
+  const registerFaceId = async () => {
     if (!user) return;
-    localStorage.removeItem(`faceid_${user.id}`);
-    setFaceIdRegistered(false);
-    toast({ title: "Жойылды", description: "Face ID тіркеуі жойылды" });
+    setRegisteringFace(true);
+    const faceData = captureFrame();
+    if (!faceData) {
+      toast({ title: "Қате", description: "Камерадан сурет алу мүмкін болмады", variant: "destructive" });
+      setRegisteringFace(false);
+      return;
+    }
+    const { error } = await supabase
+      .from("profiles")
+      .update({ face_id_registered: true, face_id_data: faceData } as any)
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({ title: "Қате", description: error.message, variant: "destructive" });
+    } else {
+      setFaceIdRegistered(true);
+      stopCamera();
+      toast({ title: "Сәтті", description: "Face ID сәтті тіркелді! Енді Face ID арқылы кіре аласыз." });
+    }
+    setRegisteringFace(false);
+  };
+
+  const removeFaceId = async () => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ face_id_registered: false, face_id_data: null } as any)
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({ title: "Қате", description: error.message, variant: "destructive" });
+    } else {
+      setFaceIdRegistered(false);
+      toast({ title: "Жойылды", description: "Face ID тіркеуі жойылды" });
+    }
   };
 
   useEffect(() => {
@@ -154,6 +173,7 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <h2 className="text-xl font-bold text-foreground">Менің профилім</h2>
+      <canvas ref={canvasRef} className="hidden" />
 
       {/* Profile Info */}
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
@@ -163,7 +183,6 @@ export default function ProfilePage() {
           </div>
           <h3 className="font-semibold text-card-foreground">Жеке ақпарат</h3>
         </div>
-
         <div className="space-y-2">
           <Label>Email</Label>
           <Input value={user?.email || ""} disabled className="bg-muted" />
@@ -182,7 +201,6 @@ export default function ProfilePage() {
             <Input value={iin} onChange={e => setIin(e.target.value)} placeholder="123456789012" maxLength={12} />
           </div>
         </div>
-
         <Button onClick={handleSaveProfile} disabled={saving} className="gap-2">
           <Save className="h-4 w-4" />
           {saving ? "Сақталуда..." : "Сақтау"}
@@ -197,17 +215,10 @@ export default function ProfilePage() {
           </div>
           <h3 className="font-semibold text-card-foreground">Құпия сөзді өзгерту</h3>
         </div>
-
         <div className="space-y-2">
           <Label>Ағымдағы құпия сөз</Label>
           <div className="relative">
-            <Input
-              type={showCurrentPass ? "text" : "password"}
-              value={currentPassword}
-              onChange={e => setCurrentPassword(e.target.value)}
-              placeholder="••••••••"
-              className="pr-10"
-            />
+            <Input type={showCurrentPass ? "text" : "password"} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" className="pr-10" />
             <button type="button" onClick={() => setShowCurrentPass(!showCurrentPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               {showCurrentPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -216,13 +227,7 @@ export default function ProfilePage() {
         <div className="space-y-2">
           <Label>Жаңа құпия сөз</Label>
           <div className="relative">
-            <Input
-              type={showNewPass ? "text" : "password"}
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              placeholder="••••••••"
-              className="pr-10"
-            />
+            <Input type={showNewPass ? "text" : "password"} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" className="pr-10" />
             <button type="button" onClick={() => setShowNewPass(!showNewPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               {showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -230,23 +235,12 @@ export default function ProfilePage() {
         </div>
         <div className="space-y-2">
           <Label>Жаңа құпия сөзді қайталаңыз</Label>
-          <Input
-            type="password"
-            value={confirmPassword}
-            onChange={e => setConfirmPassword(e.target.value)}
-            placeholder="••••••••"
-          />
+          <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" />
           {confirmPassword && newPassword !== confirmPassword && (
             <p className="text-xs text-destructive">Құпия сөздер сәйкес келмейді</p>
           )}
         </div>
-
-        <Button
-          onClick={handleChangePassword}
-          disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
-          variant="outline"
-          className="gap-2"
-        >
+        <Button onClick={handleChangePassword} disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword} variant="outline" className="gap-2">
           <Lock className="h-4 w-4" />
           {changingPassword ? "Өзгертілуде..." : "Құпия сөзді өзгерту"}
         </Button>
@@ -290,14 +284,7 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-3">
                 <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full max-w-sm mx-auto"
-                    style={{ transform: "scaleX(-1)" }}
-                  />
+                  <video ref={videoRef} autoPlay playsInline muted className="w-full max-w-sm mx-auto" style={{ transform: "scaleX(-1)" }} />
                   {faceDetected && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="h-40 w-32 rounded-full border-4 border-success animate-pulse" />
@@ -312,13 +299,11 @@ export default function ProfilePage() {
                   )}
                 </p>
                 <div className="flex gap-2">
-                  <Button onClick={registerFaceId} disabled={!faceDetected} className="gap-2">
+                  <Button onClick={registerFaceId} disabled={!faceDetected || registeringFace} className="gap-2">
                     <ScanFace className="h-4 w-4" />
-                    Face ID тіркеу
+                    {registeringFace ? "Тіркелуде..." : "Face ID тіркеу"}
                   </Button>
-                  <Button variant="outline" onClick={stopCamera}>
-                    Болдырмау
-                  </Button>
+                  <Button variant="outline" onClick={stopCamera}>Болдырмау</Button>
                 </div>
               </div>
             )}
