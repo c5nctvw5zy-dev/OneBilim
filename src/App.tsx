@@ -60,9 +60,14 @@ import CurriculumPage from "./pages/shared/CurriculumPage";
 import PerformanceMonitoringPage from "./pages/shared/PerformanceMonitoringPage";
 import AnalyticsDetailPage from "./pages/shared/AnalyticsDetailPage";
 
+// Librarian
+import BookRegistrationPage from "./pages/librarian/BookRegistrationPage";
+import BookBorrowerPage from "./pages/librarian/BookBorrowerPage";
+import OnlineLibraryPage from "./pages/librarian/OnlineLibraryPage";
+
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
-  FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User,
+  FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User, Library,
 } from "lucide-react";
 
 const superAdminNav: NavEntry[] = [
@@ -77,19 +82,20 @@ const superAdminNav: NavEntry[] = [
 ];
 
 const directorNav: NavEntry[] = [
-  { title: "Басты бет", path: "/director", icon: Home },
   {
     title: "BilimApp",
     icon: GraduationCap,
     children: [
+      { title: "Басты бет", path: "/director", icon: Home },
       { title: "Бақылау тақтасы", path: "/director/monitoring", icon: LayoutDashboard },
       { title: "Менің кестем", path: "/director/schedule", icon: Calendar },
       { title: "Үй тапсырмасы", path: "/director/homework", icon: ClipboardList },
       { title: "Оқушылармен байланыс", path: "/director/chat", icon: MessageSquare },
+      { title: "БЖБ / ТЖБ", path: "/director/assessments", icon: Sparkles },
+      { title: "Пәндер", path: "/director/subjects", icon: BookOpen },
     ],
   },
-  { title: "БЖБ / ТЖБ", path: "/director/assessments", icon: Sparkles },
-  { title: "Пәндер", path: "/director/subjects", icon: BookOpen },
+  { title: "Профиль", path: "/director/profile", icon: User },
   {
     title: "Басқарулар",
     icon: Settings,
@@ -110,23 +116,23 @@ const directorNav: NavEntry[] = [
       { title: "Аналитика", path: "/director/analytics", icon: BarChart3 },
     ],
   },
-  { title: "Профиль", path: "/director/profile", icon: User },
 ];
 
 const zavuchNav: NavEntry[] = [
-  { title: "Басты бет", path: "/zavuch", icon: Home },
   {
     title: "BilimApp",
     icon: GraduationCap,
     children: [
+      { title: "Басты бет", path: "/zavuch", icon: Home },
       { title: "Бақылау тақтасы", path: "/zavuch/monitoring", icon: LayoutDashboard },
       { title: "Менің кестем", path: "/zavuch/schedule", icon: Calendar },
       { title: "Үй тапсырмасы", path: "/zavuch/homework", icon: ClipboardList },
       { title: "Оқушылармен байланыс", path: "/zavuch/chat", icon: MessageSquare },
+      { title: "БЖБ / ТЖБ", path: "/zavuch/assessments", icon: Sparkles },
+      { title: "Пәндер", path: "/zavuch/subjects", icon: BookOpen },
     ],
   },
-  { title: "БЖБ / ТЖБ", path: "/zavuch/assessments", icon: Sparkles },
-  { title: "Пәндер", path: "/zavuch/subjects", icon: BookOpen },
+  { title: "Профиль", path: "/zavuch/profile", icon: User },
   {
     title: "Басқарулар",
     icon: Settings,
@@ -147,29 +153,29 @@ const zavuchNav: NavEntry[] = [
       { title: "Аналитика", path: "/zavuch/analytics", icon: BarChart3 },
     ],
   },
-  { title: "Профиль", path: "/zavuch/profile", icon: User },
 ];
 
 const teacherNav: NavEntry[] = [
-  { title: "Басты бет", path: "/teacher", icon: Home },
   {
     title: "BilimApp",
     icon: GraduationCap,
     children: [
+      { title: "Басты бет", path: "/teacher", icon: Home },
+      { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
+      { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
       { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
       { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
       { title: "Үй тапсырмасы", path: "/teacher/homework", icon: ClipboardList },
       { title: "Оқушылармен байланыс", path: "/teacher/chat", icon: MessageSquare },
+      { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
+      { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
     ],
   },
-  { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
-  { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
-  { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
-  { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
   { title: "Профиль", path: "/teacher/profile", icon: User },
 ];
 
 const studentNav: NavEntry[] = [
+  { title: "Басты бет", path: "/student", icon: Home },
   { title: "Менің кестем", path: "/student/schedule", icon: Calendar },
   { title: "Менің бағаларым", path: "/student/grades", icon: BarChart3 },
   { title: "Мұғаліммен байланыс", path: "/student/chat", icon: MessageSquare },
@@ -184,6 +190,19 @@ const parentNav: NavEntry[] = [
   { title: "Бағалар", path: "/parent/grades", icon: BarChart3 },
   { title: "Үй тапсырмасы", path: "/parent/homework", icon: ClipboardList },
   { title: "Профиль", path: "/parent/profile", icon: User },
+];
+
+const librarianNav: NavEntry[] = [
+  {
+    title: "BilimApp",
+    icon: Library,
+    children: [
+      { title: "Кітапті тіркеу", path: "/librarian/books", icon: BookOpen },
+      { title: "Кітап алушыны тіркеу", path: "/librarian/borrowers", icon: Users },
+      { title: "Онлайн кітапхана", path: "/librarian/library", icon: Library },
+    ],
+  },
+  { title: "Профиль", path: "/librarian/profile", icon: User },
 ];
 
 const queryClient = new QueryClient();
@@ -285,6 +304,14 @@ const App = () => (
             <Route path="/parent/grades" element={<GradesPage />} />
             <Route path="/parent/homework" element={<HomeworkPage />} />
             <Route path="/parent/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Librarian */}
+          <Route element={<ProtectedRoute allowedRoles={["librarian"]}><DashboardLayout roleName="Кітапханашы" navItems={librarianNav} userName="Кітапханашы" /></ProtectedRoute>}>
+            <Route path="/librarian/books" element={<BookRegistrationPage />} />
+            <Route path="/librarian/borrowers" element={<BookBorrowerPage />} />
+            <Route path="/librarian/library" element={<OnlineLibraryPage />} />
+            <Route path="/librarian/profile" element={<ProfilePage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
