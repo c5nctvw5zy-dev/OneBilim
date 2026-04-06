@@ -139,6 +139,80 @@ export type Database = {
           },
         ]
       }
+      book_borrowers: {
+        Row: {
+          book_id: string
+          borrow_end: string
+          borrow_start: string
+          borrower_name: string
+          created_at: string
+          id: string
+          registered_by: string
+          returned: boolean
+          school_id: string
+        }
+        Insert: {
+          book_id: string
+          borrow_end: string
+          borrow_start: string
+          borrower_name: string
+          created_at?: string
+          id?: string
+          registered_by: string
+          returned?: boolean
+          school_id: string
+        }
+        Update: {
+          book_id?: string
+          borrow_end?: string
+          borrow_start?: string
+          borrower_name?: string
+          created_at?: string
+          id?: string
+          registered_by?: string
+          returned?: boolean
+          school_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_borrowers_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      books: {
+        Row: {
+          author: string
+          created_at: string
+          id: string
+          online_link: string | null
+          registered_by: string
+          school_id: string
+          title: string
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          id?: string
+          online_link?: string | null
+          registered_by: string
+          school_id: string
+          title: string
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          id?: string
+          online_link?: string | null
+          registered_by?: string
+          school_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       classes: {
         Row: {
           created_at: string
@@ -279,6 +353,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      holidays: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          school_id: string
+          start_date: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          school_id: string
+          start_date: string
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          school_id?: string
+          start_date?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
       }
       homework: {
         Row: {
@@ -791,6 +895,7 @@ export type Database = {
         | "teacher"
         | "student"
         | "parent"
+        | "librarian"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -925,6 +1030,7 @@ export const Constants = {
         "teacher",
         "student",
         "parent",
+        "librarian",
       ],
     },
   },

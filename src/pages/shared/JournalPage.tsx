@@ -55,13 +55,10 @@ export default function JournalPage() {
   const [newDate, setNewDate] = useState("");
   const [assessmentType, setAssessmentType] = useState("бжб");
   const [assessmentDate, setAssessmentDate] = useState("");
-  const [createForm, setCreateForm] = useState({ class_id: "", subject_id: "", quarter: "1", start_date: "", end_date: "" });
+  const [createForm, setCreateForm] = useState({ class_name: "", subject_name: "", quarter: "1", start_date: "", end_date: "" });
   const [saving, setSaving] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!user) return;
-    loadInitial();
-  }, [user]);
+  useEffect(() => { if (user) loadInitial(); }, [user]);
 
   const loadInitial = async () => {
     const { data: prof } = await supabase.from("profiles").select("id, school_id").eq("user_id", user!.id).single();
@@ -69,7 +66,6 @@ export default function JournalPage() {
     setProfileId(prof.id);
     setSchoolId(prof.school_id);
 
-    // Load all classes for this school and all subjects first
     const [classesRes, subsRes] = await Promise.all([
       prof.school_id ? supabase.from("classes").select("*").eq("school_id", prof.school_id).order("name") : Promise.resolve({ data: [] }),
       supabase.from("subjects").select("*").order("name"),
@@ -77,13 +73,11 @@ export default function JournalPage() {
     setClasses(classesRes.data || []);
     setSubjects(subsRes.data || []);
 
-    // Load journals based on role
     let jData: any[] = [];
     if (role === "teacher") {
       const { data } = await supabase.from("journals").select("*, classes(*), subjects(*)").eq("teacher_id", prof.id);
       jData = data || [];
     } else {
-      // Zavuch/Director see all school journals
       const classIds = (classesRes.data || []).map((c: any) => c.id);
       if (classIds.length > 0) {
         const { data } = await supabase.from("journals").select("*, classes(*), subjects(*)").in("class_id", classIds);
@@ -102,19 +96,39 @@ export default function JournalPage() {
       .select("student_id, group_name, profiles!student_classes_student_id_fkey(id, full_name)")
       .eq("class_id", journal.class_id);
     setStudents((sc as any[]) || []);
-
     const { data: gr } = await supabase.from("grades").select("*").eq("journal_id", journal.id);
     setGrades(gr || []);
   };
 
+  const findOrCreate = async (table: "classes" | "subjects", name: string) => {
+    if (table === "classes") {
+      const existing = classes.find(c => c.name.toLowerCase() === name.toLowerCase());
+      if (existing) return existing.id;
+      if (!schoolId) return null;
+      const { data, error } = await supabase.from("classes").insert({ name, school_id: schoolId, grade_level: parseInt(name) || 1 }).select("id").single();
+      if (error || !data) return null;
+      return data.id;
+    } else {
+      const existing = subjects.find(s => s.name.toLowerCase() === name.toLowerCase());
+      if (existing) return existing.id;
+      const { data, error } = await supabase.from("subjects").insert({ name }).select("id").single();
+      if (error || !data) return null;
+      return data.id;
+    }
+  };
+
   const createJournal = async () => {
-    if (!profileId || !createForm.class_id || !createForm.subject_id || !createForm.start_date || !createForm.end_date) {
+    if (!profileId || !createForm.class_name || !createForm.subject_name || !createForm.start_date || !createForm.end_date) {
       toast({ title: "Барлық өрістерді толтырыңыз", variant: "destructive" });
       return;
     }
+    const classId = await findOrCreate("classes", createForm.class_name);
+    const subjectId = await findOrCreate("subjects", createForm.subject_name);
+    if (!classId || !subjectId) { toast({ title: "Қате", variant: "destructive" }); return; }
+
     const { data, error } = await supabase.from("journals").insert({
-      class_id: createForm.class_id,
-      subject_id: createForm.subject_id,
+      class_id: classId,
+      subject_id: subjectId,
       quarter: parseInt(createForm.quarter),
       start_date: createForm.start_date,
       end_date: createForm.end_date,
@@ -163,8 +177,6 @@ export default function JournalPage() {
     if (!newDate) return;
     setShowAddDate(false);
     setNewDate("");
-    // The date column will appear when any grade is entered for it
-    // Pre-create empty entries to show the column
     toast({ title: `${newDate} күні қосылды` });
   };
 
@@ -177,17 +189,9 @@ export default function JournalPage() {
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
-  // Get unique dates for columns
   const lessonDates = [...new Set(grades.filter(g => g.grade_type === "lesson" || !g.grade_type).map(g => g.grade_date))].sort();
   const assessments = [...new Set(grades.filter(g => g.grade_type === "бжб" || g.grade_type === "тжб").map(g => `${g.grade_type}|${g.grade_date}`))].sort();
-  const hasQortyndy = grades.some(g => g.grade_type === "қортынды");
 
-  // If newDate was added but no grades yet, include it
-  if (newDate && !lessonDates.includes(newDate)) {
-    // Already handled via toast
-  }
-
-  // Filter students by group
   const filteredStudents = selectedGroup === "all"
     ? students
     : students.filter(s => s.group_name === selectedGroup);
@@ -223,17 +227,11 @@ export default function JournalPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Сынып</Label>
-                  <Select value={createForm.class_id} onValueChange={v => setCreateForm(p => ({ ...p, class_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Сынып таңдаңыз" /></SelectTrigger>
-                    <SelectContent>{classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Input placeholder="Мысалы: 9А" value={createForm.class_name} onChange={e => setCreateForm(p => ({ ...p, class_name: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
                   <Label>Пән</Label>
-                  <Select value={createForm.subject_id} onValueChange={v => setCreateForm(p => ({ ...p, subject_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Пән таңдаңыз" /></SelectTrigger>
-                    <SelectContent>{subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Input placeholder="Мысалы: Математика" value={createForm.subject_name} onChange={e => setCreateForm(p => ({ ...p, subject_name: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
                   <Label>Тоқсан</Label>
@@ -261,7 +259,6 @@ export default function JournalPage() {
         )}
       </div>
 
-      {/* Journal selector */}
       {journals.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {journals.map(j => (
@@ -290,10 +287,8 @@ export default function JournalPage() {
         </div>
       )}
 
-      {/* Grade table */}
       {selectedJournal && (
         <div className="space-y-4">
-          {/* Group tabs + controls */}
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex gap-1">
               <button
@@ -329,7 +324,7 @@ export default function JournalPage() {
               </Dialog>
               <Dialog open={showAddAssessment} onOpenChange={setShowAddAssessment}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1"><Plus className="h-3.5 w-3.5" /> БЖБ/ТЖБ</Button>
+                  <Button variant="outline" size="sm" className="gap-1"><Plus className="h-3.5 w-3.5" /> БЖБ/ТЖБ бағасын қою</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader><DialogTitle>Бақылау жұмысын қосу</DialogTitle></DialogHeader>
@@ -349,7 +344,6 @@ export default function JournalPage() {
             </div>
           </div>
 
-          {/* Table */}
           <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>

@@ -2,21 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  GraduationCap,
-  BookOpen,
-  Users,
-  BarChart3,
-  Shield,
-  Smartphone,
-  ChevronRight,
-  Globe,
-  CheckCircle2,
-  Newspaper,
-  Calendar,
+  GraduationCap, BookOpen, Users, BarChart3, Shield, Smartphone,
+  ChevronRight, Globe, CheckCircle2, Newspaper, Calendar, ChevronLeft,
 } from "lucide-react";
 
 const languages = { kk: "Қазақша", ru: "Русский", en: "English" } as const;
 type Lang = keyof typeof languages;
+
+const newsImages = [
+  "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=600&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&h=300&fit=crop",
+];
 
 const content = {
   kk: {
@@ -54,42 +53,28 @@ const content = {
         "Мұғалім — журнал жүргізу, тесттер жасау",
         "Оқушы — бағалар, тапсырмалар, материалдар",
         "Ата-ана — баланың үлгерімін бақылау",
+        "Кітапханашы — кітаптарды басқару",
       ],
     },
-    cta: {
-      title: "Мектебіңізді қазір тіркеңіз",
-      subtitle: "1–2 жұмыс күні ішінде өтінім қаралады",
-      button: "Тіркелу",
-    },
+    cta: { title: "Мектебіңізді қазір тіркеңіз", subtitle: "1–2 жұмыс күні ішінде өтінім қаралады", button: "Тіркелу" },
     news: {
       title: "Білім жаңалықтары",
       items: [
-        { date: "2026-04-03", title: "ҰБТ-2026: жаңа форматтағы тестілеу басталды", desc: "Биыл Ұлттық бірыңғай тестілеу алғаш рет адаптивті формат бойынша өткізіледі. Оқушылар жауап деңгейіне қарай қиындығы өзгеретін сұрақтар алады." },
-        { date: "2026-04-01", title: "Қазақстанда 200-ден астам жаңа мектеп салынады", desc: "Білім министрлігі 2026 жылы елдің барлық аймақтарында 200+ жаңа мектеп салу жоспарын мақұлдады. Бұл үш ауысымды оқуды қысқартуға бағытталған." },
-        { date: "2026-03-28", title: "Цифрлық сауаттылық пәні міндетті болды", desc: "1-сыныптан бастап «Цифрлық сауаттылық» пәні міндетті оқу бағдарламасына енгізілді. Пән кодтау, кибергигиена және ақпараттық қауіпсіздік негіздерін қамтиды." },
-        { date: "2026-03-25", title: "Мұғалімдер жалақысы 25%-ға артты", desc: "Үкімет педагогтар жалақысын 2026 жылдың сәуір айынан бастап 25%-ға арттыру туралы қаулы қабылдады. Бұл шара 350 мыңнан астам мұғалімге тиесілі." },
-        { date: "2026-03-20", title: "BilimApp — жыл сайынғы EdTech марапатын жеңіп алды", desc: "BilimApp платформасы Central Asia EdTech Awards 2026 байқауында «Үздік білім платформасы» номинациясында жеңімпаз атанды." },
+        { date: "2026-04-03", title: "ҰБТ-2026: жаңа форматтағы тестілеу басталды", desc: "Биыл Ұлттық бірыңғай тестілеу алғаш рет адаптивті формат бойынша өткізіледі." },
+        { date: "2026-04-01", title: "Қазақстанда 200-ден астам жаңа мектеп салынады", desc: "Білім министрлігі 2026 жылы елдің барлық аймақтарында 200+ жаңа мектеп салу жоспарын мақұлдады." },
+        { date: "2026-03-28", title: "Цифрлық сауаттылық пәні міндетті болды", desc: "1-сыныптан бастап «Цифрлық сауаттылық» пәні міндетті оқу бағдарламасына енгізілді." },
+        { date: "2026-03-25", title: "Мұғалімдер жалақысы 25%-ға артты", desc: "Үкімет педагогтар жалақысын 2026 жылдың сәуір айынан бастап 25%-ға арттыру туралы қаулы қабылдады." },
+        { date: "2026-03-20", title: "BilimApp — жыл сайынғы EdTech марапатын жеңіп алды", desc: "BilimApp платформасы Central Asia EdTech Awards 2026 байқауында жеңімпаз атанды." },
       ],
     },
     footer: "© 2026 BilimApp. Барлық құқықтар қорғалған.",
   },
   ru: {
     nav: { login: "Войти", register: "Регистрация школы" },
-    hero: {
-      badge: "Для школ Казахстана",
-      title: "Современная образовательная платформа",
-      subtitle: "Управление школой, электронный журнал, аналитика — всё в одном месте.",
-      cta: "Начать",
-      ctaSecondary: "Подробнее",
-    },
-    stats: [
-      { value: "500+", label: "Школ" },
-      { value: "15 000+", label: "Учителей" },
-      { value: "200 000+", label: "Учеников" },
-    ],
+    hero: { badge: "Для школ Казахстана", title: "Современная образовательная платформа", subtitle: "Управление школой, электронный журнал, аналитика — всё в одном месте.", cta: "Начать", ctaSecondary: "Подробнее" },
+    stats: [{ value: "500+", label: "Школ" }, { value: "15 000+", label: "Учителей" }, { value: "200 000+", label: "Учеников" }],
     features: {
-      title: "Возможности платформы",
-      subtitle: "Объедините все процессы школы в одной системе",
+      title: "Возможности платформы", subtitle: "Объедините все процессы школы в одной системе",
       items: [
         { icon: BookOpen, title: "Электронный журнал", desc: "Оценки, посещаемость, четвертные отчёты" },
         { icon: Users, title: "Ученики и учителя", desc: "Полные профили, система ролей, импорт Excel" },
@@ -99,51 +84,26 @@ const content = {
         { icon: Smartphone, title: "Мобильная версия", desc: "Удобно с любого устройства" },
       ],
     },
-    roles: {
-      title: "Панель для каждой роли",
-      items: [
-        "Super Admin — управление платформой",
-        "Директор — полное управление школой",
-        "Завуч — контроль учебного процесса",
-        "Учитель — журнал, тесты",
-        "Ученик — оценки, задания, материалы",
-        "Родитель — отслеживание успеваемости",
-      ],
-    },
-    cta: {
-      title: "Зарегистрируйте вашу школу",
-      subtitle: "Заявка рассматривается в течение 1–2 рабочих дней",
-      button: "Регистрация",
-    },
+    roles: { title: "Панель для каждой роли", items: ["Super Admin — управление платформой", "Директор — полное управление школой", "Завуч — контроль учебного процесса", "Учитель — журнал, тесты", "Ученик — оценки, задания, материалы", "Родитель — отслеживание успеваемости", "Библиотекарь — управление книгами"] },
+    cta: { title: "Зарегистрируйте вашу школу", subtitle: "Заявка рассматривается в течение 1–2 рабочих дней", button: "Регистрация" },
     news: {
       title: "Новости образования",
       items: [
-        { date: "2026-04-03", title: "ЕНТ-2026: начинается тестирование в новом формате", desc: "В этом году ЕНТ впервые проводится в адаптивном формате. Ученики получат вопросы, сложность которых меняется в зависимости от уровня ответов." },
-        { date: "2026-04-01", title: "В Казахстане построят более 200 новых школ", desc: "Министерство образования утвердило план строительства 200+ новых школ во всех регионах страны в 2026 году." },
-        { date: "2026-03-28", title: "Цифровая грамотность стала обязательным предметом", desc: "С 1-го класса предмет «Цифровая грамотность» включён в обязательную программу. Предмет охватывает кодирование, кибергигиену и основы информационной безопасности." },
-        { date: "2026-03-25", title: "Зарплата учителей выросла на 25%", desc: "Правительство приняло постановление о повышении зарплаты педагогов на 25% с апреля 2026 года. Мера затронет более 350 тысяч учителей." },
-        { date: "2026-03-20", title: "BilimApp — победитель ежегодной премии EdTech", desc: "Платформа BilimApp стала победителем Central Asia EdTech Awards 2026 в номинации «Лучшая образовательная платформа»." },
+        { date: "2026-04-03", title: "ЕНТ-2026: начинается тестирование в новом формате", desc: "В этом году ЕНТ впервые проводится в адаптивном формате." },
+        { date: "2026-04-01", title: "В Казахстане построят более 200 новых школ", desc: "Министерство образования утвердило план строительства 200+ новых школ." },
+        { date: "2026-03-28", title: "Цифровая грамотность стала обязательным предметом", desc: "С 1-го класса предмет «Цифровая грамотность» включён в обязательную программу." },
+        { date: "2026-03-25", title: "Зарплата учителей выросла на 25%", desc: "Правительство приняло постановление о повышении зарплаты педагогов на 25%." },
+        { date: "2026-03-20", title: "BilimApp — победитель ежегодной премии EdTech", desc: "Платформа BilimApp стала победителем Central Asia EdTech Awards 2026." },
       ],
     },
     footer: "© 2026 BilimApp. Все права защищены.",
   },
   en: {
     nav: { login: "Log in", register: "Register School" },
-    hero: {
-      badge: "For Kazakhstan Schools",
-      title: "Modern Education Platform",
-      subtitle: "School management, digital gradebook, analytics — all in one place.",
-      cta: "Get Started",
-      ctaSecondary: "Learn More",
-    },
-    stats: [
-      { value: "500+", label: "Schools" },
-      { value: "15,000+", label: "Teachers" },
-      { value: "200,000+", label: "Students" },
-    ],
+    hero: { badge: "For Kazakhstan Schools", title: "Modern Education Platform", subtitle: "School management, digital gradebook, analytics — all in one place.", cta: "Get Started", ctaSecondary: "Learn More" },
+    stats: [{ value: "500+", label: "Schools" }, { value: "15,000+", label: "Teachers" }, { value: "200,000+", label: "Students" }],
     features: {
-      title: "Platform Features",
-      subtitle: "Unite all school processes in one system",
+      title: "Platform Features", subtitle: "Unite all school processes in one system",
       items: [
         { icon: BookOpen, title: "Digital Gradebook", desc: "Grades, attendance, quarterly reports" },
         { icon: Users, title: "Students & Teachers", desc: "Full profiles, role system, Excel import" },
@@ -153,30 +113,16 @@ const content = {
         { icon: Smartphone, title: "Mobile Ready", desc: "Convenient on any device" },
       ],
     },
-    roles: {
-      title: "Panel for Every Role",
-      items: [
-        "Super Admin — full platform management",
-        "Director — complete school management",
-        "Vice Principal — education monitoring",
-        "Teacher — gradebook, tests",
-        "Student — grades, assignments, materials",
-        "Parent — track child's progress",
-      ],
-    },
-    cta: {
-      title: "Register Your School Now",
-      subtitle: "Application reviewed within 1–2 business days",
-      button: "Register",
-    },
+    roles: { title: "Panel for Every Role", items: ["Super Admin — full platform management", "Director — complete school management", "Vice Principal — education monitoring", "Teacher — gradebook, tests", "Student — grades, assignments, materials", "Parent — track child's progress", "Librarian — book management"] },
+    cta: { title: "Register Your School Now", subtitle: "Application reviewed within 1–2 business days", button: "Register" },
     news: {
       title: "Education News",
       items: [
-        { date: "2026-04-03", title: "UNT-2026: new adaptive testing format launched", desc: "This year, the Unified National Test is conducted in an adaptive format for the first time. Students receive questions that adjust in difficulty based on their responses." },
-        { date: "2026-04-01", title: "Over 200 new schools to be built in Kazakhstan", desc: "The Ministry of Education approved a plan to build 200+ new schools across all regions of the country in 2026." },
-        { date: "2026-03-28", title: "Digital literacy becomes a mandatory subject", desc: "From 1st grade, 'Digital Literacy' is now part of the mandatory curriculum, covering coding, cyber hygiene, and information security basics." },
-        { date: "2026-03-25", title: "Teacher salaries increased by 25%", desc: "The government adopted a decree to raise teacher salaries by 25% starting April 2026. The measure affects over 350,000 teachers." },
-        { date: "2026-03-20", title: "BilimApp wins annual EdTech award", desc: "BilimApp platform won the Central Asia EdTech Awards 2026 in the 'Best Education Platform' category." },
+        { date: "2026-04-03", title: "UNT-2026: new adaptive testing format launched", desc: "This year, the Unified National Test is conducted in an adaptive format for the first time." },
+        { date: "2026-04-01", title: "Over 200 new schools to be built in Kazakhstan", desc: "The Ministry of Education approved a plan to build 200+ new schools." },
+        { date: "2026-03-28", title: "Digital literacy becomes a mandatory subject", desc: "From 1st grade, 'Digital Literacy' is now part of the mandatory curriculum." },
+        { date: "2026-03-25", title: "Teacher salaries increased by 25%", desc: "The government adopted a decree to raise teacher salaries by 25%." },
+        { date: "2026-03-20", title: "BilimApp wins annual EdTech award", desc: "BilimApp platform won the Central Asia EdTech Awards 2026." },
       ],
     },
     footer: "© 2026 BilimApp. All rights reserved.",
@@ -199,16 +145,8 @@ function useScrollReveal() {
 function Section({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const { ref, visible } = useScrollReveal();
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${className}`}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(20px)",
-        filter: visible ? "blur(0)" : "blur(4px)",
-        transitionDelay: `${delay}ms`,
-      }}
-    >
+    <div ref={ref} className={`transition-all duration-700 ${className}`}
+      style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)", filter: visible ? "blur(0)" : "blur(4px)", transitionDelay: `${delay}ms` }}>
       {children}
     </div>
   );
@@ -216,7 +154,18 @@ function Section({ children, className = "", delay = 0 }: { children: React.Reac
 
 export default function Landing() {
   const [lang, setLang] = useState<Lang>("kk");
+  const [currentNews, setCurrentNews] = useState(0);
   const t = content[lang];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentNews(prev => (prev + 1) % t.news.items.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [t.news.items.length]);
+
+  const prevNews = () => setCurrentNews(prev => (prev - 1 + t.news.items.length) % t.news.items.length);
+  const nextNews = () => setCurrentNews(prev => (prev + 1) % t.news.items.length);
 
   return (
     <div className="min-h-screen bg-background">
@@ -224,28 +173,15 @@ export default function Landing() {
       <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2 text-xl font-bold text-primary">
-            <GraduationCap className="h-7 w-7" />
-            BilimApp
+            <GraduationCap className="h-7 w-7" /> BilimApp
           </Link>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <button
-                className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent transition-colors"
-                onClick={() => {
-                  const keys = Object.keys(languages) as Lang[];
-                  setLang(keys[(keys.indexOf(lang) + 1) % keys.length]);
-                }}
-              >
-                <Globe className="h-4 w-4" />
-                {languages[lang]}
-              </button>
-            </div>
-            <Link to="/login">
-              <Button variant="ghost" size="sm">{t.nav.login}</Button>
-            </Link>
-            <Link to="/register">
-              <Button size="sm">{t.nav.register}</Button>
-            </Link>
+            <button className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent transition-colors"
+              onClick={() => { const keys = Object.keys(languages) as Lang[]; setLang(keys[(keys.indexOf(lang) + 1) % keys.length]); }}>
+              <Globe className="h-4 w-4" /> {languages[lang]}
+            </button>
+            <Link to="/login"><Button variant="ghost" size="sm">{t.nav.login}</Button></Link>
+            <Link to="/register"><Button size="sm">{t.nav.register}</Button></Link>
           </div>
         </div>
       </nav>
@@ -255,31 +191,16 @@ export default function Landing() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(0_0%_100%/0.1),transparent_50%)]" />
         <div className="relative mx-auto max-w-6xl px-4 py-24 md:py-32">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="mb-4 inline-block rounded-full bg-primary-foreground/15 px-4 py-1.5 text-sm font-medium text-primary-foreground/90 animate-fade-in">
-              {t.hero.badge}
-            </span>
-            <h1 className="mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-primary-foreground md:text-6xl text-balance animate-fade-in" style={{ animationDelay: "100ms" }}>
-              {t.hero.title}
-            </h1>
-            <p className="mb-8 text-lg text-primary-foreground/80 text-balance animate-fade-in" style={{ animationDelay: "200ms" }}>
-              {t.hero.subtitle}
-            </p>
+            <span className="mb-4 inline-block rounded-full bg-primary-foreground/15 px-4 py-1.5 text-sm font-medium text-primary-foreground/90 animate-fade-in">{t.hero.badge}</span>
+            <h1 className="mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-primary-foreground md:text-6xl text-balance animate-fade-in" style={{ animationDelay: "100ms" }}>{t.hero.title}</h1>
+            <p className="mb-8 text-lg text-primary-foreground/80 text-balance animate-fade-in" style={{ animationDelay: "200ms" }}>{t.hero.subtitle}</p>
             <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "300ms" }}>
-              <Link to="/register">
-                <Button variant="hero-outline" size="xl">
-                  {t.hero.cta} <ChevronRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <a href="#features">
-                <Button variant="ghost" size="xl" className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10">
-                  {t.hero.ctaSecondary}
-                </Button>
-              </a>
+              <Link to="/register"><Button variant="hero-outline" size="xl">{t.hero.cta} <ChevronRight className="h-5 w-5" /></Button></Link>
+              <a href="#features"><Button variant="ghost" size="xl" className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10">{t.hero.ctaSecondary}</Button></a>
             </div>
           </div>
-          {/* Stats */}
           <div className="mt-16 grid grid-cols-3 gap-6 animate-fade-in" style={{ animationDelay: "450ms" }}>
-            {t.stats.map((s) => (
+            {t.stats.map(s => (
               <div key={s.label} className="rounded-xl bg-primary-foreground/10 p-5 text-center backdrop-blur-sm">
                 <div className="text-3xl font-bold text-primary-foreground tabular-nums">{s.value}</div>
                 <div className="mt-1 text-sm text-primary-foreground/70">{s.label}</div>
@@ -315,9 +236,7 @@ export default function Landing() {
       {/* Roles */}
       <section className="bg-card border-y border-border">
         <div className="mx-auto max-w-6xl px-4 py-24">
-          <Section>
-            <h2 className="mb-10 text-center text-3xl font-bold text-foreground text-balance">{t.roles.title}</h2>
-          </Section>
+          <Section><h2 className="mb-10 text-center text-3xl font-bold text-foreground text-balance">{t.roles.title}</h2></Section>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {t.roles.items.map((r, i) => (
               <Section key={r} delay={i * 70}>
@@ -331,36 +250,49 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* News */}
+      {/* News Carousel */}
       <section className="mx-auto max-w-6xl px-4 py-24">
         <Section>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-              <Newspaper className="h-4 w-4" />
-              {t.news.title}
+              <Newspaper className="h-4 w-4" /> {t.news.title}
             </div>
             <h2 className="text-3xl font-bold text-foreground text-balance">{t.news.title}</h2>
           </div>
         </Section>
-        <div className="space-y-4">
-          {t.news.items.map((n, i) => (
-            <Section key={n.title} delay={i * 80}>
-              <div className="group rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    <Calendar className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center gap-3">
-                      <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">{n.date}</span>
-                    </div>
-                    <h3 className="mb-1 text-base font-semibold text-card-foreground leading-snug">{n.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{n.desc}</p>
-                  </div>
-                </div>
-              </div>
-            </Section>
-          ))}
+
+        <div className="relative">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
+            <div className="relative h-48 md:h-64 overflow-hidden">
+              <img
+                src={newsImages[currentNews]}
+                alt={t.news.items[currentNews].title}
+                className="h-full w-full object-cover transition-all duration-700"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+            </div>
+            <div className="p-6">
+              <span className="inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums mb-2">{t.news.items[currentNews].date}</span>
+              <h3 className="text-lg font-semibold text-card-foreground mb-2 leading-snug">{t.news.items[currentNews].title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t.news.items[currentNews].desc}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <button onClick={prevNews} className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card hover:bg-accent transition-colors">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="flex gap-2">
+              {t.news.items.map((_, i) => (
+                <button key={i} onClick={() => setCurrentNews(i)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${i === currentNews ? "w-8 bg-primary" : "w-2.5 bg-muted-foreground/30"}`} />
+              ))}
+            </div>
+            <button onClick={nextNews} className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card hover:bg-accent transition-colors">
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -370,19 +302,12 @@ export default function Landing() {
           <div className="hero-gradient rounded-2xl p-12 text-center">
             <h2 className="mb-3 text-3xl font-bold text-primary-foreground text-balance">{t.cta.title}</h2>
             <p className="mb-8 text-primary-foreground/70">{t.cta.subtitle}</p>
-            <Link to="/register">
-              <Button variant="hero-outline" size="xl">
-                {t.cta.button} <ChevronRight className="h-5 w-5" />
-              </Button>
-            </Link>
+            <Link to="/register"><Button variant="hero-outline" size="xl">{t.cta.button} <ChevronRight className="h-5 w-5" /></Button></Link>
           </div>
         </Section>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        {t.footer}
-      </footer>
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">{t.footer}</footer>
     </div>
   );
 }
