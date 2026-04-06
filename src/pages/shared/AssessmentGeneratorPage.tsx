@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Edit, Sparkles } from "lucide-react";
+import { FileText, Download, Edit, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const subjects = ["Математика", "Қазақ тілі", "Физика", "Химия", "Биология", "Тарих", "Ағылшын тілі", "Информатика"];
@@ -21,6 +21,7 @@ interface GeneratedAssessment {
   topic: string;
   totalScore: number;
   createdAt: string;
+  content?: string;
 }
 
 export default function AssessmentGeneratorPage() {
@@ -37,13 +38,39 @@ export default function AssessmentGeneratorPage() {
   ]);
   const [generating, setGenerating] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!subject || !className || !quarter || !topic) {
       toast({ title: "Қате", description: "Барлық өрістерді толтырыңыз", variant: "destructive" });
       return;
     }
     setGenerating(true);
-    setTimeout(() => {
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content: `Сен мектеп мұғалімдеріне арналған ${type} тапсырма жасайтын көмекшісің. Тапсырмаларды қазақ тілінде жаса. Жалпы балл: ${totalScore}. Әр тапсырманың жанына баллын жаз.`
+            },
+            {
+              role: "user",
+              content: `${type} жаса. Пән: ${subject}. Сынып: ${className}. Тоқсан: ${quarter}. Тақырып: ${topic}. Жалпы балл: ${totalScore}.`
+            }
+          ],
+        }),
+      });
+
+      let content = "";
+      if (response.ok) {
+        const data = await response.json();
+        content = data.choices?.[0]?.message?.content || data.content || "Тапсырма жасалды";
+      } else {
+        content = generateFallbackContent(type, subject, className, topic, parseInt(totalScore));
+      }
+
       const newA: GeneratedAssessment = {
         id: Date.now(),
         type,
@@ -53,11 +80,35 @@ export default function AssessmentGeneratorPage() {
         topic,
         totalScore: parseInt(totalScore) || 20,
         createdAt: new Date().toISOString().split("T")[0],
+        content,
       };
-      setAssessments((prev) => [newA, ...prev]);
-      setGenerating(false);
+      setAssessments(prev => [newA, ...prev]);
       toast({ title: "Дайын!", description: `${type} сәтті жасалды` });
-    }, 2000);
+    } catch {
+      const content = generateFallbackContent(type, subject, className, topic, parseInt(totalScore));
+      const newA: GeneratedAssessment = {
+        id: Date.now(), type, subject, className, quarter, topic,
+        totalScore: parseInt(totalScore) || 20,
+        createdAt: new Date().toISOString().split("T")[0],
+        content,
+      };
+      setAssessments(prev => [newA, ...prev]);
+      toast({ title: "Дайын!", description: `${type} жасалды` });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const downloadAsPdf = (assessment: GeneratedAssessment) => {
+    const content = assessment.content || `${assessment.type}: ${assessment.topic}\nПән: ${assessment.subject}\nСынып: ${assessment.className}\nТоқсан: ${assessment.quarter}\nЖалпы балл: ${assessment.totalScore}`;
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${assessment.type}_${assessment.subject}_${assessment.className}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Жүктелді!" });
   };
 
   return (
@@ -82,35 +133,35 @@ export default function AssessmentGeneratorPage() {
               <Label>Пән</Label>
               <Select value={subject} onValueChange={setSubject}>
                 <SelectTrigger><SelectValue placeholder="Таңдау" /></SelectTrigger>
-                <SelectContent>{subjects.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                <SelectContent>{subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>Сынып</Label>
               <Select value={className} onValueChange={setClassName}>
                 <SelectTrigger><SelectValue placeholder="Таңдау" /></SelectTrigger>
-                <SelectContent>{classList.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                <SelectContent>{classList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>Тоқсан</Label>
               <Select value={quarter} onValueChange={setQuarter}>
                 <SelectTrigger><SelectValue placeholder="Таңдау" /></SelectTrigger>
-                <SelectContent>{quarters.map((q) => <SelectItem key={q} value={q}>{q}</SelectItem>)}</SelectContent>
+                <SelectContent>{quarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>Тақырып</Label>
-              <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Тақырыпты жазыңыз" />
+              <Input value={topic} onChange={e => setTopic(e.target.value)} placeholder="Тақырыпты жазыңыз" />
             </div>
             <div className="space-y-2">
               <Label>Жалпы балл</Label>
-              <Input type="number" value={totalScore} onChange={(e) => setTotalScore(e.target.value)} />
+              <Input type="number" value={totalScore} onChange={e => setTotalScore(e.target.value)} />
             </div>
           </div>
           <Button className="mt-4" onClick={handleGenerate} disabled={generating}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            {generating ? "Жасалуда..." : "ЖИ арқылы жасау"}
+            {generating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+            {generating ? "ЖИ жасап жатыр..." : "ЖИ арқылы жасау"}
           </Button>
         </CardContent>
       </Card>
@@ -119,20 +170,25 @@ export default function AssessmentGeneratorPage() {
         <CardHeader><CardTitle className="text-base">Жасалған тапсырмалар</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {assessments.map((a) => (
-              <div key={a.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{a.type}: {a.topic}</p>
-                    <p className="text-xs text-muted-foreground">{a.subject} · {a.className} · {a.quarter} · {a.totalScore} балл</p>
+            {assessments.map(a => (
+              <div key={a.id} className="rounded-lg border border-border p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{a.type}: {a.topic}</p>
+                      <p className="text-xs text-muted-foreground">{a.subject} · {a.className} · {a.quarter} · {a.totalScore} балл</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{a.createdAt}</Badge>
+                    <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => downloadAsPdf(a)}><Download className="h-4 w-4" /></Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{a.createdAt}</Badge>
-                  <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon"><Download className="h-4 w-4" /></Button>
-                </div>
+                {a.content && (
+                  <pre className="mt-2 text-xs text-muted-foreground whitespace-pre-wrap bg-muted/50 rounded-lg p-3 max-h-40 overflow-auto">{a.content}</pre>
+                )}
               </div>
             ))}
           </div>
@@ -140,4 +196,28 @@ export default function AssessmentGeneratorPage() {
       </Card>
     </div>
   );
+}
+
+function generateFallbackContent(type: string, subject: string, className: string, topic: string, totalScore: number): string {
+  const perQ = Math.floor(totalScore / 5);
+  const remainder = totalScore - perQ * 5;
+  return `${type} — ${subject}
+Сынып: ${className}
+Тақырып: ${topic}
+Жалпы балл: ${totalScore}
+
+1-тапсырма (${perQ} балл):
+${topic} бойынша негізгі ұғымдарды анықтаңыз.
+
+2-тапсырма (${perQ} балл):
+Берілген мысалды шешіңіз.
+
+3-тапсырма (${perQ} балл):
+Формуланы қолданып есепті шығарыңыз.
+
+4-тапсырма (${perQ} балл):
+Графикті талдап, қорытынды жасаңыз.
+
+5-тапсырма (${perQ + remainder} балл):
+Шығармашылық тапсырма: өз мысалыңызды құрыңыз.`;
 }
