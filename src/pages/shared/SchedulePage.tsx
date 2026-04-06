@@ -41,7 +41,7 @@ export default function SchedulePage() {
   const [subjects, setSubjects] = useState<any[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
   const [schoolId, setSchoolId] = useState<string | null>(null);
-  const [form, setForm] = useState({ day: "1", class_id: "", subject_id: "", teacher_id: "", lesson_order: "1", start_time: "08:30", end_time: "09:15" });
+  const [form, setForm] = useState({ day: "1", class_name: "", subject_name: "", teacher_name: "", lesson_order: "1", start_time: "08:30", end_time: "09:15" });
 
   const canManage = role === "director" || role === "zavuch";
 
@@ -71,16 +71,42 @@ export default function SchedulePage() {
     setLoading(false);
   };
 
+  const findOrCreate = async (table: "classes" | "subjects", name: string) => {
+    if (table === "classes") {
+      const existing = classes.find(c => c.name.toLowerCase() === name.toLowerCase());
+      if (existing) return existing.id;
+      const { data, error } = await supabase.from("classes").insert({ name, school_id: schoolId!, grade_level: parseInt(name) || 1 }).select("id").single();
+      if (error || !data) return null;
+      return data.id;
+    } else {
+      const existing = subjects.find(s => s.name.toLowerCase() === name.toLowerCase());
+      if (existing) return existing.id;
+      const { data, error } = await supabase.from("subjects").insert({ name }).select("id").single();
+      if (error || !data) return null;
+      return data.id;
+    }
+  };
+
   const handleCreate = async () => {
-    if (!form.class_id || !form.subject_id || !schoolId) {
-      toast({ title: "Барлық өрістерді толтырыңыз", variant: "destructive" });
+    if (!form.class_name || !form.subject_name || !schoolId) {
+      toast({ title: "Сынып пен пәнді жазыңыз", variant: "destructive" });
       return;
     }
+    const classId = await findOrCreate("classes", form.class_name);
+    const subjectId = await findOrCreate("subjects", form.subject_name);
+    if (!classId || !subjectId) { toast({ title: "Қате", variant: "destructive" }); return; }
+
+    let teacherId: string | null = null;
+    if (form.teacher_name) {
+      const t = teachers.find(t => t.full_name.toLowerCase() === form.teacher_name.toLowerCase());
+      teacherId = t?.id || null;
+    }
+
     const { error } = await supabase.from("schedules").insert({
       school_id: schoolId,
-      class_id: form.class_id,
-      subject_id: form.subject_id,
-      teacher_id: form.teacher_id || null,
+      class_id: classId,
+      subject_id: subjectId,
+      teacher_id: teacherId,
       day_of_week: parseInt(form.day),
       lesson_order: parseInt(form.lesson_order),
       start_time: form.start_time,
@@ -124,27 +150,18 @@ export default function SchedulePage() {
                 </div>
                 <div className="space-y-1">
                   <Label>Сынып</Label>
-                  <Select value={form.class_id} onValueChange={v => setForm(p => ({ ...p, class_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Сынып" /></SelectTrigger>
-                    <SelectContent>{classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Input placeholder="Мысалы: 9А" value={form.class_name} onChange={e => setForm(p => ({ ...p, class_name: e.target.value }))} />
                 </div>
                 <div className="space-y-1">
                   <Label>Пән</Label>
-                  <Select value={form.subject_id} onValueChange={v => setForm(p => ({ ...p, subject_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Пән" /></SelectTrigger>
-                    <SelectContent>{subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Input placeholder="Мысалы: Математика" value={form.subject_name} onChange={e => setForm(p => ({ ...p, subject_name: e.target.value }))} />
                 </div>
                 <div className="space-y-1">
                   <Label>Мұғалім</Label>
-                  <Select value={form.teacher_id} onValueChange={v => setForm(p => ({ ...p, teacher_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Мұғалім" /></SelectTrigger>
-                    <SelectContent>{teachers.map(t => <SelectItem key={t.id} value={t.id}>{t.full_name}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Input placeholder="Мысалы: Ахметов А." value={form.teacher_name} onChange={e => setForm(p => ({ ...p, teacher_name: e.target.value }))} />
                 </div>
                 <div className="space-y-1">
-                  <Label>Сабақ реті (сағат)</Label>
+                  <Label>Сабақ реті</Label>
                   <Select value={form.lesson_order} onValueChange={v => {
                     const idx = parseInt(v) - 1;
                     const t = defaultTimes[idx] || defaultTimes[0];
@@ -162,15 +179,13 @@ export default function SchedulePage() {
       </div>
 
       {schedule.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
-          Кесте жасалмаған
-        </div>
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">Кесте жасалмаған</div>
       ) : (
         <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto">
           <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b border-border bg-muted/50">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground w-24">Сағат</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground w-24">Сабақ</th>
                 {(days.length > 0 ? days : [1,2,3,4,5]).map(d => (
                   <th key={d} className="px-4 py-3 text-left font-medium text-muted-foreground">{dayLabels[d]}</th>
                 ))}
@@ -180,7 +195,7 @@ export default function SchedulePage() {
               {Array.from({ length: maxLesson }, (_, i) => i + 1).map(order => (
                 <tr key={order} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-mono text-xs font-medium text-primary tabular-nums">
-                    {defaultTimes[order - 1]?.start || ""} - {defaultTimes[order - 1]?.end || ""}
+                    {order}-сабақ<br/><span className="text-[10px] text-muted-foreground">{defaultTimes[order - 1]?.start}-{defaultTimes[order - 1]?.end}</span>
                   </td>
                   {(days.length > 0 ? days : [1,2,3,4,5]).map(d => {
                     const item = schedule.find(s => s.day_of_week === d && s.lesson_order === order);

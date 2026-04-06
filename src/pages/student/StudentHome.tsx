@@ -2,6 +2,16 @@ import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { BarChart3, ClipboardList, Calendar, MessageSquare } from "lucide-react";
 
+const todayLessons = [
+  { time: "08:30", subject: "Математика", grade: 5 },
+  { time: "09:20", subject: "Қазақ тілі", grade: null },
+  { time: "10:20", subject: "Физика", grade: 4 },
+  { time: "11:10", subject: "Ағылшын тілі", grade: 5 },
+  { time: "12:10", subject: "Тарих", grade: null },
+  { time: "13:00", subject: "Дене шынықтыру", grade: null },
+  { time: "13:50", subject: "Информатика", grade: 3 },
+];
+
 export default function StudentHome() {
   const navigate = useNavigate();
 
@@ -17,18 +27,17 @@ export default function StudentHome() {
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <h3 className="mb-4 text-base font-semibold text-card-foreground">📅 Бүгінгі сабақтар</h3>
           <div className="space-y-2">
-            {[
-              { time: "08:30", subject: "Математика" },
-              { time: "09:20", subject: "Қазақ тілі" },
-              { time: "10:20", subject: "Физика" },
-              { time: "11:10", subject: "Ағылшын тілі" },
-              { time: "12:10", subject: "Тарих" },
-              { time: "13:00", subject: "Дене шынықтыру" },
-              { time: "13:50", subject: "Информатика" },
-            ].map((s, i) => (
+            {todayLessons.map((s, i) => (
               <div key={i} className="flex items-center gap-4 rounded-lg border border-border p-3">
                 <span className="text-sm font-mono font-medium text-primary tabular-nums w-12">{s.time}</span>
-                <span className="text-sm text-foreground">{s.subject}</span>
+                <span className="text-sm text-foreground flex-1">{s.subject}</span>
+                {s.grade !== null ? (
+                  <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                    s.grade >= 4 ? "bg-success/10 text-success" : s.grade >= 3 ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"
+                  }`}>{s.grade}</span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">—</span>
+                )}
               </div>
             ))}
           </div>
