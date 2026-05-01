@@ -307,7 +307,9 @@ export default function Landing() {
         </Section>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">{t.footer}</footer>
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+        <a href="/copyright" className="hover:text-foreground hover:underline transition-colors">{t.footer}</a>
+      </footer>
     </div>
   );
 }
