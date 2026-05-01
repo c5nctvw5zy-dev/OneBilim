@@ -77,6 +77,14 @@ export default function Login() {
   };
 
   const startFaceId = async () => {
+    if (!email.trim()) {
+      toast({
+        title: "Email қажет",
+        description: "Face ID арқылы кіру үшін алдымен email/логиніңізді енгізіңіз.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: 320, height: 240 },
