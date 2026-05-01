@@ -569,14 +569,46 @@ export type Database = {
           },
         ]
       }
+      password_resets: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          iin: string
+          temp_password_hash: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          iin: string
+          temp_password_hash: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          iin?: string
+          temp_password_hash?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          birth_date: string | null
           created_at: string
           email: string | null
           face_id_data: string | null
           face_id_registered: boolean
           full_name: string
+          gender: string | null
           id: string
           iin: string | null
           phone: string | null
@@ -586,11 +618,13 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           email?: string | null
           face_id_data?: string | null
           face_id_registered?: boolean
           full_name: string
+          gender?: string | null
           id?: string
           iin?: string | null
           phone?: string | null
@@ -600,11 +634,13 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           email?: string | null
           face_id_data?: string | null
           face_id_registered?: boolean
           full_name?: string
+          gender?: string | null
           id?: string
           iin?: string | null
           phone?: string | null

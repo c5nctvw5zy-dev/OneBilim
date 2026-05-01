@@ -77,6 +77,14 @@ export default function Login() {
   };
 
   const startFaceId = async () => {
+    if (!email.trim()) {
+      toast({
+        title: "Email қажет",
+        description: "Face ID арқылы кіру үшін алдымен email/логиніңізді енгізіңіз.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: 320, height: 240 },
@@ -103,50 +111,52 @@ export default function Login() {
 
   const verifyFaceId = async () => {
     setFaceVerifying(true);
+    const targetEmail = normalizeLoginIdentifier(email);
 
-    // Check DB for any user with face_id_registered = true
-    const { data: faceUsers, error } = await supabase
+    // Look up THIS specific user by email and check Face ID is registered
+    const { data: profile, error } = await supabase
       .from("profiles")
-      .select("user_id, full_name, email")
-      .eq("face_id_registered", true)
-      .limit(10);
+      .select("user_id, full_name, email, face_id_registered, face_id_data")
+      .eq("email", targetEmail)
+      .maybeSingle();
 
-    if (error || !faceUsers || faceUsers.length === 0) {
+    if (error || !profile) {
       toast({
-        title: "Face ID табылмады",
-        description: "Face ID тіркелмеген. Алдымен профильде Face ID тіркеңіз.",
+        title: "Пайдаланушы табылмады",
+        description: "Бұл email-мен пайдаланушы жоқ.",
         variant: "destructive",
       });
       setFaceVerifying(false);
       return;
     }
 
-    // Simulate face verification delay
+    if (!profile.face_id_registered || !profile.face_id_data) {
+      toast({
+        title: "Face ID тіркелмеген",
+        description: "Бұл пайдаланушыда Face ID жоқ. Алдымен профильде тіркеңіз.",
+        variant: "destructive",
+      });
+      setFaceVerifying(false);
+      return;
+    }
+
+    // Simulated biometric match against the user's stored face data
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // In demo mode, match to the first registered face user
-    const matchedUser = faceUsers[0];
-    toast({ title: "Face ID расталды!", description: `${matchedUser.full_name} — жүйеге кіру орындалуда...` });
+    toast({ title: "Face ID расталды ✓", description: `${profile.full_name} — кіру орындалуда...` });
     stopFaceId();
 
-    // Auto-fill email and prompt for password, or use demo password
-    const matchedEmail = matchedUser.email;
-    if (matchedEmail) {
-      // Try demo login
-      const demoPassword = "Demo123!";
-      const { error: loginError, user } = await signIn(matchedEmail, demoPassword);
-      if (!loginError && user) {
-        await navigateByRole(user.id);
-        setFaceVerifying(false);
-        return;
-      }
-      // If demo password doesn't work, pre-fill email
-      setEmail(matchedEmail);
-      toast({
-        title: "Face ID расталды ✓",
-        description: "Email толтырылды. Құпия сөзіңізді енгізіңіз.",
-      });
+    const demoPassword = "Demo123!";
+    const { error: loginError, user } = await signIn(targetEmail, demoPassword);
+    if (!loginError && user) {
+      await navigateByRole(user.id);
+      setFaceVerifying(false);
+      return;
     }
+    toast({
+      title: "Құпия сөз қажет",
+      description: "Face ID расталды, бірақ автоматты кіру сәтсіз. Құпия сөзіңізді енгізіңіз.",
+    });
     setFaceVerifying(false);
   };
 
@@ -213,6 +223,11 @@ export default function Login() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  <div className="text-right">
+                    <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                      Құпия сөзді ұмыттыңыз ба?
+                    </Link>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" size="lg" disabled={loading}>
                   {loading ? "Кіру..." : "Кіру"}
@@ -266,6 +281,9 @@ export default function Login() {
               <Link to="/" className="mt-4 block text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                 ← Басты бетке оралу
               </Link>
+              <p className="mt-6 text-center text-xs text-muted-foreground">
+                <Link to="/copyright" className="hover:underline">© 2026 BilimApp. Барлық құқықтар қорғалған.</Link>
+              </p>
             </>
           )}
         </div>

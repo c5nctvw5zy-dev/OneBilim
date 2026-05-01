@@ -14,6 +14,8 @@ export default function ProfilePage() {
   const [fullName, setFullName] = useState(profile?.full_name || "");
   const [phone, setPhone] = useState(profile?.phone || "");
   const [iin, setIin] = useState(profile?.iin || "");
+  const [birthDate, setBirthDate] = useState<string>((profile as any)?.birth_date || "");
+  const [gender, setGender] = useState<string>((profile as any)?.gender || "");
   const [saving, setSaving] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -36,6 +38,8 @@ export default function ProfilePage() {
       setFullName(profile.full_name || "");
       setPhone(profile.phone || "");
       setIin(profile.iin || "");
+      setBirthDate((profile as any).birth_date || "");
+      setGender((profile as any).gender || "");
       setFaceIdRegistered(!!profile.face_id_registered);
     }
   }, [profile]);
@@ -45,7 +49,7 @@ export default function ProfilePage() {
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: fullName, phone, iin })
+      .update({ full_name: fullName, phone, iin, birth_date: birthDate || null, gender: gender || null } as any)
       .eq("user_id", user.id);
 
     if (error) {
@@ -198,7 +202,23 @@ export default function ProfilePage() {
           </div>
           <div className="space-y-2">
             <Label>ЖСН (ИИН)</Label>
-            <Input value={iin} onChange={e => setIin(e.target.value)} placeholder="123456789012" maxLength={12} />
+            <Input value={iin} onChange={e => setIin(e.target.value.replace(/\D/g, ""))} placeholder="123456789012" maxLength={12} />
+          </div>
+          <div className="space-y-2">
+            <Label>Туған күні</Label>
+            <Input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Жынысы</Label>
+            <select
+              value={gender}
+              onChange={e => setGender(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">Таңдаңыз</option>
+              <option value="Ер">Ер</option>
+              <option value="Әйел">Әйел</option>
+            </select>
           </div>
         </div>
         <Button onClick={handleSaveProfile} disabled={saving} className="gap-2">
