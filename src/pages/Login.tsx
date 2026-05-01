@@ -223,6 +223,11 @@ export default function Login() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  <div className="text-right">
+                    <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                      Құпия сөзді ұмыттыңыз ба?
+                    </Link>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" size="lg" disabled={loading}>
                   {loading ? "Кіру..." : "Кіру"}
@@ -276,6 +281,9 @@ export default function Login() {
               <Link to="/" className="mt-4 block text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                 ← Басты бетке оралу
               </Link>
+              <p className="mt-6 text-center text-xs text-muted-foreground">
+                <Link to="/copyright" className="hover:underline">© 2026 BilimApp. Барлық құқықтар қорғалған.</Link>
+              </p>
             </>
           )}
         </div>
