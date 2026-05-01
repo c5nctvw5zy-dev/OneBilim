@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
+import Copyright from "./pages/Copyright";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import DashboardLayout from "@/components/DashboardLayout";
 import type { NavEntry } from "@/components/DashboardLayout";
@@ -218,6 +220,8 @@ const App = () => (
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/copyright" element={<Copyright />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Super Admin */}
           <Route element={<ProtectedRoute allowedRoles={["super_admin"]}><DashboardLayout roleName="Super Admin" navItems={superAdminNav} userName="Admin" /></ProtectedRoute>}>
