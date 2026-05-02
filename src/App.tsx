@@ -25,6 +25,7 @@ import SuperAdminUsers from "./pages/superadmin/SuperAdminUsers";
 import SuperAdminAnalytics from "./pages/superadmin/SuperAdminAnalytics";
 import SuperAdminLogs from "./pages/superadmin/SuperAdminLogs";
 import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
+import SuperAdminNews from "./pages/superadmin/SuperAdminNews";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
@@ -70,17 +71,38 @@ import OnlineLibraryPage from "./pages/librarian/OnlineLibraryPage";
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
   FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User, Library,
+  Newspaper, Shield, Building2,
 } from "lucide-react";
 
 const superAdminNav: NavEntry[] = [
-  { title: "Басты бет", path: "/super-admin", icon: Home },
-  { title: "Мектептер", path: "/super-admin/schools", icon: School },
-  { title: "Өтінімдер", path: "/super-admin/applications", icon: ClipboardList },
-  { title: "Пәндер", path: "/super-admin/subjects", icon: BookOpen },
+  {
+    title: "Жүйені басқару",
+    icon: Settings,
+    children: [
+      { title: "Басты бет", path: "/super-admin", icon: Home },
+      { title: "Жүйе баптаулары", path: "/super-admin/settings", icon: Settings },
+      { title: "Өтінімдер", path: "/super-admin/applications", icon: ClipboardList },
+      { title: "Пәндер", path: "/super-admin/subjects", icon: BookOpen },
+    ],
+  },
+  {
+    title: "Ұйымдар",
+    icon: Building2,
+    children: [
+      { title: "Мектептер", path: "/super-admin/schools", icon: School },
+    ],
+  },
+  { title: "Профиль", path: "/super-admin/profile", icon: User },
   { title: "Пайдаланушылар", path: "/super-admin/users", icon: Users },
   { title: "Аналитика", path: "/super-admin/analytics", icon: BarChart3 },
-  { title: "Логтар", path: "/super-admin/logs", icon: FileText },
-  { title: "Баптаулар", path: "/super-admin/settings", icon: Settings },
+  { title: "Жаңалықтар", path: "/super-admin/news", icon: Newspaper },
+  {
+    title: "Қауіпсіздік",
+    icon: Shield,
+    children: [
+      { title: "Логтар", path: "/super-admin/logs", icon: FileText },
+    ],
+  },
 ];
 
 const directorNav: NavEntry[] = [
@@ -233,6 +255,7 @@ const App = () => (
             <Route path="/super-admin/analytics" element={<SuperAdminAnalytics />} />
             <Route path="/super-admin/logs" element={<SuperAdminLogs />} />
             <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
+            <Route path="/super-admin/news" element={<SuperAdminNews />} />
             <Route path="/super-admin/profile" element={<ProfilePage />} />
           </Route>
 

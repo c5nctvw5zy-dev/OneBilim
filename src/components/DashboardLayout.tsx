@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import AnnouncementCenter from "@/components/AnnouncementCenter";
 
 export interface NavItem {
   title: string;
@@ -257,6 +258,7 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           <Outlet />
         </main>
+        <AnnouncementCenter />
       </div>
     </div>
   );
