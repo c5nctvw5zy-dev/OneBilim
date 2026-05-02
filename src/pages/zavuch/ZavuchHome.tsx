@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import { Home, Calendar, FileCheck, BookOpen, ClipboardList, AlertTriangle, Clock, Users, TrendingUp, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import AnnouncementBroadcast from "@/components/AnnouncementBroadcast";
 
 const topStudents = [
   { name: "Назарбекова Айым", class: "11А", avg: 4.9 },
@@ -25,6 +27,7 @@ const problemClasses = [
 
 export default function ZavuchHome() {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function ZavuchHome() {
           <h3 className="mb-4 text-base font-semibold text-card-foreground">⚡ Жылдам әрекеттер</h3>
           <div className="space-y-2">
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/analytics")}><BookOpen className="h-4 w-4" /> Жалпы статистика</Button>
-            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/chat")}><ClipboardList className="h-4 w-4" /> Хабарландыру жазу</Button>
+            <AnnouncementBroadcast scope="school" schoolId={profile?.school_id} />
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/students")}><Users className="h-4 w-4" /> Оқушыларды бақылау</Button>
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/zavuch/documents")}><FileCheck className="h-4 w-4" /> Бұйрық шығару</Button>
           </div>
