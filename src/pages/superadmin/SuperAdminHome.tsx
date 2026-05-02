@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
-import { School, Users, Activity, FileText, Plus, Bell, ClipboardList, Loader2, Trash2 } from "lucide-react";
+import { School, Users, Activity, FileText, Plus, ClipboardList, Loader2, Trash2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import AnnouncementBroadcast from "@/components/AnnouncementBroadcast";
 
 export default function SuperAdminHome() {
   const navigate = useNavigate();
@@ -15,6 +16,12 @@ export default function SuperAdminHome() {
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [deleting, setDeleting] = useState(false);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -38,6 +45,9 @@ export default function SuperAdminHome() {
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
+  const timeStr = now.toLocaleTimeString("kk-KZ", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const dateStr = now.toLocaleDateString("kk-KZ", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
     const hours = Math.floor(diff / 3600000);
@@ -54,6 +64,12 @@ export default function SuperAdminHome() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm">
+        <Clock className="h-5 w-5 text-primary" />
+        <span className="text-lg font-mono font-semibold text-foreground tabular-nums">{timeStr}</span>
+        <span className="text-sm text-muted-foreground">· {dateStr}</span>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Мектептер" value={stats.schools} icon={School} color="blue" />
         <StatCard title="Пайдаланушылар" value={stats.users} icon={Users} color="green" />
@@ -63,7 +79,7 @@ export default function SuperAdminHome() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="mb-4 text-base font-semibold text-card-foreground">Жылдам әрекеттер</h3>
+          <h3 className="mb-4 text-base font-semibold text-card-foreground">⚡ Жылдам әрекеттер</h3>
           <div className="space-y-2">
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/super-admin/schools")}>
               <Plus className="h-4 w-4" /> Мектеп қосу
@@ -72,6 +88,7 @@ export default function SuperAdminHome() {
               <ClipboardList className="h-4 w-4" /> Өтінімдерді қабылдау
               {stats.pending > 0 && <span className="ml-auto rounded-full bg-warning/10 px-2 py-0.5 text-xs font-bold text-warning">{stats.pending}</span>}
             </Button>
+            <AnnouncementBroadcast scope="system" />
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/super-admin/users")}>
               <Users className="h-4 w-4" /> Пайдаланушылар
             </Button>
