@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
-import { Users, GraduationCap, TrendingUp, CheckCircle, BarChart3, Bell, Eye, FileText, AlertTriangle, Clock } from "lucide-react";
+import { Users, GraduationCap, TrendingUp, CheckCircle, BarChart3, Eye, FileText, AlertTriangle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import AnnouncementBroadcast from "@/components/AnnouncementBroadcast";
 
 const topStudents = [
   { name: "Назарбекова Айым", class: "11А", avg: 4.9 },
@@ -27,6 +29,7 @@ const problemClasses = [
 export default function DirectorHome() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile } = useAuth();
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -57,7 +60,7 @@ export default function DirectorHome() {
           <h3 className="mb-4 text-base font-semibold text-card-foreground">⚡ Жылдам әрекеттер</h3>
           <div className="space-y-2">
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/analytics")}><BarChart3 className="h-4 w-4" /> Жалпы статистиканы көру</Button>
-            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/chat")}><Bell className="h-4 w-4" /> Хабарландыру жазу</Button>
+            <AnnouncementBroadcast scope="school" schoolId={profile?.school_id} />
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/students")}><Eye className="h-4 w-4" /> Оқушыларды бақылау</Button>
             <Button variant="outline" className="w-full justify-start gap-2" onClick={() => navigate("/director/documents")}><FileText className="h-4 w-4" /> Бұйрық шығару</Button>
           </div>
