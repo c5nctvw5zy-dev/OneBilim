@@ -239,7 +239,51 @@ const librarianNav: NavEntry[] = [
   { title: "Профиль", path: "/librarian/profile", icon: User },
 ];
 
-const queryClient = new QueryClient();
+const psychologistNav: NavEntry[] = [
+  { title: "🧑‍⚕️ Кеңес беру", path: "/psychologist/consult", icon: Brain },
+  { title: "🧪 Тест жүргізу", path: "/psychologist/tests", icon: ClipboardList },
+  { title: "📁 Оқушылармен жұмыс", path: "/psychologist/work", icon: FileText },
+  { title: "💬 Чат", path: "/psychologist/chat", icon: MessageSquare },
+  { title: "Профиль", path: "/psychologist/profile", icon: User },
+];
+
+const socialNav: NavEntry[] = [
+  { title: "📊 Әлеуметтік бақылау", path: "/social/monitoring", icon: BarChart3 },
+  { title: "👨‍👩‍👧 Отбасымен байланыс", path: "/social/family", icon: Users },
+  { title: "💬 Чат", path: "/social/chat", icon: MessageSquare },
+  { title: "Профиль", path: "/social/profile", icon: User },
+];
+
+const speechNav: NavEntry[] = [
+  { title: "🧑‍🏫 Жеке сабақ", path: "/speech/individual", icon: BookOpen },
+  { title: "♿ Инклюзивті білім", path: "/speech/inclusive", icon: Accessibility },
+  { title: "💬 Чат", path: "/speech/chat", icon: MessageSquare },
+  { title: "Профиль", path: "/speech/profile", icon: User },
+];
+
+const nurseNav: NavEntry[] = [
+  { title: "🩺 Денсаулық тексеру", path: "/nurse/health", icon: Stethoscope },
+  { title: "📕 Алғашқы көмек", path: "/nurse/first-aid", icon: HeartPulse },
+  { title: "📁 Медициналық карталар", path: "/nurse/cards", icon: FileText },
+  { title: "💬 Чат", path: "/nurse/chat", icon: MessageSquare },
+  { title: "Профиль", path: "/nurse/profile", icon: User },
+];
+
+const hrNav: NavEntry[] = [
+  { title: "👥 Қызметкерлер", path: "/hr/staff", icon: Users },
+  { title: "📄 Жұмысқа қабылдау", path: "/hr/hiring", icon: Briefcase },
+  { title: "💬 Чат", path: "/hr/chat", icon: MessageSquare },
+  { title: "Профиль", path: "/hr/profile", icon: User },
+];
+
+const secretaryNav: NavEntry[] = [
+  { title: "📜 Бұйрық кітабы", path: "/secretary/orders", icon: FileSignature },
+  { title: "✉️ Хат жазу", path: "/secretary/letter", icon: MessageSquare },
+  { title: "📂 Құжаттарды тіркеу", path: "/secretary/register-docs", icon: FileCheck },
+  { title: "📁 Құжаттармен жұмыс", path: "/secretary/docs-work", icon: FileText },
+  { title: "💬 Чат", path: "/secretary/chat", icon: MessageSquare },
+  { title: "Профиль", path: "/secretary/profile", icon: User },
+];
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
