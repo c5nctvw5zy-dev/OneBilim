@@ -68,10 +68,20 @@ import BookRegistrationPage from "./pages/librarian/BookRegistrationPage";
 import BookBorrowerPage from "./pages/librarian/BookBorrowerPage";
 import OnlineLibraryPage from "./pages/librarian/OnlineLibraryPage";
 
+// Жаңа рөлдер (Психолог, Әлеуметтік педагог, Логопед, Медбике, Кадр, Хатшы)
+import {
+  PsychologistConsult, PsychologistTests, PsychologistWork,
+  SocialMonitoring, SocialFamily,
+  SpeechIndividual, SpeechInclusive,
+  NurseHealth, NurseFirstAid, NurseCards,
+  HrStaff, HrHiring,
+  SecretaryOrders, SecretaryWriteLetter, SecretaryRegisterDocs, SecretaryDocsWork,
+} from "./pages/staff/StaffPages";
+
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
   FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User, Library,
-  Newspaper, Shield, Building2,
+  Newspaper, Shield, Building2, Brain, HeartPulse, Accessibility, Stethoscope, Briefcase, FileSignature,
 } from "lucide-react";
 
 const superAdminNav: NavEntry[] = [
