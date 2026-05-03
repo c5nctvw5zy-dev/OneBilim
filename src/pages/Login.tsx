@@ -52,6 +52,13 @@ export default function Login() {
     teacher: "/teacher",
     student: "/student",
     parent: "/parent",
+    librarian: "/librarian/books",
+    psychologist: "/psychologist",
+    social_pedagogue: "/social",
+    speech_therapist: "/speech",
+    nurse: "/nurse",
+    hr: "/hr",
+    secretary: "/secretary",
   };
 
   const navigateByRole = async (userId?: string | null) => {
