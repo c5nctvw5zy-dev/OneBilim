@@ -261,6 +261,13 @@ export default function Login() {
                     { label: "Мұғалім", alias: "teacher", icon: "👨‍🏫" },
                     { label: "Оқушы", alias: "student", icon: "🎓" },
                     { label: "Ата-ана", alias: "parent", icon: "👪" },
+                    { label: "Кітапханашы", alias: "librarian", icon: "📚" },
+                    { label: "Психолог", alias: "psychologist", icon: "🧠" },
+                    { label: "Әл. педагог", alias: "social", icon: "🤝" },
+                    { label: "Логопед", alias: "speech", icon: "🗣️" },
+                    { label: "Медбике", alias: "nurse", icon: "🩺" },
+                    { label: "Кадр", alias: "hr", icon: "💼" },
+                    { label: "Хатшы", alias: "secretary", icon: "✍️" },
                   ].map((demo) => (
                     <Button
                       key={demo.alias}
