@@ -285,6 +285,8 @@ const secretaryNav: NavEntry[] = [
   { title: "Профиль", path: "/secretary/profile", icon: User },
 ];
 
+const queryClient = new QueryClient();
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
