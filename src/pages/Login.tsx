@@ -16,6 +16,13 @@ const demoLoginAliases: Record<string, string> = {
   teacher: "teacher@bilimapp.kz",
   student: "student@bilimapp.kz",
   parent: "parent@bilimapp.kz",
+  librarian: "librarian@bilimapp.kz",
+  psychologist: "psychologist@bilimapp.kz",
+  social: "social@bilimapp.kz",
+  speech: "speech@bilimapp.kz",
+  nurse: "nurse@bilimapp.kz",
+  hr: "hr@bilimapp.kz",
+  secretary: "secretary@bilimapp.kz",
 };
 
 const normalizeLoginIdentifier = (value: string) => {
