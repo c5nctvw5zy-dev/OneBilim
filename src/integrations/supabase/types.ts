@@ -1094,6 +1094,12 @@ export type Database = {
         | "student"
         | "parent"
         | "librarian"
+        | "psychologist"
+        | "social_pedagogue"
+        | "speech_therapist"
+        | "nurse"
+        | "hr"
+        | "secretary"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1229,6 +1235,12 @@ export const Constants = {
         "student",
         "parent",
         "librarian",
+        "psychologist",
+        "social_pedagogue",
+        "speech_therapist",
+        "nurse",
+        "hr",
+        "secretary",
       ],
     },
   },
