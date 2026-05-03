@@ -455,6 +455,7 @@ const App = () => (
             <Route path="/secretary/profile" element={<ProfilePage />} />
           </Route>
 
+          <Route path="*" element={<NotFound />} />
         </Routes>
         </AuthProvider>
       </BrowserRouter>
