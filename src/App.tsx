@@ -397,7 +397,64 @@ const App = () => (
             <Route path="/librarian/profile" element={<ProfilePage />} />
           </Route>
 
-          <Route path="*" element={<NotFound />} />
+          {/* Психолог */}
+          <Route element={<ProtectedRoute allowedRoles={["psychologist"]}><DashboardLayout roleName="Психолог" navItems={psychologistNav} userName="Психолог" /></ProtectedRoute>}>
+            <Route path="/psychologist" element={<PsychologistConsult />} />
+            <Route path="/psychologist/consult" element={<PsychologistConsult />} />
+            <Route path="/psychologist/tests" element={<PsychologistTests />} />
+            <Route path="/psychologist/work" element={<PsychologistWork />} />
+            <Route path="/psychologist/chat" element={<ChatPage />} />
+            <Route path="/psychologist/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Әлеуметтік педагог */}
+          <Route element={<ProtectedRoute allowedRoles={["social_pedagogue"]}><DashboardLayout roleName="Әлеуметтік педагог" navItems={socialNav} userName="Әлеуметтік педагог" /></ProtectedRoute>}>
+            <Route path="/social" element={<SocialMonitoring />} />
+            <Route path="/social/monitoring" element={<SocialMonitoring />} />
+            <Route path="/social/family" element={<SocialFamily />} />
+            <Route path="/social/chat" element={<ChatPage />} />
+            <Route path="/social/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Логопед */}
+          <Route element={<ProtectedRoute allowedRoles={["speech_therapist"]}><DashboardLayout roleName="Логопед" navItems={speechNav} userName="Логопед" /></ProtectedRoute>}>
+            <Route path="/speech" element={<SpeechIndividual />} />
+            <Route path="/speech/individual" element={<SpeechIndividual />} />
+            <Route path="/speech/inclusive" element={<SpeechInclusive />} />
+            <Route path="/speech/chat" element={<ChatPage />} />
+            <Route path="/speech/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Медбике */}
+          <Route element={<ProtectedRoute allowedRoles={["nurse"]}><DashboardLayout roleName="Медбике" navItems={nurseNav} userName="Медбике" /></ProtectedRoute>}>
+            <Route path="/nurse" element={<NurseHealth />} />
+            <Route path="/nurse/health" element={<NurseHealth />} />
+            <Route path="/nurse/first-aid" element={<NurseFirstAid />} />
+            <Route path="/nurse/cards" element={<NurseCards />} />
+            <Route path="/nurse/chat" element={<ChatPage />} />
+            <Route path="/nurse/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Кадр маманы */}
+          <Route element={<ProtectedRoute allowedRoles={["hr"]}><DashboardLayout roleName="Кадр маманы" navItems={hrNav} userName="Кадр маманы" /></ProtectedRoute>}>
+            <Route path="/hr" element={<HrStaff />} />
+            <Route path="/hr/staff" element={<HrStaff />} />
+            <Route path="/hr/hiring" element={<HrHiring />} />
+            <Route path="/hr/chat" element={<ChatPage />} />
+            <Route path="/hr/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Хатшы */}
+          <Route element={<ProtectedRoute allowedRoles={["secretary"]}><DashboardLayout roleName="Хатшы" navItems={secretaryNav} userName="Хатшы" /></ProtectedRoute>}>
+            <Route path="/secretary" element={<SecretaryOrders />} />
+            <Route path="/secretary/orders" element={<SecretaryOrders />} />
+            <Route path="/secretary/letter" element={<SecretaryWriteLetter />} />
+            <Route path="/secretary/register-docs" element={<SecretaryRegisterDocs />} />
+            <Route path="/secretary/docs-work" element={<SecretaryDocsWork />} />
+            <Route path="/secretary/chat" element={<ChatPage />} />
+            <Route path="/secretary/profile" element={<ProfilePage />} />
+          </Route>
+
         </Routes>
         </AuthProvider>
       </BrowserRouter>
