@@ -16,6 +16,13 @@ const demoLoginAliases: Record<string, string> = {
   teacher: "teacher@bilimapp.kz",
   student: "student@bilimapp.kz",
   parent: "parent@bilimapp.kz",
+  librarian: "librarian@bilimapp.kz",
+  psychologist: "psychologist@bilimapp.kz",
+  social: "social@bilimapp.kz",
+  speech: "speech@bilimapp.kz",
+  nurse: "nurse@bilimapp.kz",
+  hr: "hr@bilimapp.kz",
+  secretary: "secretary@bilimapp.kz",
 };
 
 const normalizeLoginIdentifier = (value: string) => {
@@ -45,6 +52,13 @@ export default function Login() {
     teacher: "/teacher",
     student: "/student",
     parent: "/parent",
+    librarian: "/librarian/books",
+    psychologist: "/psychologist",
+    social_pedagogue: "/social",
+    speech_therapist: "/speech",
+    nurse: "/nurse",
+    hr: "/hr",
+    secretary: "/secretary",
   };
 
   const navigateByRole = async (userId?: string | null) => {
@@ -146,7 +160,7 @@ export default function Login() {
     toast({ title: "Face ID расталды ✓", description: `${profile.full_name} — кіру орындалуда...` });
     stopFaceId();
 
-    const demoPassword = "Demo123!";
+    const demoPassword = "BilimApp2026!";
     const { error: loginError, user } = await signIn(targetEmail, demoPassword);
     if (!loginError && user) {
       await navigateByRole(user.id);
@@ -247,6 +261,13 @@ export default function Login() {
                     { label: "Мұғалім", alias: "teacher", icon: "👨‍🏫" },
                     { label: "Оқушы", alias: "student", icon: "🎓" },
                     { label: "Ата-ана", alias: "parent", icon: "👪" },
+                    { label: "Кітапханашы", alias: "librarian", icon: "📚" },
+                    { label: "Психолог", alias: "psychologist", icon: "🧠" },
+                    { label: "Әл. педагог", alias: "social", icon: "🤝" },
+                    { label: "Логопед", alias: "speech", icon: "🗣️" },
+                    { label: "Медбике", alias: "nurse", icon: "🩺" },
+                    { label: "Кадр", alias: "hr", icon: "💼" },
+                    { label: "Хатшы", alias: "secretary", icon: "✍️" },
                   ].map((demo) => (
                     <Button
                       key={demo.alias}
@@ -258,7 +279,7 @@ export default function Login() {
                       onClick={async () => {
                         setLoading(true);
                         const demoEmail = demoLoginAliases[demo.alias]!;
-                        const { error, user } = await signIn(demoEmail, "Demo123!");
+                        const { error, user } = await signIn(demoEmail, "BilimApp2026!");
                         if (error) {
                           toast({ title: "Қате", description: error.message, variant: "destructive" });
                           setLoading(false);
