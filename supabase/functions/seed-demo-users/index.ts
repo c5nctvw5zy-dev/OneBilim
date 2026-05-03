@@ -13,19 +13,19 @@ Deno.serve(async (req) => {
   const admin = createClient(supabaseUrl, serviceKey);
 
   const demoUsers = [
-    { email: "superadmin@bilimapp.kz", password: "Demo123!", fullName: "Админ Суперов", role: "super_admin" },
-    { email: "director@bilimapp.kz", password: "Demo123!", fullName: "Директор Мектепов", role: "director" },
-    { email: "zavuch@bilimapp.kz", password: "Demo123!", fullName: "Завуч Оқуова", role: "zavuch" },
-    { email: "teacher@bilimapp.kz", password: "Demo123!", fullName: "Мұғалім Сабақов", role: "teacher" },
-    { email: "student@bilimapp.kz", password: "Demo123!", fullName: "Оқушы Білімов", role: "student" },
-    { email: "parent@bilimapp.kz", password: "Demo123!", fullName: "Ата-ана Балаев", role: "parent" },
-    { email: "librarian@bilimapp.kz", password: "Demo123!", fullName: "Кітапханашы Кітапова", role: "librarian" },
-    { email: "psychologist@bilimapp.kz", password: "Demo123!", fullName: "Психолог Көмекова", role: "psychologist" },
-    { email: "social@bilimapp.kz", password: "Demo123!", fullName: "Әлеуметтік педагог Жанұзақова", role: "social_pedagogue" },
-    { email: "speech@bilimapp.kz", password: "Demo123!", fullName: "Логопед Сөзбекова", role: "speech_therapist" },
-    { email: "nurse@bilimapp.kz", password: "Demo123!", fullName: "Медбике Дәрігерова", role: "nurse" },
-    { email: "hr@bilimapp.kz", password: "Demo123!", fullName: "Кадр маманы Кадрова", role: "hr" },
-    { email: "secretary@bilimapp.kz", password: "Demo123!", fullName: "Хатшы Жазушева", role: "secretary" },
+    { email: "superadmin@bilimapp.kz", password: "BilimApp2026!", fullName: "Админ Суперов", role: "super_admin" },
+    { email: "director@bilimapp.kz", password: "BilimApp2026!", fullName: "Директор Мектепов", role: "director" },
+    { email: "zavuch@bilimapp.kz", password: "BilimApp2026!", fullName: "Завуч Оқуова", role: "zavuch" },
+    { email: "teacher@bilimapp.kz", password: "BilimApp2026!", fullName: "Мұғалім Сабақов", role: "teacher" },
+    { email: "student@bilimapp.kz", password: "BilimApp2026!", fullName: "Оқушы Білімов", role: "student" },
+    { email: "parent@bilimapp.kz", password: "BilimApp2026!", fullName: "Ата-ана Балаев", role: "parent" },
+    { email: "librarian@bilimapp.kz", password: "BilimApp2026!", fullName: "Кітапханашы Кітапова", role: "librarian" },
+    { email: "psychologist@bilimapp.kz", password: "BilimApp2026!", fullName: "Психолог Көмекова", role: "psychologist" },
+    { email: "social@bilimapp.kz", password: "BilimApp2026!", fullName: "Әлеуметтік педагог Жанұзақова", role: "social_pedagogue" },
+    { email: "speech@bilimapp.kz", password: "BilimApp2026!", fullName: "Логопед Сөзбекова", role: "speech_therapist" },
+    { email: "nurse@bilimapp.kz", password: "BilimApp2026!", fullName: "Медбике Дәрігерова", role: "nurse" },
+    { email: "hr@bilimapp.kz", password: "BilimApp2026!", fullName: "Кадр маманы Кадрова", role: "hr" },
+    { email: "secretary@bilimapp.kz", password: "BilimApp2026!", fullName: "Хатшы Жазушева", role: "secretary" },
   ] as const;
 
   const results = [];

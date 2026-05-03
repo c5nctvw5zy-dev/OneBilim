@@ -160,7 +160,7 @@ export default function Login() {
     toast({ title: "Face ID расталды ✓", description: `${profile.full_name} — кіру орындалуда...` });
     stopFaceId();
 
-    const demoPassword = "Demo123!";
+    const demoPassword = "BilimApp2026!";
     const { error: loginError, user } = await signIn(targetEmail, demoPassword);
     if (!loginError && user) {
       await navigateByRole(user.id);
@@ -279,7 +279,7 @@ export default function Login() {
                       onClick={async () => {
                         setLoading(true);
                         const demoEmail = demoLoginAliases[demo.alias]!;
-                        const { error, user } = await signIn(demoEmail, "Demo123!");
+                        const { error, user } = await signIn(demoEmail, "BilimApp2026!");
                         if (error) {
                           toast({ title: "Қате", description: error.message, variant: "destructive" });
                           setLoading(false);
