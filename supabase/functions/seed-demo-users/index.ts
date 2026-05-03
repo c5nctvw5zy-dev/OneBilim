@@ -19,6 +19,13 @@ Deno.serve(async (req) => {
     { email: "teacher@bilimapp.kz", password: "Demo123!", fullName: "Мұғалім Сабақов", role: "teacher" },
     { email: "student@bilimapp.kz", password: "Demo123!", fullName: "Оқушы Білімов", role: "student" },
     { email: "parent@bilimapp.kz", password: "Demo123!", fullName: "Ата-ана Балаев", role: "parent" },
+    { email: "librarian@bilimapp.kz", password: "Demo123!", fullName: "Кітапханашы Кітапова", role: "librarian" },
+    { email: "psychologist@bilimapp.kz", password: "Demo123!", fullName: "Психолог Көмекова", role: "psychologist" },
+    { email: "social@bilimapp.kz", password: "Demo123!", fullName: "Әлеуметтік педагог Жанұзақова", role: "social_pedagogue" },
+    { email: "speech@bilimapp.kz", password: "Demo123!", fullName: "Логопед Сөзбекова", role: "speech_therapist" },
+    { email: "nurse@bilimapp.kz", password: "Demo123!", fullName: "Медбике Дәрігерова", role: "nurse" },
+    { email: "hr@bilimapp.kz", password: "Demo123!", fullName: "Кадр маманы Кадрова", role: "hr" },
+    { email: "secretary@bilimapp.kz", password: "Demo123!", fullName: "Хатшы Жазушева", role: "secretary" },
   ] as const;
 
   const results = [];
