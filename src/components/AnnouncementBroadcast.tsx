@@ -36,12 +36,17 @@ export default function AnnouncementBroadcast({ scope, schoolId, trigger, audien
     }
     setSending(true);
     const { data: userRes } = await supabase.auth.getUser();
+    if (!userRes.user) {
+      setSending(false);
+      toast({ title: "Алдымен жүйеге кіріңіз", variant: "destructive" });
+      return;
+    }
     const { error } = await supabase.from("announcements").insert({
       title: title.trim(),
       body: body.trim(),
       audience,
       school_id: scope === "system" ? null : schoolId ?? null,
-      created_by: userRes.user!.id,
+      created_by: userRes.user.id,
     });
     setSending(false);
     if (error) {
