@@ -58,12 +58,9 @@ export default function SimpleCrud({ title, table, fields, listColumns, defaults
     const payload: any = { ...defaults, ...form };
     if (scope === "school" && profile?.school_id && !payload.school_id) payload.school_id = profile.school_id;
     if (user) {
-      if (!payload.created_by) payload.created_by = user.id;
-      if (payload.uploaded_by === undefined && "uploaded_by" in payload === false) {} // noop
-      if (payload.from_user === undefined && "from_user" in payload === false) {}
-      // Auto-fill common owner fields when present in defaults but undefined
-      ["uploaded_by", "from_user", "registered_by", "recorded_by"].forEach(k => {
-        if (payload[k] === undefined) payload[k] = user.id;
+      ["created_by", "uploaded_by", "from_user", "registered_by", "recorded_by"].forEach(k => {
+        if (k in payload && payload[k] === undefined) payload[k] = user.id;
+        else if (k === "created_by" && !payload[k]) payload[k] = user.id;
       });
     }
     const { error } = await (supabase as any).from(table).insert(payload);
