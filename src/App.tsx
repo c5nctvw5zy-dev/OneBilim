@@ -80,6 +80,10 @@ import {
 } from "./pages/staff/StaffPages";
 
 import {
+  AlphabetBookPage, OrdersBookPage, StaffPage, TimesheetsPage, JournalPercentPage,
+} from "./pages/admin/AdminPages";
+
+import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
   FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User, Library,
   Newspaper, Shield, Building2, Brain, HeartPulse, Accessibility, Stethoscope, Briefcase, FileSignature,
@@ -138,6 +142,10 @@ const directorNav: NavEntry[] = [
     children: [
       { title: "Оқушылар мен сыныптар", path: "/director/students", icon: GraduationCap },
       { title: "Мұғалімдер", path: "/director/teachers", icon: Users },
+      { title: "Қызметкерлер", path: "/director/staff", icon: Briefcase },
+      { title: "Алфавиттік кітап", path: "/director/alphabet", icon: BookMarked },
+      { title: "Бұйрықтар кітабы", path: "/director/orders", icon: FileSignature },
+      { title: "Табельдер", path: "/director/timesheets", icon: FileText },
       { title: "Құжаттар", path: "/director/documents", icon: FileCheck },
       { title: "Оқу бағдарламасы", path: "/director/curriculum", icon: BookOpenCheck },
       { title: "Сабақ кестесі", path: "/director/timetable", icon: BookMarked },
@@ -148,6 +156,7 @@ const directorNav: NavEntry[] = [
     title: "Мониторинг",
     icon: BarChart3,
     children: [
+      { title: "Журнал пайыздары", path: "/director/journal-percent", icon: BarChart3 },
       { title: "Сабақ үлгерімі", path: "/director/performance", icon: BarChart3 },
       { title: "Аналитика", path: "/director/analytics", icon: BarChart3 },
     ],
@@ -176,6 +185,10 @@ const zavuchNav: NavEntry[] = [
     children: [
       { title: "Оқушылар мен сыныптар", path: "/zavuch/students", icon: GraduationCap },
       { title: "Мұғалімдер", path: "/zavuch/teachers", icon: Users },
+      { title: "Қызметкерлер", path: "/zavuch/staff", icon: Briefcase },
+      { title: "Алфавиттік кітап", path: "/zavuch/alphabet", icon: BookMarked },
+      { title: "Бұйрықтар кітабы", path: "/zavuch/orders", icon: FileSignature },
+      { title: "Табельдер", path: "/zavuch/timesheets", icon: FileText },
       { title: "Құжаттар", path: "/zavuch/documents", icon: FileCheck },
       { title: "Оқу бағдарламасы", path: "/zavuch/curriculum", icon: BookOpenCheck },
       { title: "Сабақ кестесі", path: "/zavuch/timetable", icon: BookMarked },
@@ -186,6 +199,7 @@ const zavuchNav: NavEntry[] = [
     title: "Мониторинг",
     icon: BarChart3,
     children: [
+      { title: "Журнал пайыздары", path: "/zavuch/journal-percent", icon: BarChart3 },
       { title: "Сабақ үлгерімі", path: "/zavuch/performance", icon: BarChart3 },
       { title: "Аналитика", path: "/zavuch/analytics", icon: BarChart3 },
     ],
@@ -335,6 +349,11 @@ const App = () => (
             <Route path="/director/timetable" element={<SchedulePage />} />
             <Route path="/director/performance" element={<PerformanceMonitoringPage />} />
             <Route path="/director/analytics" element={<AnalyticsDetailPage />} />
+            <Route path="/director/staff" element={<StaffPage />} />
+            <Route path="/director/alphabet" element={<AlphabetBookPage />} />
+            <Route path="/director/orders" element={<OrdersBookPage />} />
+            <Route path="/director/timesheets" element={<TimesheetsPage />} />
+            <Route path="/director/journal-percent" element={<JournalPercentPage />} />
             <Route path="/director/settings" element={<DirectorSettings />} />
             <Route path="/director/profile" element={<ProfilePage />} />
           </Route>
@@ -356,6 +375,11 @@ const App = () => (
             <Route path="/zavuch/timetable" element={<SchedulePage />} />
             <Route path="/zavuch/performance" element={<PerformanceMonitoringPage />} />
             <Route path="/zavuch/analytics" element={<AnalyticsDetailPage />} />
+            <Route path="/zavuch/staff" element={<StaffPage />} />
+            <Route path="/zavuch/alphabet" element={<AlphabetBookPage />} />
+            <Route path="/zavuch/orders" element={<OrdersBookPage />} />
+            <Route path="/zavuch/timesheets" element={<TimesheetsPage />} />
+            <Route path="/zavuch/journal-percent" element={<JournalPercentPage />} />
             <Route path="/zavuch/settings" element={<DirectorSettings />} />
             <Route path="/zavuch/profile" element={<ProfilePage />} />
           </Route>
