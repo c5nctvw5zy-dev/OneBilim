@@ -1740,6 +1740,51 @@ export type Database = {
         }
         Relationships: []
       }
+      timesheets: {
+        Row: {
+          absences: number | null
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          period: string
+          position: string | null
+          school_id: string
+          staff_name: string
+          updated_at: string
+          worked_days: number | null
+          worked_hours: number | null
+        }
+        Insert: {
+          absences?: number | null
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          period: string
+          position?: string | null
+          school_id: string
+          staff_name: string
+          updated_at?: string
+          worked_days?: number | null
+          worked_hours?: number | null
+        }
+        Update: {
+          absences?: number | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          period?: string
+          position?: string | null
+          school_id?: string
+          staff_name?: string
+          updated_at?: string
+          worked_days?: number | null
+          worked_hours?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
