@@ -375,6 +375,11 @@ const App = () => (
             <Route path="/zavuch/timetable" element={<SchedulePage />} />
             <Route path="/zavuch/performance" element={<PerformanceMonitoringPage />} />
             <Route path="/zavuch/analytics" element={<AnalyticsDetailPage />} />
+            <Route path="/zavuch/staff" element={<StaffPage />} />
+            <Route path="/zavuch/alphabet" element={<AlphabetBookPage />} />
+            <Route path="/zavuch/orders" element={<OrdersBookPage />} />
+            <Route path="/zavuch/timesheets" element={<TimesheetsPage />} />
+            <Route path="/zavuch/journal-percent" element={<JournalPercentPage />} />
             <Route path="/zavuch/settings" element={<DirectorSettings />} />
             <Route path="/zavuch/profile" element={<ProfilePage />} />
           </Route>
