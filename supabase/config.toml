@@ -1,1 +1,10 @@
 project_id = "sbsxehdtlmkvopforfdy"
+
+[functions.ai-admin-assistant]
+verify_jwt = false
+
+[functions.password-recovery]
+verify_jwt = false
+
+[functions.seed-demo-users]
+verify_jwt = false

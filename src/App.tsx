@@ -62,6 +62,7 @@ import SubjectsManagementPage from "./pages/shared/SubjectsManagementPage";
 import CurriculumPage from "./pages/shared/CurriculumPage";
 import PerformanceMonitoringPage from "./pages/shared/PerformanceMonitoringPage";
 import AnalyticsDetailPage from "./pages/shared/AnalyticsDetailPage";
+import AdminAIAssistantPage from "./pages/shared/AdminAIAssistantPage";
 
 // Librarian
 import BookRegistrationPage from "./pages/librarian/BookRegistrationPage";
@@ -121,6 +122,7 @@ const directorNav: NavEntry[] = [
     icon: GraduationCap,
     children: [
       { title: "Басты бет", path: "/director", icon: Home },
+      { title: "🤖 ЖИ көмекші", path: "/director/ai", icon: Sparkles },
       { title: "Бақылау тақтасы", path: "/director/monitoring", icon: LayoutDashboard },
       { title: "Менің кестем", path: "/director/schedule", icon: Calendar },
       { title: "Үй тапсырмасы", path: "/director/homework", icon: ClipboardList },
@@ -158,6 +160,7 @@ const zavuchNav: NavEntry[] = [
     icon: GraduationCap,
     children: [
       { title: "Басты бет", path: "/zavuch", icon: Home },
+      { title: "🤖 ЖИ көмекші", path: "/zavuch/ai", icon: Sparkles },
       { title: "Бақылау тақтасы", path: "/zavuch/monitoring", icon: LayoutDashboard },
       { title: "Менің кестем", path: "/zavuch/schedule", icon: Calendar },
       { title: "Үй тапсырмасы", path: "/zavuch/homework", icon: ClipboardList },
@@ -318,6 +321,7 @@ const App = () => (
           {/* Director */}
           <Route element={<ProtectedRoute allowedRoles={["director"]}><DashboardLayout roleName="Директор" navItems={directorNav} userName="Ахметова А." /></ProtectedRoute>}>
             <Route path="/director" element={<DirectorHome />} />
+            <Route path="/director/ai" element={<AdminAIAssistantPage />} />
             <Route path="/director/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/director/schedule" element={<SchedulePage />} />
             <Route path="/director/homework" element={<HomeworkPage />} />
@@ -338,6 +342,7 @@ const App = () => (
           {/* Zavuch */}
           <Route element={<ProtectedRoute allowedRoles={["zavuch"]}><DashboardLayout roleName="Завуч" navItems={zavuchNav} userName="Мұхтарова Д." /></ProtectedRoute>}>
             <Route path="/zavuch" element={<ZavuchHome />} />
+            <Route path="/zavuch/ai" element={<AdminAIAssistantPage />} />
             <Route path="/zavuch/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/zavuch/schedule" element={<SchedulePage />} />
             <Route path="/zavuch/homework" element={<HomeworkPage />} />
