@@ -5,15 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Trash2, Loader2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
 export type CrudField = {
   key: string;
   label: string;
-  type?: "text" | "textarea" | "date" | "number" | "boolean";
+  type?: "text" | "textarea" | "date" | "number" | "boolean" | "select";
   required?: boolean;
+  options?: { value: string; label: string }[];
 };
 
 interface Props {
@@ -33,6 +35,7 @@ export default function SimpleCrud({ title, table, fields, listColumns, defaults
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
   const [form, setForm] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
 
@@ -50,24 +53,41 @@ export default function SimpleCrud({ title, table, fields, listColumns, defaults
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [table]);
 
+  const openCreate = () => { setEditing(null); setForm({}); setOpen(true); };
+  const openEdit = (row: any) => {
+    setEditing(row);
+    const f: Record<string, any> = {};
+    fields.forEach(fd => { f[fd.key] = row[fd.key] ?? ""; });
+    setForm(f); setOpen(true);
+  };
+
   const submit = async () => {
     for (const f of fields) {
       if (f.required && !form[f.key]) { toast({ title: `${f.label} міндетті`, variant: "destructive" }); return; }
     }
     setSaving(true);
-    const payload: any = { ...defaults, ...form };
-    if (scope === "school" && profile?.school_id && !payload.school_id) payload.school_id = profile.school_id;
-    if (user) {
-      ["created_by", "uploaded_by", "from_user", "registered_by", "recorded_by"].forEach(k => {
-        if (k in payload && payload[k] === undefined) payload[k] = user.id;
-        else if (k === "created_by" && !payload[k]) payload[k] = user.id;
-      });
+    if (editing) {
+      const payload: any = {};
+      fields.forEach(fd => { payload[fd.key] = form[fd.key] === "" ? null : form[fd.key]; });
+      const { error } = await (supabase as any).from(table).update(payload).eq("id", editing.id);
+      setSaving(false);
+      if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Жаңартылды" });
+    } else {
+      const payload: any = { ...defaults, ...form };
+      if (scope === "school" && profile?.school_id && !payload.school_id) payload.school_id = profile.school_id;
+      if (user) {
+        ["created_by", "uploaded_by", "from_user", "registered_by", "recorded_by"].forEach(k => {
+          if (k in payload && payload[k] === undefined) payload[k] = user.id;
+          else if (k === "created_by" && !payload[k]) payload[k] = user.id;
+        });
+      }
+      const { error } = await (supabase as any).from(table).insert(payload);
+      setSaving(false);
+      if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Сақталды" });
     }
-    const { error } = await (supabase as any).from(table).insert(payload);
-    setSaving(false);
-    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "Сақталды" });
-    setForm({}); setOpen(false); load();
+    setForm({}); setEditing(null); setOpen(false); load();
   };
 
   const remove = async (id: string) => {
@@ -89,12 +109,12 @@ export default function SimpleCrud({ title, table, fields, listColumns, defaults
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-foreground">{title}</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditing(null); setForm({}); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2"><Plus className="h-4 w-4" /> Қосу</Button>
+            <Button className="gap-2" onClick={openCreate}><Plus className="h-4 w-4" /> Қосу</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-            <DialogHeader><DialogTitle>Жаңа жазба</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{editing ? "Өзгерту" : "Жаңа жазба"}</DialogTitle></DialogHeader>
             <div className="space-y-3">
               {fields.map(f => (
                 <div key={f.key}>
@@ -103,6 +123,13 @@ export default function SimpleCrud({ title, table, fields, listColumns, defaults
                     <Textarea rows={4} value={form[f.key] || ""} onChange={e => setForm({ ...form, [f.key]: e.target.value })} />
                   ) : f.type === "boolean" ? (
                     <input type="checkbox" className="ml-2" checked={!!form[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.checked })} />
+                  ) : f.type === "select" ? (
+                    <Select value={form[f.key] || ""} onValueChange={(v) => setForm({ ...form, [f.key]: v })}>
+                      <SelectTrigger><SelectValue placeholder="Таңдаңыз" /></SelectTrigger>
+                      <SelectContent>
+                        {f.options?.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <Input
                       type={f.type === "number" ? "number" : f.type === "date" ? "date" : "text"}
@@ -134,17 +161,22 @@ export default function SimpleCrud({ title, table, fields, listColumns, defaults
                   const f = fields.find(ff => ff.key === c);
                   return <TableHead key={c}>{f?.label || c}</TableHead>;
                 })}
-                <TableHead className="w-12"></TableHead>
+                <TableHead className="w-24 text-right">Әрекет</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map(r => (
-                <TableRow key={r.id}>
+                <TableRow key={r.id} className="group">
                   {cols.map(c => <TableCell key={c}>{renderCell(r[c])}</TableCell>)}
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => remove(r.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(r)} title="Өзгерту">
+                        <Pencil className="h-4 w-4 text-primary" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => remove(r.id)} title="Жою">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
