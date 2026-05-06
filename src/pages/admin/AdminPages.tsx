@@ -4,7 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-// 📖 Алфавиттік кітап
+// 📖 Алфавиттік кітап (бұл кесте Оқушылар мен сыныптар бетіне автоматты түрде түседі)
+const PROGRAM_OPTIONS = [
+  { value: "general", label: "Жалпы оқу білімі" },
+  { value: "home", label: "Үйден оқыту" },
+  { value: "gifted", label: "Дарынды бала" },
+  { value: "inclusive", label: "Жеке/инклюзивті оқыту" },
+  { value: "remote", label: "Қашықтан оқу" },
+];
+
 export const AlphabetBookPage = () => (
   <SimpleCrud
     title="📖 Алфавиттік кітап"
@@ -14,16 +22,22 @@ export const AlphabetBookPage = () => (
       { key: "last_name", label: "Тегі", required: true },
       { key: "first_name", label: "Аты", required: true },
       { key: "birth_date", label: "Туған күні", type: "date" },
+      { key: "gender", label: "Жынысы", type: "select", options: [{ value: "male", label: "Ұл" }, { value: "female", label: "Қыз" }] },
       { key: "nationality", label: "Ұлты" },
       { key: "address", label: "Мекенжайы" },
-      { key: "grade_level", label: "Сынып", type: "number" },
-      { key: "section", label: "Параллель" },
+      { key: "phone", label: "Телефон" },
+      { key: "grade_level", label: "Сынып", type: "number", required: true },
+      { key: "section", label: "Параллель (А/Ә/Б)" },
+      { key: "education_program", label: "Оқу бағдарламасы", type: "select", options: PROGRAM_OPTIONS },
+      { key: "parent_name", label: "Ата-ана аты" },
+      { key: "parent_phone", label: "Ата-ана телефоны" },
       { key: "enroll_date", label: "Қабылданған күні", type: "date" },
+      { key: "status", label: "Күйі", type: "select", options: [{ value: "active", label: "Оқып жүр" }, { value: "exited", label: "Шығарылған" }] },
       { key: "exit_date", label: "Шыққан күні", type: "date" },
-      { key: "exit_order_no", label: "Бұйрық №" },
-      { key: "exit_reason", label: "Шығу себебі" },
+      { key: "exit_order_no", label: "Шығу бұйрығы №" },
+      { key: "exit_reason", label: "Шығу себебі", type: "textarea" },
     ]}
-    listColumns={["alphabet_number", "last_name", "first_name", "grade_level", "section", "status"]}
+    listColumns={["alphabet_number", "last_name", "first_name", "grade_level", "section", "education_program", "status"]}
   />
 );
 

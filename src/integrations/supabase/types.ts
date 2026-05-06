@@ -20,16 +20,21 @@ export type Database = {
           alphabet_number: number | null
           birth_date: string | null
           created_at: string
+          education_program: string | null
           enroll_date: string | null
           exit_date: string | null
           exit_order_date: string | null
           exit_order_no: string | null
           exit_reason: string | null
           first_name: string
+          gender: string | null
           grade_level: number | null
           id: string
           last_name: string
           nationality: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          phone: string | null
           school_id: string
           section: string | null
           status: string
@@ -40,16 +45,21 @@ export type Database = {
           alphabet_number?: number | null
           birth_date?: string | null
           created_at?: string
+          education_program?: string | null
           enroll_date?: string | null
           exit_date?: string | null
           exit_order_date?: string | null
           exit_order_no?: string | null
           exit_reason?: string | null
           first_name: string
+          gender?: string | null
           grade_level?: number | null
           id?: string
           last_name: string
           nationality?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          phone?: string | null
           school_id: string
           section?: string | null
           status?: string
@@ -60,16 +70,21 @@ export type Database = {
           alphabet_number?: number | null
           birth_date?: string | null
           created_at?: string
+          education_program?: string | null
           enroll_date?: string | null
           exit_date?: string | null
           exit_order_date?: string | null
           exit_order_no?: string | null
           exit_reason?: string | null
           first_name?: string
+          gender?: string | null
           grade_level?: number | null
           id?: string
           last_name?: string
           nationality?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          phone?: string | null
           school_id?: string
           section?: string | null
           status?: string
