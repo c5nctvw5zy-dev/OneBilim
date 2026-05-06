@@ -29,7 +29,7 @@ import SuperAdminNews from "./pages/superadmin/SuperAdminNews";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
-import DirectorStudents from "./pages/director/DirectorStudents";
+import DirectorStudents from "./pages/director/DirectorClasses";
 import DirectorTeachers from "./pages/director/DirectorTeachers";
 import DirectorDocuments from "./pages/director/DirectorDocuments";
 import DirectorSettings from "./pages/director/DirectorSettings";
