@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Loader2, Trash2, Copy, ClipboardPaste } from "lucide-react";
 
 interface ScheduleItem {
   id: string;
@@ -42,6 +42,7 @@ export default function SchedulePage() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [schoolId, setSchoolId] = useState<string | null>(null);
   const [form, setForm] = useState({ day: "1", class_name: "", subject_name: "", teacher_name: "", lesson_order: "1", start_time: "08:30", end_time: "09:15" });
+  const [buffer, setBuffer] = useState<ScheduleItem | null>(null);
 
   const canManage = role === "director" || role === "zavuch";
 
@@ -124,6 +125,29 @@ export default function SchedulePage() {
     toast({ title: "Жойылды" });
   };
 
+  const handleCopy = (item: ScheduleItem) => {
+    setBuffer(item);
+    toast({ title: "Көшірілді", description: `${(item.subjects as any)?.name} көшірілді — енді бос ұяшыққа қойыңыз` });
+  };
+
+  const handlePaste = async (day: number, order: number) => {
+    if (!buffer || !schoolId) return;
+    const time = defaultTimes[order - 1];
+    const { data, error } = await supabase.from("schedules").insert({
+      school_id: schoolId,
+      class_id: (buffer.classes as any)?.id,
+      subject_id: (buffer.subjects as any)?.id,
+      teacher_id: (buffer as any).teacher?.id ?? null,
+      day_of_week: day,
+      lesson_order: order,
+      start_time: time?.start ?? null,
+      end_time: time?.end ?? null,
+    }).select("id, day_of_week, lesson_order, start_time, end_time, classes:class_id(id, name), subjects:subject_id(id, name), teacher:teacher_id(id, full_name)").single();
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setSchedule(prev => [...prev, data as any]);
+    toast({ title: "Қойылды" });
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const days = [...new Set(schedule.map(s => s.day_of_week))].sort();
@@ -202,18 +226,27 @@ export default function SchedulePage() {
                     return (
                       <td key={d} className="px-4 py-3 text-foreground text-xs">
                         {item ? (
-                          <div className="flex items-center justify-between gap-1">
-                            <div>
+                          <div className="flex items-center justify-between gap-1 group">
+                            <div className="min-w-0">
                               <span className="font-medium">{(item.subjects as any)?.name}</span>
                               <span className="text-muted-foreground ml-1">({(item.classes as any)?.name})</span>
-                              {(item as any).teacher && <div className="text-[10px] text-muted-foreground">{(item as any).teacher.full_name}</div>}
+                              {(item as any).teacher && <div className="text-[10px] text-muted-foreground truncate">{(item as any).teacher.full_name}</div>}
                             </div>
                             {canManage && (
-                              <button onClick={() => handleDelete(item.id)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="h-3 w-3" />
-                              </button>
+                              <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => handleCopy(item)} title="Көшіру" className="text-muted-foreground hover:text-primary">
+                                  <Copy className="h-3 w-3" />
+                                </button>
+                                <button onClick={() => handleDelete(item.id)} title="Жою" className="text-muted-foreground hover:text-destructive">
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
                             )}
                           </div>
+                        ) : canManage && buffer ? (
+                          <button onClick={() => handlePaste(d, order)} title="Қою" className="text-muted-foreground hover:text-primary inline-flex items-center gap-1">
+                            <ClipboardPaste className="h-3 w-3" /> қою
+                          </button>
                         ) : "—"}
                       </td>
                     );

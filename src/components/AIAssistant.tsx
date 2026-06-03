@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Sparkles, Send, Loader2, Bot, User as UserIcon, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Sparkles, Send, Loader2, Bot, User as UserIcon, Trash2, CalendarRange } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -28,6 +31,33 @@ export default function AIAssistant({ context }: Props) {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [schedOpen, setSchedOpen] = useState(false);
+  const [schedClass, setSchedClass] = useState("");
+  const [schedReq, setSchedReq] = useState("");
+  const [schedLoading, setSchedLoading] = useState(false);
+
+  const generateSchedule = async () => {
+    if (!schedClass.trim()) { toast({ title: "Сыныпты енгізіңіз", variant: "destructive" }); return; }
+    setSchedLoading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-generate-schedule`;
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({ class_name: schedClass.trim(), requirements: schedReq.trim() }),
+      });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || "Қате");
+      const summary = `✅ **${json.class_name}** сыныбы үшін кесте автоматты түрде жасалды (${json.inserted}/${json.total} сабақ).\n\nКестені «Сабақ кестесі» бөлімінен көріп, қажет болса өзгертіңіз (көшіру / қою / жою).`;
+      setMessages(prev => [...prev, { role: "user", content: `🗓️ Авто кесте жасау: ${schedClass}${schedReq ? " — " + schedReq : ""}` }, { role: "assistant", content: summary }]);
+      setSchedOpen(false); setSchedClass(""); setSchedReq("");
+      toast({ title: "Кесте дайын!", description: `${json.inserted} сабақ қосылды` });
+    } catch (e: any) {
+      toast({ title: "Қате", description: e.message, variant: "destructive" });
+    } finally { setSchedLoading(false); }
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -107,12 +137,46 @@ export default function AIAssistant({ context }: Props) {
             <p className="text-xs text-muted-foreground">Талдау · Бұйрық · Кеңес · Жоспар</p>
           </div>
         </div>
-        {messages.length > 0 && (
-          <Button variant="ghost" size="sm" onClick={() => setMessages([])} className="gap-1">
-            <Trash2 className="h-4 w-4" /> Тазарту
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setSchedOpen(true)} className="gap-1">
+            <CalendarRange className="h-4 w-4" /> Авто кесте
           </Button>
-        )}
+          {messages.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setMessages([])} className="gap-1">
+              <Trash2 className="h-4 w-4" /> Тазарту
+            </Button>
+          )}
+        </div>
       </div>
+
+      <Dialog open={schedOpen} onOpenChange={setSchedOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><CalendarRange className="h-5 w-5 text-primary" /> Авто кесте жасау</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium text-foreground">Сынып *</label>
+              <Input placeholder="мысалы: 7Г" value={schedClass} onChange={e => setSchedClass(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Талаптар / ескертулер</label>
+              <Textarea
+                rows={5}
+                placeholder="мысалы: Дене шынықтыру аптасына 3 рет, Математика күн сайын 1-ші сабақ, Жұма күні тек 5 сабақ..."
+                value={schedReq}
+                onChange={e => setSchedReq(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">ЖИ талаптарыңызға сай аптаға арналған толық кесте жасайды. Кесте автоматты «Сабақ кестесі» бөліміне сақталады.</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSchedOpen(false)} disabled={schedLoading}>Болдырмау</Button>
+            <Button onClick={generateSchedule} disabled={schedLoading} className="gap-2">
+              {schedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Кестені жасау
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
