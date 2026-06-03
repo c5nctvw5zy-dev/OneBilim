@@ -42,6 +42,7 @@ export default function SchedulePage() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [schoolId, setSchoolId] = useState<string | null>(null);
   const [form, setForm] = useState({ day: "1", class_name: "", subject_name: "", teacher_name: "", lesson_order: "1", start_time: "08:30", end_time: "09:15" });
+  const [buffer, setBuffer] = useState<ScheduleItem | null>(null);
 
   const canManage = role === "director" || role === "zavuch";
 
