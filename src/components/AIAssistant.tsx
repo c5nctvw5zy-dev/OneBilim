@@ -31,6 +31,33 @@ export default function AIAssistant({ context }: Props) {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [schedOpen, setSchedOpen] = useState(false);
+  const [schedClass, setSchedClass] = useState("");
+  const [schedReq, setSchedReq] = useState("");
+  const [schedLoading, setSchedLoading] = useState(false);
+
+  const generateSchedule = async () => {
+    if (!schedClass.trim()) { toast({ title: "Сыныпты енгізіңіз", variant: "destructive" }); return; }
+    setSchedLoading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-generate-schedule`;
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({ class_name: schedClass.trim(), requirements: schedReq.trim() }),
+      });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || "Қате");
+      const summary = `✅ **${json.class_name}** сыныбы үшін кесте автоматты түрде жасалды (${json.inserted}/${json.total} сабақ).\n\nКестені «Сабақ кестесі» бөлімінен көріп, қажет болса өзгертіңіз (көшіру / қою / жою).`;
+      setMessages(prev => [...prev, { role: "user", content: `🗓️ Авто кесте жасау: ${schedClass}${schedReq ? " — " + schedReq : ""}` }, { role: "assistant", content: summary }]);
+      setSchedOpen(false); setSchedClass(""); setSchedReq("");
+      toast({ title: "Кесте дайын!", description: `${json.inserted} сабақ қосылды` });
+    } catch (e: any) {
+      toast({ title: "Қате", description: e.message, variant: "destructive" });
+    } finally { setSchedLoading(false); }
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
