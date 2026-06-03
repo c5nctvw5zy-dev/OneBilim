@@ -226,18 +226,27 @@ export default function SchedulePage() {
                     return (
                       <td key={d} className="px-4 py-3 text-foreground text-xs">
                         {item ? (
-                          <div className="flex items-center justify-between gap-1">
-                            <div>
+                          <div className="flex items-center justify-between gap-1 group">
+                            <div className="min-w-0">
                               <span className="font-medium">{(item.subjects as any)?.name}</span>
                               <span className="text-muted-foreground ml-1">({(item.classes as any)?.name})</span>
-                              {(item as any).teacher && <div className="text-[10px] text-muted-foreground">{(item as any).teacher.full_name}</div>}
+                              {(item as any).teacher && <div className="text-[10px] text-muted-foreground truncate">{(item as any).teacher.full_name}</div>}
                             </div>
                             {canManage && (
-                              <button onClick={() => handleDelete(item.id)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="h-3 w-3" />
-                              </button>
+                              <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => handleCopy(item)} title="Көшіру" className="text-muted-foreground hover:text-primary">
+                                  <Copy className="h-3 w-3" />
+                                </button>
+                                <button onClick={() => handleDelete(item.id)} title="Жою" className="text-muted-foreground hover:text-destructive">
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
                             )}
                           </div>
+                        ) : canManage && buffer ? (
+                          <button onClick={() => handlePaste(d, order)} title="Қою" className="text-muted-foreground hover:text-primary inline-flex items-center gap-1">
+                            <ClipboardPaste className="h-3 w-3" /> қою
+                          </button>
                         ) : "—"}
                       </td>
                     );
