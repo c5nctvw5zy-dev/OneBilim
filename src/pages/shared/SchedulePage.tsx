@@ -125,6 +125,29 @@ export default function SchedulePage() {
     toast({ title: "Жойылды" });
   };
 
+  const handleCopy = (item: ScheduleItem) => {
+    setBuffer(item);
+    toast({ title: "Көшірілді", description: `${(item.subjects as any)?.name} көшірілді — енді бос ұяшыққа қойыңыз` });
+  };
+
+  const handlePaste = async (day: number, order: number) => {
+    if (!buffer || !schoolId) return;
+    const time = defaultTimes[order - 1];
+    const { data, error } = await supabase.from("schedules").insert({
+      school_id: schoolId,
+      class_id: (buffer.classes as any)?.id,
+      subject_id: (buffer.subjects as any)?.id,
+      teacher_id: (buffer as any).teacher?.id ?? null,
+      day_of_week: day,
+      lesson_order: order,
+      start_time: time?.start ?? null,
+      end_time: time?.end ?? null,
+    }).select("id, day_of_week, lesson_order, start_time, end_time, classes:class_id(id, name), subjects:subject_id(id, name), teacher:teacher_id(id, full_name)").single();
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setSchedule(prev => [...prev, data as any]);
+    toast({ title: "Қойылды" });
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const days = [...new Set(schedule.map(s => s.day_of_week))].sort();
