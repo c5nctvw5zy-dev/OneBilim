@@ -1530,42 +1530,63 @@ export type Database = {
       }
       staff: {
         Row: {
+          address: string | null
+          class_name: string | null
           created_at: string
           full_name: string
+          gender: string | null
           hire_date: string | null
           id: string
           iin: string | null
+          is_teacher: boolean
+          nationality: string | null
           notes: string | null
+          order_no: string | null
           phone: string | null
           position: string | null
           school_id: string
           status: string
+          subject: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          class_name?: string | null
           created_at?: string
           full_name: string
+          gender?: string | null
           hire_date?: string | null
           id?: string
           iin?: string | null
+          is_teacher?: boolean
+          nationality?: string | null
           notes?: string | null
+          order_no?: string | null
           phone?: string | null
           position?: string | null
           school_id: string
           status?: string
+          subject?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          class_name?: string | null
           created_at?: string
           full_name?: string
+          gender?: string | null
           hire_date?: string | null
           id?: string
           iin?: string | null
+          is_teacher?: boolean
+          nationality?: string | null
           notes?: string | null
+          order_no?: string | null
           phone?: string | null
           position?: string | null
           school_id?: string
           status?: string
+          subject?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1657,24 +1678,36 @@ export type Database = {
       subjects: {
         Row: {
           created_at: string
+          description: string | null
+          hours_per_week: number | null
           id: string
+          level: string | null
           name: string
           name_en: string | null
           name_ru: string | null
+          school_id: string | null
         }
         Insert: {
           created_at?: string
+          description?: string | null
+          hours_per_week?: number | null
           id?: string
+          level?: string | null
           name: string
           name_en?: string | null
           name_ru?: string | null
+          school_id?: string | null
         }
         Update: {
           created_at?: string
+          description?: string | null
+          hours_per_week?: number | null
           id?: string
+          level?: string | null
           name?: string
           name_en?: string | null
           name_ru?: string | null
+          school_id?: string | null
         }
         Relationships: []
       }
