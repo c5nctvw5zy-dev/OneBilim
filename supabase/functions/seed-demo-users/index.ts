@@ -35,10 +35,8 @@ Deno.serve(async (req) => {
     { email: "zavuch.uteulieva@bilimapp.kz", password: "BilimApp2026!", fullName: "Утеулиева Раушан Шамшаевна", role: "zavuch" },
     { email: "zavuch.otarbaeva@bilimapp.kz", password: "BilimApp2026!", fullName: "Отарбаева Назгүл Серікқызы", role: "zavuch" },
     { email: "zavuch.bekmedetova@bilimapp.kz", password: "BilimApp2026!", fullName: "Бекмедетова Фарида Картанбайқызы", role: "zavuch" },
-    // Демо мұғалімдер
-    { email: "teacher.nurakynova@bilimapp.kz", password: "BilimApp2026!", fullName: "Нұрақынова Алмагүл Нұрбосынқызы", role: "teacher", subject: "Информатика", ownClass: { name: "8Н", grade_level: 8, section: "Н" } },
-    { email: "teacher.estemisova@bilimapp.kz", password: "BilimApp2026!", fullName: "Естемисова Арайлым Өмірбекқызы", role: "teacher", subject: "Қазақ тілі мен әдебиеті", ownClass: { name: "7Г", grade_level: 7, section: "Г" } },
-    { email: "teacher.naimanbai@bilimapp.kz", password: "BilimApp2026!", fullName: "Найманбай Арайлым Ғалымқыза", role: "teacher", subject: "Ағылшын тілі", ownClass: { name: "6Б", grade_level: 6, section: "Б" } },
+    // №26 мектеп Директоры
+    { email: "director.seitakhmetova@bilimapp.kz", password: "BilimApp2026!", fullName: "Сейтахметова Галя Акылбековна", role: "director" },
   ];
 
   // Ensure a demo school exists
