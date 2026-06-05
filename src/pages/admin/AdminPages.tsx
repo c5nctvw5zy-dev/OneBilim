@@ -88,34 +88,12 @@ function ExcelImportBar() {
   );
 }
 
+import AlphabetBookWizard from "@/components/AlphabetBookWizard";
+
 export const AlphabetBookPage = () => (
   <div className="space-y-4">
     <ExcelImportBar />
-    <SimpleCrud
-      title="📖 Алфавиттік кітап"
-      table="alphabet_book"
-      fields={[
-        { key: "alphabet_number", label: "Реттік нөмір", type: "number" },
-        { key: "last_name", label: "Тегі", required: true },
-        { key: "first_name", label: "Аты", required: true },
-        { key: "birth_date", label: "Туған күні", type: "date" },
-        { key: "gender", label: "Жынысы", type: "select", options: [{ value: "male", label: "Ұл" }, { value: "female", label: "Қыз" }] },
-        { key: "nationality", label: "Ұлты" },
-        { key: "address", label: "Мекенжайы" },
-        { key: "phone", label: "Телефон" },
-        { key: "grade_level", label: "Сынып", type: "number", required: true },
-        { key: "section", label: "Параллель (А/Ә/Б)" },
-        { key: "education_program", label: "Оқу бағдарламасы", type: "select", options: PROGRAM_OPTIONS },
-        { key: "parent_name", label: "Ата-ана аты" },
-        { key: "parent_phone", label: "Ата-ана телефоны" },
-        { key: "enroll_date", label: "Қабылданған күні", type: "date" },
-        { key: "status", label: "Күйі", type: "select", options: [{ value: "active", label: "Оқып жүр" }, { value: "exited", label: "Шығарылған" }] },
-        { key: "exit_date", label: "Шыққан күні", type: "date" },
-        { key: "exit_order_no", label: "Шығу бұйрығы №" },
-        { key: "exit_reason", label: "Шығу себебі", type: "textarea" },
-      ]}
-      listColumns={["alphabet_number", "last_name", "first_name", "grade_level", "section", "education_program", "status"]}
-    />
+    <AlphabetBookWizard />
   </div>
 );
 
