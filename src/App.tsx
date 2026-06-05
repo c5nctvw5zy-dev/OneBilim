@@ -213,15 +213,16 @@ const teacherNav: NavEntry[] = [
     children: [
       { title: "Басты бет", path: "/teacher", icon: Home },
       { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
+      { title: "🤖 ЖИ көмекші", path: "/teacher/ai", icon: Sparkles },
       { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
-      { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
       { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
-      { title: "Үй тапсырмасы", path: "/teacher/homework", icon: ClipboardList },
-      { title: "Оқушылармен байланыс", path: "/teacher/chat", icon: MessageSquare },
-      { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
-      { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
     ],
   },
+  { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
+  { title: "Үй тапсырмасы", path: "/teacher/homework", icon: ClipboardList },
+  { title: "Оқушылармен байланыс", path: "/teacher/chat", icon: MessageSquare },
+  { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
+  { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
   { title: "Профиль", path: "/teacher/profile", icon: User },
 ];
 
@@ -387,6 +388,7 @@ const App = () => (
           {/* Teacher */}
           <Route element={<ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout roleName="Мұғалім" navItems={teacherNav} userName="Сейітов Қ." /></ProtectedRoute>}>
             <Route path="/teacher" element={<TeacherHome />} />
+            <Route path="/teacher/ai" element={<AdminAIAssistantPage />} />
             <Route path="/teacher/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/teacher/schedule" element={<SchedulePage />} />
             <Route path="/teacher/leadership" element={<ClassLeadershipPage />} />
