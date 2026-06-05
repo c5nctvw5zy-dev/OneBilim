@@ -11,20 +11,31 @@ import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const QUICK_PROMPTS = [
-  { icon: "📊", label: "Үлгерім талдауы", prompt: "Соңғы тоқсандағы оқушылар үлгерімінің жалпы суретіне талдау жасап, проблемалы тұстарды атап беріңіз және 5 нақты ұсыныс беріңіз." },
+const ADMIN_PROMPTS = [
+  { icon: "📊", label: "Үлгерім талдауы", prompt: "Соңғы тоқсандағы оқушылар үлгерімінің жалпы талдауын жасап, проблемалы тұстарды атап, 5 нақты ұсыныс беріңіз." },
   { icon: "📝", label: "Бұйрық жобасы", prompt: "Тоқсандық қорытынды бойынша оқушыларды марапаттау туралы бұйрық жобасын дайындаңыз. Қазақша, ресми стиль." },
   { icon: "✉️", label: "Хабарландыру", prompt: "Ата-аналар жиналысы туралы қысқа әрі сыпайы хабарландыру жазыңыз." },
-  { icon: "🧠", label: "Әдістемелік кеңес", prompt: "Үлгерімі төмен 8-сынып оқушыларымен жұмыс істеудің 7 тиімді әдістемелік тәсілін ұсыныңыз." },
-  { icon: "📅", label: "Тоқсандық жоспар", prompt: "ІІ тоқсанға арналған оқу-тәрбие жұмысының ықшам жоспарын жасаңыз (апта бойынша негізгі іс-шаралар)." },
-  { icon: "📈", label: "Есеп жобасы", prompt: "Жыл басынан бергі мектептің оқу-тәрбие жұмысы туралы директордың есебіне арналған құрылым мен негізгі бөлімдерді ұсыныңыз." },
+  { icon: "🧠", label: "Әдістемелік кеңес", prompt: "Үлгерімі төмен 8-сынып оқушыларымен жұмыс істеудің 7 тиімді тәсілін ұсыныңыз." },
+  { icon: "📅", label: "Тоқсандық жоспар", prompt: "ІІ тоқсанға арналған оқу-тәрбие жұмысының ықшам жоспарын жасаңыз." },
+  { icon: "📈", label: "Есеп жобасы", prompt: "Жыл басынан бергі мектептің оқу-тәрбие жұмысы туралы директор есебіне арналған құрылым ұсыныңыз." },
+];
+
+const TEACHER_PROMPTS = [
+  { icon: "🧠", label: "Сабақ жоспары / Жылдық жоспар", prompt: "Менің пәнім бойынша осы тақырыпқа қысқа мерзімді сабақ жоспарын (немесе ұзақ мерзімді жылдық жоспарды) жасап беріңіз. Мақсат, дағдылар, рефлексия, бағалау критерийлерін қосыңыз." },
+  { icon: "🧑‍🎓", label: "Оқушыға авто мінездеме", prompt: "Менің сыныбымдағы оқушыға мінездеме жазып беріңіз: үлгерімі, тәртібі, белсенділігі, сильные/слабые жақтары, ұсыныс." },
+  { icon: "📊", label: "Үлгерім анализі (өз сыныбы)", prompt: "Менің сыныбымның үлгерімін талдаңыз: үздіктер, артта қалғандар, орташа балл, динамика, нақты ұсыныстар." },
+  { icon: "🤖", label: "Ақылды көмекші (Chat AI)", prompt: "Маған сабаққа дайындалуға, ата-анамен сөйлесуге, оқушыны ынталандыруға кеңес беріңіз." },
+  { icon: "📽", label: "Презентация генерациялау", prompt: "Тақырып: [мысалы, «Алгоритмдер»]. Осы тақырып бойынша 8-10 слайдтан тұратын презентация құрылымын (әр слайдтың мазмұнымен) дайындаңыз." },
+  { icon: "🔬", label: "Онлайн зертхана 8D/3D/2D", prompt: "Тақырып: [мысалы, «Молекулалар»]. Осы тақырыпқа сай 8D/3D/2D онлайн зертхана идеяларын, қолжетімді сілтемелер мен қадамдық тапсырмаларды ұсыныңыз." },
+  { icon: "📃", label: "Тест жасау", prompt: "Тақырып: [мысалы, «Квадрат теңдеулер»]. Осы тақырып бойынша 10 сұрақтан тұратын тест жасап беріңіз: А/В/С/D нұсқалары, дұрыс жауаптары." },
 ];
 
 interface Props {
   context?: Record<string, any>;
+  variant?: "admin" | "teacher";
 }
 
-export default function AIAssistant({ context }: Props) {
+export default function AIAssistant({ context, variant = "admin" }: Props) {
   const { toast } = useToast();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -35,6 +46,8 @@ export default function AIAssistant({ context }: Props) {
   const [schedClass, setSchedClass] = useState("");
   const [schedReq, setSchedReq] = useState("");
   const [schedLoading, setSchedLoading] = useState(false);
+
+  const prompts = variant === "teacher" ? TEACHER_PROMPTS : ADMIN_PROMPTS;
 
   const generateSchedule = async () => {
     if (!schedClass.trim()) { toast({ title: "Сыныпты енгізіңіз", variant: "destructive" }); return; }
@@ -50,10 +63,10 @@ export default function AIAssistant({ context }: Props) {
       });
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.error || "Қате");
-      const summary = `✅ **${json.class_name}** сыныбы үшін кесте автоматты түрде жасалды (${json.inserted}/${json.total} сабақ).\n\nКестені «Сабақ кестесі» бөлімінен көріп, қажет болса өзгертіңіз (көшіру / қою / жою).`;
-      setMessages(prev => [...prev, { role: "user", content: `🗓️ Авто кесте жасау: ${schedClass}${schedReq ? " — " + schedReq : ""}` }, { role: "assistant", content: summary }]);
+      const summary = `✅ **${json.class_name}** үшін кесте жасалды (${json.inserted}/${json.total} сабақ).\n\n«Сабақ кестесі» бөліміне өтіп қараңыз. Қажет болса көшіру / қою / жою арқылы өңдеңіз.`;
+      setMessages(prev => [...prev, { role: "user", content: `🗓️ Авто кесте: ${schedClass}${schedReq ? " — " + schedReq : ""}` }, { role: "assistant", content: summary }]);
       setSchedOpen(false); setSchedClass(""); setSchedReq("");
-      toast({ title: "Кесте дайын!", description: `${json.inserted} сабақ қосылды` });
+      toast({ title: "Кесте дайын!", description: `${json.inserted} сабақ` });
     } catch (e: any) {
       toast({ title: "Қате", description: e.message, variant: "destructive" });
     } finally { setSchedLoading(false); }
@@ -78,16 +91,13 @@ export default function AIAssistant({ context }: Props) {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-admin-assistant`;
       const resp = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
         body: JSON.stringify({ messages: next, context }),
         signal: controller.signal,
       });
 
-      if (resp.status === 429) { toast({ title: "Тым көп сұраныс", description: "Біраздан кейін қайталаңыз.", variant: "destructive" }); setLoading(false); return; }
-      if (resp.status === 402) { toast({ title: "Несие таусылды", description: "Workspace > Usage бөлімінен толтырыңыз.", variant: "destructive" }); setLoading(false); return; }
+      if (resp.status === 429) { toast({ title: "Тым көп сұраныс", variant: "destructive" }); setLoading(false); return; }
+      if (resp.status === 402) { toast({ title: "Несие таусылды", variant: "destructive" }); setLoading(false); return; }
       if (!resp.ok || !resp.body) throw new Error("AI қызметі қолжетімсіз");
 
       const reader = resp.body.getReader();
@@ -112,10 +122,7 @@ export default function AIAssistant({ context }: Props) {
           try {
             const p = JSON.parse(json);
             const c = p.choices?.[0]?.delta?.content;
-            if (c) {
-              acc += c;
-              setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: acc } : m));
-            }
+            if (c) { acc += c; setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: acc } : m)); }
           } catch { buffer = line + "\n" + buffer; break; }
         }
       }
@@ -134,13 +141,15 @@ export default function AIAssistant({ context }: Props) {
           <div className="rounded-xl bg-primary/15 p-2"><Sparkles className="h-5 w-5 text-primary" /></div>
           <div>
             <h3 className="font-semibold text-foreground">ЖИ көмекші</h3>
-            <p className="text-xs text-muted-foreground">Талдау · Бұйрық · Кеңес · Жоспар</p>
+            <p className="text-xs text-muted-foreground">{variant === "teacher" ? "Жоспар · Мінездеме · Талдау · Тест" : "Талдау · Бұйрық · Кеңес · Жоспар"}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setSchedOpen(true)} className="gap-1">
-            <CalendarRange className="h-4 w-4" /> Авто кесте
-          </Button>
+          {variant === "admin" && (
+            <Button variant="outline" size="sm" onClick={() => setSchedOpen(true)} className="gap-1">
+              <CalendarRange className="h-4 w-4" /> Авто кесте
+            </Button>
+          )}
           {messages.length > 0 && (
             <Button variant="ghost" size="sm" onClick={() => setMessages([])} className="gap-1">
               <Trash2 className="h-4 w-4" /> Тазарту
@@ -154,18 +163,13 @@ export default function AIAssistant({ context }: Props) {
           <DialogHeader><DialogTitle className="flex items-center gap-2"><CalendarRange className="h-5 w-5 text-primary" /> Авто кесте жасау</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium text-foreground">Сынып *</label>
+              <label className="text-sm font-medium">Сынып *</label>
               <Input placeholder="мысалы: 7Г" value={schedClass} onChange={e => setSchedClass(e.target.value)} />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground">Талаптар / ескертулер</label>
-              <Textarea
-                rows={5}
-                placeholder="мысалы: Дене шынықтыру аптасына 3 рет, Математика күн сайын 1-ші сабақ, Жұма күні тек 5 сабақ..."
-                value={schedReq}
-                onChange={e => setSchedReq(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground mt-1">ЖИ талаптарыңызға сай аптаға арналған толық кесте жасайды. Кесте автоматты «Сабақ кестесі» бөліміне сақталады.</p>
+              <label className="text-sm font-medium">Талаптар</label>
+              <Textarea rows={5} placeholder="мысалы: Дене шынықтыру аптасына 3 рет..." value={schedReq} onChange={e => setSchedReq(e.target.value)} />
+              <p className="text-xs text-muted-foreground mt-1">Кесте автоматты «Сабақ кестесі» бөліміне сақталады.</p>
             </div>
           </div>
           <DialogFooter>
@@ -182,15 +186,11 @@ export default function AIAssistant({ context }: Props) {
         {messages.length === 0 ? (
           <div className="space-y-4">
             <div className="text-center text-sm text-muted-foreground py-4">
-              Сұрақ қойыңыз немесе төмендегі дайын тапсырмалардан таңдаңыз
+              {variant === "teacher" ? "Мұғалімге арналған блоктар:" : "Сұрақ қойыңыз немесе төмендегі дайын тапсырмалардан таңдаңыз"}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {QUICK_PROMPTS.map(q => (
-                <button
-                  key={q.label}
-                  onClick={() => send(q.prompt)}
-                  className="text-left rounded-xl border border-border bg-card p-3 hover:bg-accent transition-colors"
-                >
+              {prompts.map(q => (
+                <button key={q.label} onClick={() => send(q.prompt)} className="text-left rounded-xl border border-border bg-card p-3 hover:bg-accent transition-colors">
                   <div className="flex items-center gap-2 font-medium text-sm text-foreground">
                     <span>{q.icon}</span> {q.label}
                   </div>
@@ -231,7 +231,7 @@ export default function AIAssistant({ context }: Props) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-            placeholder="Сұрағыңызды жазыңыз... (Enter — жіберу, Shift+Enter — жаңа жол)"
+            placeholder="Сұрағыңызды жазыңыз..."
             className="min-h-[44px] max-h-[120px] resize-none"
             disabled={loading}
           />

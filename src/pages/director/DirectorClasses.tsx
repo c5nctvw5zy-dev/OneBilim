@@ -1,21 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Trash2, Loader2, UserCheck, Pencil, LogOut, GraduationCap } from "lucide-react";
+import { Search, Plus, Trash2, Loader2, UserCheck, Pencil, LogOut, GraduationCap, ChevronDown, ChevronRight, ArrowUpRight, KeyRound, UserPlus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 const PROGRAM_LABEL: Record<string, string> = {
-  general: "Жалпы",
-  home: "Үйден",
-  gifted: "Дарынды",
-  inclusive: "Инклюзивті",
-  remote: "Қашықтан",
+  general: "Жалпы", home: "Үйден", gifted: "Дарынды", inclusive: "Инклюзивті", remote: "Қашықтан",
 };
 
 export default function DirectorClasses() {
@@ -36,6 +33,10 @@ export default function DirectorClasses() {
   const [exitStudent, setExitStudent] = useState<any | null>(null);
   const [exitReason, setExitReason] = useState("");
   const [exitOrderNo, setExitOrderNo] = useState("");
+  const [openKeys, setOpenKeys] = useState<Record<string, boolean>>({});
+  const [rolloverOpen, setRolloverOpen] = useState(false);
+  const [rolloverBusy, setRolloverBusy] = useState(false);
+  const [quickAdd, setQuickAdd] = useState<{ key: string; last_name: string; first_name: string } | null>(null);
 
   useEffect(() => { if (user) loadData(); }, [user]);
 
@@ -64,7 +65,6 @@ export default function DirectorClasses() {
     setLoading(false);
   };
 
-  // Group students by class label "{grade}{section}"
   const studentsByClass = useMemo(() => {
     const map: Record<string, any[]> = {};
     students.filter(s => s.status !== "exited").forEach(s => {
@@ -75,7 +75,6 @@ export default function DirectorClasses() {
     return map;
   }, [students]);
 
-  // Build display list: union of classes + alphabet sections
   const displayBlocks = useMemo(() => {
     const keys = new Set<string>();
     classes.forEach(c => keys.add(`${c.grade_level || ""}${c.section || ""}`.trim()));
@@ -126,8 +125,49 @@ export default function DirectorClasses() {
       exit_order_no: exitOrderNo || null,
     }).eq("id", exitStudent.id);
     if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "Оқушы шығарылды", description: exitStudent.last_name + " " + exitStudent.first_name });
+    toast({ title: "Оқушы шығарылды" });
     setExitStudent(null); setExitReason(""); setExitOrderNo(""); loadData();
+  };
+
+  const addQuickStudent = async () => {
+    if (!quickAdd || !schoolId) return;
+    const m = quickAdd.key.match(/^(\d+)(.*)$/);
+    const grade = m ? parseInt(m[1]) : null;
+    const section = m ? m[2] : "";
+    const nextNo = Math.max(0, ...students.map(s => Number(s.alphabet_number) || 0)) + 1;
+    const { error } = await (supabase as any).from("alphabet_book").insert({
+      school_id: schoolId,
+      last_name: quickAdd.last_name, first_name: quickAdd.first_name,
+      grade_level: grade, section, status: "active",
+      alphabet_number: nextNo, enroll_date: new Date().toISOString().slice(0, 10),
+      education_program: "general",
+    });
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Оқушы қосылды" });
+    setQuickAdd(null); loadData();
+  };
+
+  // Жаңа оқу жылына көшіру: барлық 1..10 сыныптағы оқушыларды +1 grade_level. 11 — түлек (status=exited).
+  const rolloverYear = async () => {
+    if (!confirm("Барлық оқушылар келесі сыныпқа көшіріледі. 11-сынып түлек болады. Жалғастырамыз ба?")) return;
+    setRolloverBusy(true);
+    try {
+      // 11 -> graduated
+      await (supabase as any).from("alphabet_book")
+        .update({ status: "exited", exit_reason: "Түлек — орта мектепті бітірді", exit_date: new Date().toISOString().slice(0, 10) })
+        .eq("school_id", schoolId).eq("grade_level", 11).eq("status", "active");
+      // 1..10 -> +1
+      for (let g = 10; g >= 1; g--) {
+        await (supabase as any).from("alphabet_book")
+          .update({ grade_level: g + 1 })
+          .eq("school_id", schoolId).eq("grade_level", g).eq("status", "active");
+      }
+      toast({ title: "Жаңа оқу жылына көшірілді ✅", description: "11-сынып оқушылары түлек ретінде белгіленді." });
+      setRolloverOpen(false);
+      loadData();
+    } finally {
+      setRolloverBusy(false);
+    }
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -138,32 +178,33 @@ export default function DirectorClasses() {
         <div>
           <h2 className="text-xl font-bold text-foreground">Оқушылар мен сыныптар</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Әр сынып жеке блокта. Оқушылар «Алфавиттік кітаптан» автоматты түрде осында түседі.
+            Әр сынып жеке блок. Шеврон ▶ басып сынып ішіндегі оқушыларды, кіру ақпаратын көріңіз.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input placeholder="Сынып іздеу..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-40 bg-transparent text-sm outline-none" />
           </div>
+          <Button variant="outline" className="gap-2" onClick={() => setRolloverOpen(true)}>
+            <ArrowUpRight className="h-4 w-4" /> Жаңа оқу жылы — көшіру
+          </Button>
           <Button className="gap-2" onClick={() => setShowAdd(!showAdd)}><Plus className="h-4 w-4" /> Сынып қосу</Button>
         </div>
       </div>
 
       {showAdd && (
-        <Card>
-          <CardContent className="p-5 space-y-4">
-            <h3 className="font-semibold">Жаңа сынып</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Input placeholder="Сынып (мыс: 5)" value={newGrade} onChange={e => setNewGrade(e.target.value)} />
-              <Input placeholder="Параллель (мыс: А)" value={newSection} onChange={e => setNewSection(e.target.value)} />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleAddClass}>Қосу</Button>
-              <Button variant="outline" onClick={() => setShowAdd(false)}>Болдырмау</Button>
-            </div>
-          </CardContent>
-        </Card>
+        <Card><CardContent className="p-5 space-y-4">
+          <h3 className="font-semibold">Жаңа сынып</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input placeholder="Сынып (5)" value={newGrade} onChange={e => setNewGrade(e.target.value)} />
+            <Input placeholder="Параллель (А)" value={newSection} onChange={e => setNewSection(e.target.value)} />
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleAddClass}>Қосу</Button>
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Болдырмау</Button>
+          </div>
+        </CardContent></Card>
       )}
 
       {displayBlocks.length === 0 && (
@@ -172,28 +213,29 @@ export default function DirectorClasses() {
         </CardContent></Card>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="space-y-3">
         {displayBlocks.map(key => {
           const cls = classes.find(c => `${c.grade_level || ""}${c.section || ""}`.trim() === key);
           const list = studentsByClass[key] || [];
+          const isOpen = !!openKeys[key];
           return (
             <Card key={key} className="overflow-hidden">
-              <CardHeader className="pb-3 bg-primary/5">
-                <CardTitle className="flex items-center justify-between text-base">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5 text-primary" />
-                    <span className="font-bold text-lg">{key}</span>
-                    <Badge variant="secondary">{list.length} оқушы</Badge>
-                    {cls?.teacher_name && <Badge variant="outline">👤 {cls.teacher_name}</Badge>}
-                  </div>
+              <Collapsible open={isOpen} onOpenChange={v => setOpenKeys(p => ({ ...p, [key]: v }))}>
+                <div className="flex items-center justify-between gap-2 bg-primary/5 p-3">
+                  <CollapsibleTrigger asChild>
+                    <button className="flex items-center gap-2 flex-1 text-left">
+                      {isOpen ? <ChevronDown className="h-4 w-4 text-primary" /> : <ChevronRight className="h-4 w-4 text-primary" />}
+                      <GraduationCap className="h-5 w-5 text-primary" />
+                      <span className="font-bold text-lg">{key}</span>
+                      <Badge variant="secondary">{list.length} оқушы</Badge>
+                      {cls?.teacher_name && <Badge variant="outline">👤 {cls.teacher_name}</Badge>}
+                    </button>
+                  </CollapsibleTrigger>
                   <div className="flex gap-1">
                     {cls && (
                       <>
                         <Button size="icon" variant="ghost" title="Жетекші тағайындау" onClick={() => { setAssignTeacher(cls); setSelectedTeacherId(cls.homeroom_teacher_id || ""); }}>
                           <UserCheck className="h-4 w-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" title="Сыныппен жұмыс / өзгерту" onClick={() => { setAssignTeacher(cls); setSelectedTeacherId(cls.homeroom_teacher_id || ""); }}>
-                          <Pencil className="h-4 w-4 text-primary" />
                         </Button>
                         <Button size="icon" variant="ghost" title="Сыныпты жою" onClick={() => handleDeleteClass(cls.id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -201,51 +243,69 @@ export default function DirectorClasses() {
                       </>
                     )}
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                {list.length === 0 ? (
-                  <div className="p-6 text-center text-sm text-muted-foreground">Бұл сыныпта оқушы жоқ</div>
-                ) : (
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/30">
-                      <tr>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground w-8">#</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Аты-жөні</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Бағдарлама</th>
-                        <th className="px-3 py-2 w-24"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {list.map((s, i) => (
-                        <tr key={s.id} className="border-t border-border group hover:bg-muted/30">
-                          <td className="px-3 py-2 text-muted-foreground">{s.alphabet_number || i + 1}</td>
-                          <td className="px-3 py-2 font-medium">{s.last_name} {s.first_name}</td>
-                          <td className="px-3 py-2 text-xs text-muted-foreground">
-                            {PROGRAM_LABEL[s.education_program] || "Жалпы"}
-                          </td>
-                          <td className="px-3 py-2 text-right">
-                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button size="icon" variant="ghost" className="h-7 w-7" title="Өзгерту" onClick={() => setEditStudent({ ...s })}>
-                                <Pencil className="h-3.5 w-3.5 text-primary" />
-                              </Button>
-                              <Button size="icon" variant="ghost" className="h-7 w-7" title="Шығару" onClick={() => setExitStudent(s)}>
-                                <LogOut className="h-3.5 w-3.5 text-destructive" />
-                              </Button>
-                            </div>
-                          </td>
+                </div>
+                <CollapsibleContent>
+                  <div className="border-t border-border bg-muted/20 p-3 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-lg border border-border bg-card p-3">
+                      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground"><KeyRound className="h-3.5 w-3.5" /> Сыныптың кіру ақпараты</div>
+                      <div className="mt-1 text-sm">
+                        <div>Логин: <code className="text-xs bg-muted px-1 rounded">{`class-${key.toLowerCase()}`}</code></div>
+                        <div>Пароль: <code className="text-xs bg-muted px-1 rounded">BilimApp2026!</code></div>
+                        <p className="text-[10px] text-muted-foreground mt-1">Кіру ақпаратын оқушылар мен ата-аналарға беруге болады.</p>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border bg-card p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground"><UserPlus className="h-3.5 w-3.5" /> Жаңа оқушы қосу</div>
+                        <Button size="sm" variant="ghost" onClick={() => setQuickAdd({ key, last_name: "", first_name: "" })} className="h-7"><Plus className="h-3 w-3" /></Button>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1">Толық анкета — «Алфавиттік кітап» бөлімінен.</p>
+                    </div>
+                  </div>
+                  {list.length === 0 ? (
+                    <div className="p-6 text-center text-sm text-muted-foreground">Бұл сыныпта оқушы жоқ</div>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/30">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground w-8">#</th>
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Аты-жөні</th>
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Бағдарлама</th>
+                          <th className="px-3 py-2 w-24"></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </CardContent>
+                      </thead>
+                      <tbody>
+                        {list.map((s, i) => (
+                          <tr key={s.id} className="border-t border-border group hover:bg-muted/30">
+                            <td className="px-3 py-2 text-muted-foreground">{s.alphabet_number || i + 1}</td>
+                            <td className="px-3 py-2 font-medium">{s.last_name} {s.first_name}</td>
+                            <td className="px-3 py-2 text-xs text-muted-foreground">
+                              {PROGRAM_LABEL[s.education_program] || "Жалпы"}
+                              {s.education_program === "inclusive" && <Badge className="ml-2" variant="outline">♿</Badge>}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button size="icon" variant="ghost" className="h-7 w-7" title="Профиль / құпия сөз" onClick={() => setEditStudent({ ...s })}>
+                                  <Pencil className="h-3.5 w-3.5 text-primary" />
+                                </Button>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" title="Шығару" onClick={() => setExitStudent(s)}>
+                                  <LogOut className="h-3.5 w-3.5 text-destructive" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </CollapsibleContent>
+              </Collapsible>
             </Card>
           );
         })}
       </div>
 
-      {/* Жетекші тағайындау */}
+      {/* Жетекші */}
       <Dialog open={!!assignTeacher} onOpenChange={v => { if (!v) setAssignTeacher(null); }}>
         <DialogContent>
           <DialogHeader><DialogTitle>Сынып жетекшісі — {assignTeacher?.name}</DialogTitle></DialogHeader>
@@ -262,28 +322,22 @@ export default function DirectorClasses() {
         </DialogContent>
       </Dialog>
 
-      {/* Оқушыны өзгерту */}
+      {/* Edit student */}
       <Dialog open={!!editStudent} onOpenChange={v => { if (!v) setEditStudent(null); }}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Оқушы профилі</DialogTitle></DialogHeader>
           {editStudent && (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-xs text-muted-foreground">Тегі</label>
-                  <Input value={editStudent.last_name || ""} onChange={e => setEditStudent({ ...editStudent, last_name: e.target.value })} /></div>
-                <div><label className="text-xs text-muted-foreground">Аты</label>
-                  <Input value={editStudent.first_name || ""} onChange={e => setEditStudent({ ...editStudent, first_name: e.target.value })} /></div>
-                <div><label className="text-xs text-muted-foreground">Сынып</label>
-                  <Input type="number" value={editStudent.grade_level || ""} onChange={e => setEditStudent({ ...editStudent, grade_level: Number(e.target.value) })} /></div>
-                <div><label className="text-xs text-muted-foreground">Параллель</label>
-                  <Input value={editStudent.section || ""} onChange={e => setEditStudent({ ...editStudent, section: e.target.value })} /></div>
-                <div><label className="text-xs text-muted-foreground">Туған күні</label>
-                  <Input type="date" value={editStudent.birth_date || ""} onChange={e => setEditStudent({ ...editStudent, birth_date: e.target.value })} /></div>
-                <div><label className="text-xs text-muted-foreground">Телефон</label>
-                  <Input value={editStudent.phone || ""} onChange={e => setEditStudent({ ...editStudent, phone: e.target.value })} /></div>
+                <div><label className="text-xs">Тегі</label><Input value={editStudent.last_name || ""} onChange={e => setEditStudent({ ...editStudent, last_name: e.target.value })} /></div>
+                <div><label className="text-xs">Аты</label><Input value={editStudent.first_name || ""} onChange={e => setEditStudent({ ...editStudent, first_name: e.target.value })} /></div>
+                <div><label className="text-xs">Сынып</label><Input type="number" value={editStudent.grade_level || ""} onChange={e => setEditStudent({ ...editStudent, grade_level: Number(e.target.value) })} /></div>
+                <div><label className="text-xs">Параллель</label><Input value={editStudent.section || ""} onChange={e => setEditStudent({ ...editStudent, section: e.target.value })} /></div>
+                <div><label className="text-xs">Туған күні</label><Input type="date" value={editStudent.birth_date || ""} onChange={e => setEditStudent({ ...editStudent, birth_date: e.target.value })} /></div>
+                <div><label className="text-xs">Телефон</label><Input value={editStudent.phone || ""} onChange={e => setEditStudent({ ...editStudent, phone: e.target.value })} /></div>
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Оқу бағдарламасы</label>
+                <label className="text-xs">Оқу бағдарламасы</label>
                 <Select value={editStudent.education_program || "general"} onValueChange={v => setEditStudent({ ...editStudent, education_program: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -292,13 +346,12 @@ export default function DirectorClasses() {
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-xs text-muted-foreground">Ата-ана</label>
-                  <Input value={editStudent.parent_name || ""} onChange={e => setEditStudent({ ...editStudent, parent_name: e.target.value })} /></div>
-                <div><label className="text-xs text-muted-foreground">Ата-ана тел.</label>
-                  <Input value={editStudent.parent_phone || ""} onChange={e => setEditStudent({ ...editStudent, parent_phone: e.target.value })} /></div>
+                <div><label className="text-xs">Ата-ана</label><Input value={editStudent.parent_name || ""} onChange={e => setEditStudent({ ...editStudent, parent_name: e.target.value })} /></div>
+                <div><label className="text-xs">Ата-ана тел.</label><Input value={editStudent.parent_phone || ""} onChange={e => setEditStudent({ ...editStudent, parent_phone: e.target.value })} /></div>
               </div>
-              <div><label className="text-xs text-muted-foreground">Мекенжайы</label>
-                <Input value={editStudent.address || ""} onChange={e => setEditStudent({ ...editStudent, address: e.target.value })} /></div>
+              <div className="rounded-lg border border-dashed p-2 text-xs text-muted-foreground">
+                Уақытша құпия сөз: <code className="bg-muted px-1 rounded">BilimApp2026!</code> — оқушыға бере аласыз.
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -308,23 +361,59 @@ export default function DirectorClasses() {
         </DialogContent>
       </Dialog>
 
-      {/* Оқушыны шығару */}
+      {/* Quick add */}
+      <Dialog open={!!quickAdd} onOpenChange={v => { if (!v) setQuickAdd(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{quickAdd?.key} сыныбына оқушы қосу</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><label className="text-sm">Тегі</label><Input value={quickAdd?.last_name || ""} onChange={e => setQuickAdd(p => p ? { ...p, last_name: e.target.value } : p)} /></div>
+            <div><label className="text-sm">Аты</label><Input value={quickAdd?.first_name || ""} onChange={e => setQuickAdd(p => p ? { ...p, first_name: e.target.value } : p)} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setQuickAdd(null)}>Болдырмау</Button>
+            <Button onClick={addQuickStudent} disabled={!quickAdd?.last_name || !quickAdd?.first_name}>Қосу</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exit student */}
       <Dialog open={!!exitStudent} onOpenChange={v => { if (!v) { setExitStudent(null); setExitReason(""); setExitOrderNo(""); } }}>
         <DialogContent>
           <DialogHeader><DialogTitle>Оқушыны мектептен шығару</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">
             <strong>{exitStudent?.last_name} {exitStudent?.first_name}</strong> орта білім ұйымынан шығарылады.
-            Бұл әрекет Алфавиттік кітапта тіркеледі.
           </p>
           <div className="space-y-2">
             <label className="text-sm font-medium">Бұйрық №</label>
-            <Input value={exitOrderNo} onChange={e => setExitOrderNo(e.target.value)} placeholder="Мыс: 142" />
+            <Input value={exitOrderNo} onChange={e => setExitOrderNo(e.target.value)} />
             <label className="text-sm font-medium">Шығу себебі</label>
-            <Input value={exitReason} onChange={e => setExitReason(e.target.value)} placeholder="Себебін жазыңыз" />
+            <Input value={exitReason} onChange={e => setExitReason(e.target.value)} />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setExitStudent(null)}>Болдырмау</Button>
             <Button variant="destructive" onClick={exitStudentAction}>Шығару</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Year rollover */}
+      <Dialog open={rolloverOpen} onOpenChange={setRolloverOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Жаңа оқу жылына көшіру</DialogTitle></DialogHeader>
+          <div className="space-y-2 text-sm">
+            <p>Барлық белсенді оқушылар бір сыныпқа жоғары көшіріледі:</p>
+            <ul className="list-disc pl-5 text-muted-foreground">
+              <li><b>1 → 2</b>, <b>2 → 3</b>, ..., <b>10 → 11</b></li>
+              <li><b>11-сынып оқушылары түлек болып белгіленеді</b> (status = шығарылған)</li>
+            </ul>
+            <p className="text-xs text-warning">⚠️ Бұл әрекет қайтарылмайды. Резервтік көшірме жасап алыңыз.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRolloverOpen(false)}>Болдырмау</Button>
+            <Button onClick={rolloverYear} disabled={rolloverBusy} className="gap-2">
+              {rolloverBusy && <Loader2 className="h-4 w-4 animate-spin" />}
+              Көшіру
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
