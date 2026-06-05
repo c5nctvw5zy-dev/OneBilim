@@ -10,13 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import * as XLSX from "xlsx";
 
 // 📖 Алфавиттік кітап (бұл кесте Оқушылар мен сыныптар бетіне автоматты түрде түседі)
-const PROGRAM_OPTIONS = [
-  { value: "general", label: "Жалпы оқу білімі" },
-  { value: "home", label: "Үйден оқыту" },
-  { value: "gifted", label: "Дарынды бала" },
-  { value: "inclusive", label: "Жеке/инклюзивті оқыту" },
-  { value: "remote", label: "Қашықтан оқу" },
-];
+// (PROGRAM_OPTIONS moved to AlphabetBookWizard)
 
 const TEMPLATE_COLUMNS = [
   "alphabet_number", "last_name", "first_name", "birth_date", "gender",
