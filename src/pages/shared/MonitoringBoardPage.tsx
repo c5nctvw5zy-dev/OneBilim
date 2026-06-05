@@ -31,8 +31,14 @@ export default function MonitoringBoardPage() {
     const { data: prof } = await supabase.from("profiles").select("school_id").eq("user_id", user!.id).single();
     if (!prof?.school_id) { setLoading(false); return; }
     setSchoolId(prof.school_id);
+    let hoursQuery = (supabase as any).from("lesson_hours").select("*").eq("school_id", prof.school_id).order("subject_name");
+    // Teachers only see their own hours
+    if (role === "teacher") {
+      const { data: myProf } = await supabase.from("profiles").select("id").eq("user_id", user!.id).single();
+      if (myProf?.id) hoursQuery = hoursQuery.eq("teacher_id", myProf.id);
+    }
     const [{ data: hours }, { data: teacherRoles }, { data: profs }] = await Promise.all([
-      (supabase as any).from("lesson_hours").select("*").eq("school_id", prof.school_id).order("subject_name"),
+      hoursQuery,
       supabase.from("user_roles").select("user_id").eq("role", "teacher"),
       supabase.from("profiles").select("id, full_name, user_id").eq("school_id", prof.school_id),
     ]);

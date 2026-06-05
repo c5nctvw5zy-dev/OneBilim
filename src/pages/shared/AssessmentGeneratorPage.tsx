@@ -79,12 +79,26 @@ export default function AssessmentGeneratorPage() {
       });
 
       let content = "";
-      if (response.ok) {
-        const data = await response.json();
-        content = data.choices?.[0]?.message?.content || data.content || "Тапсырма жасалды";
-      } else {
-        content = generateFallbackContent(type, subject, className, topic, parseInt(totalScore));
+      if (response.ok && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let idx;
+          while ((idx = buffer.indexOf("\n")) !== -1) {
+            let line = buffer.slice(0, idx); buffer = buffer.slice(idx + 1);
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line || !line.startsWith("data: ")) continue;
+            const j = line.slice(6).trim();
+            if (j === "[DONE]") break;
+            try { content += JSON.parse(j).choices?.[0]?.delta?.content || ""; } catch {}
+          }
+        }
       }
+      if (!content) content = generateFallbackContent(type, subject, className, topic, parseInt(totalScore));
 
       const newA: GeneratedAssessment = {
         id: Date.now(),
