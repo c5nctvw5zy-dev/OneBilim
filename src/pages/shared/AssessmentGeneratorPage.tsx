@@ -46,30 +46,59 @@ export default function AssessmentGeneratorPage() {
     setGenerating(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-admin-assistant`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
         body: JSON.stringify({
           messages: [
             {
               role: "system",
-              content: `Сен мектеп мұғалімдеріне арналған ${type} тапсырма жасайтын көмекшісің. Тапсырмаларды қазақ тілінде жаса. Жалпы балл: ${totalScore}. Әр тапсырманың жанына баллын жаз.`
+              content: `Сен — қазақстандық мектеп мұғалімдеріне арналған ${type} (Бөлім/Тоқсан Жиынтық Бағалау) тапсырмаларын ҚАЗАҚ ТІЛІНДЕ жасайтын ассистентсің.
+
+ЕРЕЖЕЛЕР:
+1. Тапсырмалар ТЕК берілген ТАҚЫРЫПҚА сай болуы керек — басқа тақырыптарды араластырмаңыз.
+2. Тапсырмалар Блум таксономиясының деңгейлерін қамтиды (білу → түсіну → қолдану → талдау → бағалау → жасау).
+3. Тапсырмаларды дескрипторлары мен балл бөлулерімен бірге беріңіз.
+4. Жалпы балл: ${totalScore}. Әр тапсырманың жанында балы көрсетілсін.
+5. ${type === "БЖБ" ? "БЖБ — қысқа, 1 бөлім, 4-6 тапсырма." : "ТЖБ — тоқсандық, 6-10 тапсырма, әртүрлі деңгей."}
+6. Соңында «Бағалау критерийлері» бөлімін қосыңыз.`
             },
             {
               role: "user",
-              content: `${type} жаса. Пән: ${subject}. Сынып: ${className}. Тоқсан: ${quarter}. Тақырып: ${topic}. Жалпы балл: ${totalScore}.`
+              content: `${type} жасап беріңіз.
+Пән: ${subject}
+Сынып: ${className}
+Тоқсан: ${quarter}
+ТАҚЫРЫП: "${topic}"
+Жалпы балл: ${totalScore}
+
+Тапсырмалар тек "${topic}" тақырыбы бойынша болсын.`
             }
           ],
         }),
       });
 
       let content = "";
-      if (response.ok) {
-        const data = await response.json();
-        content = data.choices?.[0]?.message?.content || data.content || "Тапсырма жасалды";
-      } else {
-        content = generateFallbackContent(type, subject, className, topic, parseInt(totalScore));
+      if (response.ok && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let idx;
+          while ((idx = buffer.indexOf("\n")) !== -1) {
+            let line = buffer.slice(0, idx); buffer = buffer.slice(idx + 1);
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line || !line.startsWith("data: ")) continue;
+            const j = line.slice(6).trim();
+            if (j === "[DONE]") break;
+            try { content += JSON.parse(j).choices?.[0]?.delta?.content || ""; } catch {}
+          }
+        }
       }
+      if (!content) content = generateFallbackContent(type, subject, className, topic, parseInt(totalScore));
 
       const newA: GeneratedAssessment = {
         id: Date.now(),

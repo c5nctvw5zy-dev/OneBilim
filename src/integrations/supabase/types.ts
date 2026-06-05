@@ -30,6 +30,7 @@ export type Database = {
           gender: string | null
           grade_level: number | null
           id: string
+          iin: string | null
           last_name: string
           nationality: string | null
           parent_name: string | null
@@ -55,6 +56,7 @@ export type Database = {
           gender?: string | null
           grade_level?: number | null
           id?: string
+          iin?: string | null
           last_name: string
           nationality?: string | null
           parent_name?: string | null
@@ -80,6 +82,7 @@ export type Database = {
           gender?: string | null
           grade_level?: number | null
           id?: string
+          iin?: string | null
           last_name?: string
           nationality?: string | null
           parent_name?: string | null

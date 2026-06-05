@@ -1,0 +1,1 @@
+ALTER TABLE public.alphabet_book ADD COLUMN IF NOT EXISTS iin text;

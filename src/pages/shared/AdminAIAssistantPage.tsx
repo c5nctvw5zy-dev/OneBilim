@@ -3,20 +3,20 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function AdminAIAssistantPage() {
   const { profile, role } = useAuth();
+  const variant = role === "teacher" ? "teacher" : "admin";
   return (
     <div className="space-y-4 max-w-5xl">
       <div>
         <h1 className="text-2xl font-bold text-foreground">🤖 ЖИ көмекші</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Талдау, бұйрық/хат жобасы, әдістемелік кеңес, жоспарлау — барлығы бір орында.
+          {variant === "teacher"
+            ? "Жоспар · Мінездеме · Үлгерім · Презентация · Зертхана · Тест — бәрі бір орында."
+            : "Талдау, бұйрық/хат жобасы, әдістемелік кеңес, жоспарлау — барлығы бір орында."}
         </p>
       </div>
       <AIAssistant
-        context={{
-          school_id: profile?.school_id,
-          role,
-          full_name: profile?.full_name,
-        }}
+        variant={variant}
+        context={{ school_id: profile?.school_id, role, full_name: profile?.full_name }}
       />
     </div>
   );
