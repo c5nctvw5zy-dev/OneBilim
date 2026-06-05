@@ -46,18 +46,33 @@ export default function AssessmentGeneratorPage() {
     setGenerating(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-admin-assistant`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
         body: JSON.stringify({
           messages: [
             {
               role: "system",
-              content: `Сен мектеп мұғалімдеріне арналған ${type} тапсырма жасайтын көмекшісің. Тапсырмаларды қазақ тілінде жаса. Жалпы балл: ${totalScore}. Әр тапсырманың жанына баллын жаз.`
+              content: `Сен — қазақстандық мектеп мұғалімдеріне арналған ${type} (Бөлім/Тоқсан Жиынтық Бағалау) тапсырмаларын ҚАЗАҚ ТІЛІНДЕ жасайтын ассистентсің.
+
+ЕРЕЖЕЛЕР:
+1. Тапсырмалар ТЕК берілген ТАҚЫРЫПҚА сай болуы керек — басқа тақырыптарды араластырмаңыз.
+2. Тапсырмалар Блум таксономиясының деңгейлерін қамтиды (білу → түсіну → қолдану → талдау → бағалау → жасау).
+3. Тапсырмаларды дескрипторлары мен балл бөлулерімен бірге беріңіз.
+4. Жалпы балл: ${totalScore}. Әр тапсырманың жанында балы көрсетілсін.
+5. ${type === "БЖБ" ? "БЖБ — қысқа, 1 бөлім, 4-6 тапсырма." : "ТЖБ — тоқсандық, 6-10 тапсырма, әртүрлі деңгей."}
+6. Соңында «Бағалау критерийлері» бөлімін қосыңыз.`
             },
             {
               role: "user",
-              content: `${type} жаса. Пән: ${subject}. Сынып: ${className}. Тоқсан: ${quarter}. Тақырып: ${topic}. Жалпы балл: ${totalScore}.`
+              content: `${type} жасап беріңіз.
+Пән: ${subject}
+Сынып: ${className}
+Тоқсан: ${quarter}
+ТАҚЫРЫП: "${topic}"
+Жалпы балл: ${totalScore}
+
+Тапсырмалар тек "${topic}" тақырыбы бойынша болсын.`
             }
           ],
         }),
