@@ -96,9 +96,12 @@ export default function SuperAdminNews() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-          <Newspaper className="h-6 w-6 text-primary" /> Жаңалықтар
-        </h2>
+        <div>
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+            <Newspaper className="h-6 w-6 text-primary" /> Білім жаңалықтары
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1">Тек Супер Админ редакциялай алады · басты бетте көрсетіледі</p>
+        </div>
         <Button onClick={openNew} className="gap-2"><Plus className="h-4 w-4" /> Жаңалық қосу</Button>
       </div>
 
