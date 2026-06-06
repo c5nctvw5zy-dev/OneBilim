@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Download, Sparkles, FileText, Presentation, ListChecks, UserCog, Image as ImageIcon, FlaskConical, BarChart3 } from "lucide-react";
+import { Download, Sparkles, FileText, Presentation, ListChecks, UserCog, Image as ImageIcon, FlaskConical, BarChart3 } from "lucide-react";
+import BilimLoader, { BilimSpinner } from "@/components/BilimLoader";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 
