@@ -219,9 +219,9 @@ export default function AIAssistant({ context, variant = "admin" }: Props) {
           ))
         )}
         {loading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <div className="shrink-0 h-8 w-8 rounded-full bg-muted flex items-center justify-center"><Bot className="h-4 w-4" /></div>
-            <div className="bg-muted rounded-2xl px-4 py-2.5"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            <div className="bg-muted rounded-2xl px-4 py-3"><BilimLoader size="sm" label="Ойлануда..." className="!flex-row gap-2" /></div>
           </div>
         )}
       </div>
