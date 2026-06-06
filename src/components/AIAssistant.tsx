@@ -237,7 +237,7 @@ export default function AIAssistant({ context, variant = "admin" }: Props) {
             disabled={loading}
           />
           <Button onClick={() => send(input)} disabled={loading || !input.trim()} size="icon" className="h-11 w-11 shrink-0">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {loading ? <BilimSpinner /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
       </div>
