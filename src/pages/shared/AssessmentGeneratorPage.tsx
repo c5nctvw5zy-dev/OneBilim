@@ -190,7 +190,7 @@ export default function AssessmentGeneratorPage() {
             </div>
           </div>
           <Button className="mt-4" onClick={handleGenerate} disabled={generating}>
-            {generating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+            {generating ? <span className="mr-2"><BilimSpinner /></span> : <Sparkles className="h-4 w-4 mr-2" />}
             {generating ? "ЖИ жасап жатыр..." : "ЖИ арқылы жасау"}
           </Button>
         </CardContent>
