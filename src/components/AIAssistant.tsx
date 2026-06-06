@@ -176,7 +176,7 @@ export default function AIAssistant({ context, variant = "admin" }: Props) {
           <DialogFooter>
             <Button variant="outline" onClick={() => setSchedOpen(false)} disabled={schedLoading}>Болдырмау</Button>
             <Button onClick={generateSchedule} disabled={schedLoading} className="gap-2">
-              {schedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {schedLoading ? <BilimSpinner /> : <Sparkles className="h-4 w-4" />}
               Кестені жасау
             </Button>
           </DialogFooter>
