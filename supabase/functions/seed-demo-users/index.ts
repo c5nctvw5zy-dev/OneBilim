@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
     { email: "superadmin@bilimapp.kz", password: "BilimApp2026!", fullName: "Админ Суперов", role: "super_admin" },
     { email: "director@bilimapp.kz", password: "BilimApp2026!", fullName: "Директор Мектепов", role: "director" },
     { email: "zavuch@bilimapp.kz", password: "BilimApp2026!", fullName: "Завуч Оқуова", role: "zavuch" },
-    { email: "teacher@bilimapp.kz", password: "BilimApp2026!", fullName: "Мұғалім Сабақов", role: "teacher" },
+    { email: "teacher@bilimapp.kz", password: "BilimApp2026!", fullName: "Мұғалім Сабақов", role: "teacher", subject: "Математика", ownClass: { name: "7Г", grade_level: 7, section: "Г" } },
     { email: "student@bilimapp.kz", password: "BilimApp2026!", fullName: "Оқушы Білімов", role: "student" },
     { email: "parent@bilimapp.kz", password: "BilimApp2026!", fullName: "Ата-ана Балаев", role: "parent" },
     { email: "librarian@bilimapp.kz", password: "BilimApp2026!", fullName: "Кітапханашы Кітапова", role: "librarian" },
@@ -125,6 +125,49 @@ Deno.serve(async (req) => {
         homeroom_teacher_id: teacherProfileId,
       });
     }
+  }
+
+  // Demo journal for teacher@bilimapp.kz + sample alphabet_book students
+  try {
+    const teacherUid = userIdByEmail["teacher@bilimapp.kz"];
+    if (teacherUid) {
+      const { data: tProf } = await admin.from("profiles").select("id").eq("user_id", teacherUid).maybeSingle();
+      const { data: tClass } = await admin.from("classes").select("id").eq("school_id", demoSchoolId).eq("name", "7Г").maybeSingle();
+      const { data: tSubj } = await admin.from("subjects").select("id").eq("name", "Математика").maybeSingle();
+      if (tProf?.id && tClass?.id && tSubj?.id) {
+        const { data: existJ } = await admin.from("journals").select("id")
+          .eq("teacher_id", tProf.id).eq("class_id", tClass.id).eq("subject_id", tSubj.id).eq("quarter", 2).maybeSingle();
+        if (!existJ?.id) {
+          await admin.from("journals").insert({
+            teacher_id: tProf.id, class_id: tClass.id, subject_id: tSubj.id,
+            quarter: 2, start_date: "2026-11-01", end_date: "2026-12-29",
+          });
+        }
+        // Sample alphabet_book students
+        const sampleStudents = [
+          { last_name: "Әбіш", first_name: "Айдана", gender: "Қыз" },
+          { last_name: "Бекен", first_name: "Дамир", gender: "Ұл" },
+          { last_name: "Қайрат", first_name: "Аружан", gender: "Қыз" },
+          { last_name: "Серік", first_name: "Нұрлан", gender: "Ұл" },
+          { last_name: "Тұрсын", first_name: "Мадина", gender: "Қыз" },
+        ];
+        for (let i = 0; i < sampleStudents.length; i++) {
+          const s = sampleStudents[i];
+          const { data: ex } = await admin.from("alphabet_book")
+            .select("id").eq("school_id", demoSchoolId)
+            .eq("last_name", s.last_name).eq("first_name", s.first_name).maybeSingle();
+          if (!ex) {
+            await admin.from("alphabet_book").insert({
+              school_id: demoSchoolId, alphabet_number: i + 1,
+              last_name: s.last_name, first_name: s.first_name, gender: s.gender,
+              grade_level: 7, section: "Г", status: "active", education_program: "general",
+            });
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Demo journal seed error:", e);
   }
 
   return new Response(JSON.stringify({ success: true, school_id: demoSchoolId, results }), {
