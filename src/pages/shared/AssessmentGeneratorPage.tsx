@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Edit, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Download, Edit, Sparkles } from "lucide-react";
+import { BilimSpinner } from "@/components/BilimLoader";
 import { useToast } from "@/hooks/use-toast";
 
 const subjects = ["Математика", "Қазақ тілі", "Физика", "Химия", "Биология", "Тарих", "Ағылшын тілі", "Информатика"];
