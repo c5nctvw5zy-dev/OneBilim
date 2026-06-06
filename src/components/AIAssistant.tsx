@@ -4,7 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Sparkles, Send, Loader2, Bot, User as UserIcon, Trash2, CalendarRange } from "lucide-react";
+import { Sparkles, Send, Bot, User as UserIcon, Trash2, CalendarRange } from "lucide-react";
+import BilimLoader, { BilimSpinner } from "@/components/BilimLoader";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
@@ -175,7 +176,7 @@ export default function AIAssistant({ context, variant = "admin" }: Props) {
           <DialogFooter>
             <Button variant="outline" onClick={() => setSchedOpen(false)} disabled={schedLoading}>Болдырмау</Button>
             <Button onClick={generateSchedule} disabled={schedLoading} className="gap-2">
-              {schedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {schedLoading ? <BilimSpinner /> : <Sparkles className="h-4 w-4" />}
               Кестені жасау
             </Button>
           </DialogFooter>
@@ -218,9 +219,9 @@ export default function AIAssistant({ context, variant = "admin" }: Props) {
           ))
         )}
         {loading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <div className="shrink-0 h-8 w-8 rounded-full bg-muted flex items-center justify-center"><Bot className="h-4 w-4" /></div>
-            <div className="bg-muted rounded-2xl px-4 py-2.5"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            <div className="bg-muted rounded-2xl px-4 py-3"><BilimLoader size="sm" label="Ойлануда..." className="!flex-row gap-2" /></div>
           </div>
         )}
       </div>
@@ -236,7 +237,7 @@ export default function AIAssistant({ context, variant = "admin" }: Props) {
             disabled={loading}
           />
           <Button onClick={() => send(input)} disabled={loading || !input.trim()} size="icon" className="h-11 w-11 shrink-0">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {loading ? <BilimSpinner /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
       </div>
