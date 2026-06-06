@@ -316,6 +316,12 @@ export default function TeacherAIWorkspace({ context }: { context?: Record<strin
                   </div>
                 ))}
 
+                {loading && !result && (
+                  <div className="rounded-xl border border-border bg-muted/30 p-8">
+                    <BilimLoader size="lg" label="ЖИ көмекші ойлануда..." />
+                  </div>
+                )}
+
                 {result && (
                   <div className="rounded-xl border border-border bg-muted/30 p-4 max-h-[400px] overflow-y-auto">
                     <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -331,7 +337,7 @@ export default function TeacherAIWorkspace({ context }: { context?: Record<strin
                   </Button>
                 )}
                 <Button onClick={generate} disabled={loading} className="gap-2">
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {loading ? <BilimSpinner /> : <Sparkles className="h-4 w-4" />}
                   {result ? "Қайта генерациялау" : "Генерациялау"}
                 </Button>
               </DialogFooter>
