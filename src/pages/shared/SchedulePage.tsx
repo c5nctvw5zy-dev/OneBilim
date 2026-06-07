@@ -150,10 +150,14 @@ export default function SchedulePage() {
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
-  // Apply class filter (for teachers, hide unrelated; for admins, allow filter)
+  // Apply role-based filters
   let visible = schedule;
   if (role === "teacher" && profile?.id) {
     visible = visible.filter(s => (s as any).teacher?.id === profile.id);
+  } else if (role === "student" || role === "parent") {
+    const myClass = ((profile as any)?.class_name || "").toLowerCase().trim();
+    if (myClass) visible = visible.filter(s => ((s.classes as any)?.name || "").toLowerCase().trim() === myClass);
+    else visible = [];
   }
   if (classFilter !== "all") {
     visible = visible.filter(s => (s.classes as any)?.id === classFilter);
@@ -263,7 +267,9 @@ export default function SchedulePage() {
 
       {visible.length === 0 && (
         <p className="text-center text-sm text-muted-foreground">
-          {role === "teacher" ? "Сізге сабақ тағайындалмаған." : "Кесте әлі толтырылмаған. «ЖИ көмекші» → «Авто кесте» арқылы автоматты жасауға немесе «Кесте жасау» батырмасын басуға болады."}
+          {role === "teacher" ? "Сізге сабақ тағайындалмаған."
+            : role === "student" || role === "parent" ? "Сіздің сыныбыңыздың кестесі әлі толтырылмаған."
+            : "Кесте әлі толтырылмаған. «ЖИ көмекші» → «Авто кесте» арқылы автоматты жасауға немесе «Кесте жасау» батырмасын басуға болады."}
         </p>
       )}
     </div>
