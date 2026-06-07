@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import {
   GraduationCap, BookOpen, Users, BarChart3, Shield, Smartphone,
   ChevronRight, Globe, CheckCircle2, Newspaper, Calendar, ChevronLeft,
 } from "lucide-react";
+
+interface DBNews { id: string; title: string; excerpt: string | null; content: string | null; image_url: string | null; created_at: string; }
 
 const languages = { kk: "Қазақша", ru: "Русский", en: "English" } as const;
 type Lang = keyof typeof languages;
@@ -155,17 +158,29 @@ function Section({ children, className = "", delay = 0 }: { children: React.Reac
 export default function Landing() {
   const [lang, setLang] = useState<Lang>("kk");
   const [currentNews, setCurrentNews] = useState(0);
+  const [dbNews, setDbNews] = useState<DBNews[]>([]);
   const t = content[lang];
 
   useEffect(() => {
+    supabase.from("news").select("id, title, excerpt, content, image_url, created_at")
+      .eq("published", true).order("created_at", { ascending: false }).limit(8)
+      .then(({ data }) => setDbNews((data as DBNews[]) || []));
+  }, []);
+
+  // Use DB news if any published, otherwise fallback static items.
+  const newsItems = dbNews.length > 0
+    ? dbNews.map((n, i) => ({ date: n.created_at.slice(0, 10), title: n.title, desc: n.excerpt || n.content?.slice(0, 200) || "", image: n.image_url || newsImages[i % newsImages.length] }))
+    : t.news.items.map((it, i) => ({ ...it, image: newsImages[i % newsImages.length] }));
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentNews(prev => (prev + 1) % t.news.items.length);
+      setCurrentNews(prev => (prev + 1) % newsItems.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [t.news.items.length]);
+  }, [newsItems.length]);
 
-  const prevNews = () => setCurrentNews(prev => (prev - 1 + t.news.items.length) % t.news.items.length);
-  const nextNews = () => setCurrentNews(prev => (prev + 1) % t.news.items.length);
+  const prevNews = () => setCurrentNews(prev => (prev - 1 + newsItems.length) % newsItems.length);
+  const nextNews = () => setCurrentNews(prev => (prev + 1) % newsItems.length);
 
   return (
     <div className="min-h-screen bg-background">
@@ -264,18 +279,14 @@ export default function Landing() {
         <div className="relative">
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
             <div className="relative h-48 md:h-64 overflow-hidden">
-              <img
-                src={newsImages[currentNews]}
-                alt={t.news.items[currentNews].title}
-                className="h-full w-full object-cover transition-all duration-700"
-                loading="lazy"
-              />
+              <img src={newsItems[currentNews].image} alt={newsItems[currentNews].title}
+                className="h-full w-full object-cover transition-all duration-700" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
             </div>
             <div className="p-6">
-              <span className="inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums mb-2">{t.news.items[currentNews].date}</span>
-              <h3 className="text-lg font-semibold text-card-foreground mb-2 leading-snug">{t.news.items[currentNews].title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t.news.items[currentNews].desc}</p>
+              <span className="inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums mb-2">{newsItems[currentNews].date}</span>
+              <h3 className="text-lg font-semibold text-card-foreground mb-2 leading-snug">{newsItems[currentNews].title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{newsItems[currentNews].desc}</p>
             </div>
           </div>
 
@@ -284,7 +295,7 @@ export default function Landing() {
               <ChevronLeft className="h-5 w-5" />
             </button>
             <div className="flex gap-2">
-              {t.news.items.map((_, i) => (
+              {newsItems.map((_, i) => (
                 <button key={i} onClick={() => setCurrentNews(i)}
                   className={`h-2.5 rounded-full transition-all duration-300 ${i === currentNews ? "w-8 bg-primary" : "w-2.5 bg-muted-foreground/30"}`} />
               ))}

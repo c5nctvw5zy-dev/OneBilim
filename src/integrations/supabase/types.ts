@@ -1290,6 +1290,7 @@ export type Database = {
           id: string
           iin: string | null
           phone: string | null
+          preferred_language: string
           school_id: string | null
           updated_at: string
           user_id: string
@@ -1306,6 +1307,7 @@ export type Database = {
           id?: string
           iin?: string | null
           phone?: string | null
+          preferred_language?: string
           school_id?: string | null
           updated_at?: string
           user_id: string
@@ -1322,6 +1324,7 @@ export type Database = {
           id?: string
           iin?: string | null
           phone?: string | null
+          preferred_language?: string
           school_id?: string | null
           updated_at?: string
           user_id?: string
