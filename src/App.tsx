@@ -220,6 +220,8 @@ const teacherNav: NavEntry[] = [
       { title: "🤖 ЖИ көмекші", path: "/teacher/ai", icon: Sparkles },
       { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
       { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
+      { title: "🤖 ҚМЖ/КТЖ генератор", path: "/teacher/curriculum-ai", icon: Sparkles },
+      { title: "Пәндер каталогы", path: "/teacher/subjects", icon: BookOpen },
     ],
   },
   { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
