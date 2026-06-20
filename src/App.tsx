@@ -63,6 +63,8 @@ import CurriculumPage from "./pages/shared/CurriculumPage";
 import PerformanceMonitoringPage from "./pages/shared/PerformanceMonitoringPage";
 import AnalyticsDetailPage from "./pages/shared/AnalyticsDetailPage";
 import AdminAIAssistantPage from "./pages/shared/AdminAIAssistantPage";
+import CurriculumAIPage from "./pages/shared/CurriculumAIPage";
+import SubjectsCatalogPage from "./pages/shared/SubjectsCatalogPage";
 
 // Librarian
 import BookRegistrationPage from "./pages/librarian/BookRegistrationPage";
