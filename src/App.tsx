@@ -179,6 +179,7 @@ const zavuchNav: NavEntry[] = [
       { title: "Оқушылармен байланыс", path: "/zavuch/chat", icon: MessageSquare },
       { title: "БЖБ / ТЖБ", path: "/zavuch/assessments", icon: Sparkles },
       { title: "Пәндер", path: "/zavuch/subjects", icon: BookOpen },
+      { title: "🤖 ҚМЖ/КТЖ генератор", path: "/zavuch/curriculum-ai", icon: Sparkles },
     ],
   },
   { title: "Профиль", path: "/zavuch/profile", icon: User },
