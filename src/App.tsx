@@ -408,6 +408,10 @@ const App = () => (
             <Route path="/teacher/chat" element={<ChatPage />} />
             <Route path="/teacher/assessments" element={<AssessmentGeneratorPage />} />
             <Route path="/teacher/journal" element={<JournalPage />} />
+            <Route path="/teacher/curriculum-ai" element={<CurriculumAIPage />} />
+            <Route path="/teacher/subjects" element={<SubjectsCatalogPage />} />
+            <Route path="/teacher/subjects/:subject" element={<SubjectsCatalogPage />} />
+            <Route path="/teacher/subjects/:subject/:grade" element={<SubjectsCatalogPage />} />
             <Route path="/teacher/documents" element={<DocumentsPage />} />
             <Route path="/teacher/profile" element={<ProfilePage />} />
           </Route>
