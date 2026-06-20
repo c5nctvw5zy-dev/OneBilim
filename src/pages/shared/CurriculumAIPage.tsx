@@ -205,7 +205,7 @@ export default function CurriculumAIPage() {
                 <Textarea value={content} onChange={e => setContent(e.target.value)} className="min-h-[500px] font-mono text-sm"/>
               ) : (
                 <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-primary prose-table:text-xs">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                  <ReactMarkdown>{content}</ReactMarkdown>
                 </div>
               )}
             </CardContent>
