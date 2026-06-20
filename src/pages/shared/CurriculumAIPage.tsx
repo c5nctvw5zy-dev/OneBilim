@@ -8,12 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, FileText, RefreshCw, Edit3, Download, Upload, CheckCircle2, Clock, XCircle, BookOpen, FileType2 } from "lucide-react";
-import { BilimLoader, BilimSpinner } from "@/components/BilimLoader";
+import BilimLoader, { BilimSpinner } from "@/components/BilimLoader";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { jsPDF } from "jspdf";
 import { Document as DocxDoc, Packer, Paragraph, HeadingLevel } from "docx";
 
