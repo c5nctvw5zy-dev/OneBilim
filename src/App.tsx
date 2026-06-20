@@ -377,7 +377,10 @@ const App = () => (
             <Route path="/zavuch/homework" element={<HomeworkPage />} />
             <Route path="/zavuch/chat" element={<ChatPage />} />
             <Route path="/zavuch/assessments" element={<AssessmentGeneratorPage />} />
-            <Route path="/zavuch/subjects" element={<SubjectsManagementPage />} />
+            <Route path="/zavuch/subjects" element={<SubjectsCatalogPage />} />
+            <Route path="/zavuch/subjects/:subject" element={<SubjectsCatalogPage />} />
+            <Route path="/zavuch/subjects/:subject/:grade" element={<SubjectsCatalogPage />} />
+            <Route path="/zavuch/curriculum-ai" element={<CurriculumAIPage />} />
             <Route path="/zavuch/students" element={<DirectorStudents />} />
             <Route path="/zavuch/teachers" element={<DirectorTeachers />} />
             <Route path="/zavuch/documents" element={<DocumentsPage />} />
