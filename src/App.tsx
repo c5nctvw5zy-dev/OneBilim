@@ -63,6 +63,8 @@ import CurriculumPage from "./pages/shared/CurriculumPage";
 import PerformanceMonitoringPage from "./pages/shared/PerformanceMonitoringPage";
 import AnalyticsDetailPage from "./pages/shared/AnalyticsDetailPage";
 import AdminAIAssistantPage from "./pages/shared/AdminAIAssistantPage";
+import CurriculumAIPage from "./pages/shared/CurriculumAIPage";
+import SubjectsCatalogPage from "./pages/shared/SubjectsCatalogPage";
 
 // Librarian
 import BookRegistrationPage from "./pages/librarian/BookRegistrationPage";
@@ -133,6 +135,7 @@ const directorNav: NavEntry[] = [
       { title: "Оқушылармен байланыс", path: "/director/chat", icon: MessageSquare },
       { title: "БЖБ / ТЖБ", path: "/director/assessments", icon: Sparkles },
       { title: "Пәндер", path: "/director/subjects", icon: BookOpen },
+      { title: "🤖 ҚМЖ/КТЖ генератор", path: "/director/curriculum-ai", icon: Sparkles },
     ],
   },
   { title: "Профиль", path: "/director/profile", icon: User },
@@ -176,6 +179,7 @@ const zavuchNav: NavEntry[] = [
       { title: "Оқушылармен байланыс", path: "/zavuch/chat", icon: MessageSquare },
       { title: "БЖБ / ТЖБ", path: "/zavuch/assessments", icon: Sparkles },
       { title: "Пәндер", path: "/zavuch/subjects", icon: BookOpen },
+      { title: "🤖 ҚМЖ/КТЖ генератор", path: "/zavuch/curriculum-ai", icon: Sparkles },
     ],
   },
   { title: "Профиль", path: "/zavuch/profile", icon: User },
@@ -216,6 +220,8 @@ const teacherNav: NavEntry[] = [
       { title: "🤖 ЖИ көмекші", path: "/teacher/ai", icon: Sparkles },
       { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
       { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
+      { title: "🤖 ҚМЖ/КТЖ генератор", path: "/teacher/curriculum-ai", icon: Sparkles },
+      { title: "Пәндер каталогы", path: "/teacher/subjects", icon: BookOpen },
     ],
   },
   { title: "Бақылау тақтасы", path: "/teacher/monitoring", icon: LayoutDashboard },
@@ -342,7 +348,10 @@ const App = () => (
             <Route path="/director/homework" element={<HomeworkPage />} />
             <Route path="/director/chat" element={<ChatPage />} />
             <Route path="/director/assessments" element={<AssessmentGeneratorPage />} />
-            <Route path="/director/subjects" element={<SubjectsManagementPage />} />
+            <Route path="/director/subjects" element={<SubjectsCatalogPage />} />
+            <Route path="/director/subjects/:subject" element={<SubjectsCatalogPage />} />
+            <Route path="/director/subjects/:subject/:grade" element={<SubjectsCatalogPage />} />
+            <Route path="/director/curriculum-ai" element={<CurriculumAIPage />} />
             <Route path="/director/students" element={<DirectorStudents />} />
             <Route path="/director/teachers" element={<DirectorTeachers />} />
             <Route path="/director/documents" element={<DirectorDocuments />} />
@@ -368,7 +377,10 @@ const App = () => (
             <Route path="/zavuch/homework" element={<HomeworkPage />} />
             <Route path="/zavuch/chat" element={<ChatPage />} />
             <Route path="/zavuch/assessments" element={<AssessmentGeneratorPage />} />
-            <Route path="/zavuch/subjects" element={<SubjectsManagementPage />} />
+            <Route path="/zavuch/subjects" element={<SubjectsCatalogPage />} />
+            <Route path="/zavuch/subjects/:subject" element={<SubjectsCatalogPage />} />
+            <Route path="/zavuch/subjects/:subject/:grade" element={<SubjectsCatalogPage />} />
+            <Route path="/zavuch/curriculum-ai" element={<CurriculumAIPage />} />
             <Route path="/zavuch/students" element={<DirectorStudents />} />
             <Route path="/zavuch/teachers" element={<DirectorTeachers />} />
             <Route path="/zavuch/documents" element={<DocumentsPage />} />
@@ -396,6 +408,10 @@ const App = () => (
             <Route path="/teacher/chat" element={<ChatPage />} />
             <Route path="/teacher/assessments" element={<AssessmentGeneratorPage />} />
             <Route path="/teacher/journal" element={<JournalPage />} />
+            <Route path="/teacher/curriculum-ai" element={<CurriculumAIPage />} />
+            <Route path="/teacher/subjects" element={<SubjectsCatalogPage />} />
+            <Route path="/teacher/subjects/:subject" element={<SubjectsCatalogPage />} />
+            <Route path="/teacher/subjects/:subject/:grade" element={<SubjectsCatalogPage />} />
             <Route path="/teacher/documents" element={<DocumentsPage />} />
             <Route path="/teacher/profile" element={<ProfilePage />} />
           </Route>

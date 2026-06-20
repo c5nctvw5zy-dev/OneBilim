@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -426,39 +426,60 @@ export type Database = {
       curriculum_plans: {
         Row: {
           academic_year: string | null
+          additional_instructions: string | null
           class_name: string | null
+          content: string | null
           created_at: string
           created_by: string
           group_name: string | null
           id: string
           plan_type: string
+          program: string | null
+          reviewer_comment: string | null
           school_id: string
+          status: string
           subject_name: string
           teacher_name: string | null
+          textbook: string | null
+          updated_at: string
         }
         Insert: {
           academic_year?: string | null
+          additional_instructions?: string | null
           class_name?: string | null
+          content?: string | null
           created_at?: string
           created_by: string
           group_name?: string | null
           id?: string
           plan_type: string
+          program?: string | null
+          reviewer_comment?: string | null
           school_id: string
+          status?: string
           subject_name: string
           teacher_name?: string | null
+          textbook?: string | null
+          updated_at?: string
         }
         Update: {
           academic_year?: string | null
+          additional_instructions?: string | null
           class_name?: string | null
+          content?: string | null
           created_at?: string
           created_by?: string
           group_name?: string | null
           id?: string
           plan_type?: string
+          program?: string | null
+          reviewer_comment?: string | null
           school_id?: string
+          status?: string
           subject_name?: string
           teacher_name?: string | null
+          textbook?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
