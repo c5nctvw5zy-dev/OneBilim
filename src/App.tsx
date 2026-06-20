@@ -135,6 +135,7 @@ const directorNav: NavEntry[] = [
       { title: "Оқушылармен байланыс", path: "/director/chat", icon: MessageSquare },
       { title: "БЖБ / ТЖБ", path: "/director/assessments", icon: Sparkles },
       { title: "Пәндер", path: "/director/subjects", icon: BookOpen },
+      { title: "🤖 ҚМЖ/КТЖ генератор", path: "/director/curriculum-ai", icon: Sparkles },
     ],
   },
   { title: "Профиль", path: "/director/profile", icon: User },
