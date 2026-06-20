@@ -348,7 +348,10 @@ const App = () => (
             <Route path="/director/homework" element={<HomeworkPage />} />
             <Route path="/director/chat" element={<ChatPage />} />
             <Route path="/director/assessments" element={<AssessmentGeneratorPage />} />
-            <Route path="/director/subjects" element={<SubjectsManagementPage />} />
+            <Route path="/director/subjects" element={<SubjectsCatalogPage />} />
+            <Route path="/director/subjects/:subject" element={<SubjectsCatalogPage />} />
+            <Route path="/director/subjects/:subject/:grade" element={<SubjectsCatalogPage />} />
+            <Route path="/director/curriculum-ai" element={<CurriculumAIPage />} />
             <Route path="/director/students" element={<DirectorStudents />} />
             <Route path="/director/teachers" element={<DirectorTeachers />} />
             <Route path="/director/documents" element={<DirectorDocuments />} />
