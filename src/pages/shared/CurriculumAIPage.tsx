@@ -80,7 +80,7 @@ export default function CurriculumAIPage() {
 
   const saveToSystem = async () => {
     try {
-      const { data, error } = await supabase.from("curriculum_plans").insert({
+      const { data, error } = await (supabase.from("curriculum_plans") as any).insert({
         school_id: profile?.school_id,
         plan_type: planType,
         class_name: form.className,
@@ -92,6 +92,7 @@ export default function CurriculumAIPage() {
         content,
         additional_instructions: additional,
         status: "pending",
+        created_by: profile?.user_id,
       }).select().single();
       if (error) throw error;
       setSavedId(data.id);
