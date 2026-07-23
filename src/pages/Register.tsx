@@ -14,6 +14,9 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const nextQs = nextParam ? `?next=${encodeURIComponent(nextParam)}` : "";
   const [form, setForm] = useState({
     schoolName: "", bin: "", schoolType: "", region: "", city: "", address: "", phone: "", email: "",
     dirName: "", dirIIN: "", dirPhone: "", dirEmail: "",
@@ -45,7 +48,7 @@ export default function Register() {
       return;
     }
     toast({ title: "Өтінім жіберілді!", description: "1-2 жұмыс күні ішінде тексеріледі." });
-    navigate("/login");
+    navigate("/login" + nextQs);
   };
 
   return (
@@ -55,7 +58,7 @@ export default function Register() {
           <Link to="/" className="flex items-center gap-2 text-xl font-bold text-primary">
             <GraduationCap className="h-7 w-7" /> BilimApp
           </Link>
-          <Link to="/login"><Button variant="ghost" size="sm">Кіру</Button></Link>
+          <Link to={"/login" + nextQs}><Button variant="ghost" size="sm">Кіру</Button></Link>
         </div>
       </nav>
 
