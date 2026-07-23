@@ -302,7 +302,7 @@ export default function Login() {
 
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Мектебіңіз тіркелмеген бе?{" "}
-                <Link to="/register" className="text-primary font-medium hover:underline">Тіркелу</Link>
+                <Link to={"/register" + (safeNext ? `?next=${encodeURIComponent(safeNext)}` : "")} className="text-primary font-medium hover:underline">Тіркелу</Link>
               </p>
               <Link to="/" className="mt-4 block text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                 ← Басты бетке оралу
