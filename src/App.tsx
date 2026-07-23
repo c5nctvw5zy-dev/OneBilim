@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 import Copyright from "./pages/Copyright";
 import ForgotPassword from "./pages/ForgotPassword";
+import OAuthConsent from "./pages/OAuthConsent";
 
 import DashboardLayout from "@/components/DashboardLayout";
 import type { NavEntry } from "@/components/DashboardLayout";
@@ -324,6 +325,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/copyright" element={<Copyright />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
 
           {/* Super Admin */}
           <Route element={<ProtectedRoute allowedRoles={["super_admin"]}><DashboardLayout roleName="Super Admin" navItems={superAdminNav} userName="Admin" /></ProtectedRoute>}>
