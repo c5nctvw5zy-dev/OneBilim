@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://sbsxehdtlmkvopforfdy.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "bilimapp-mcp",
+      "version": "0.1.0",
+      "title": "BilimApp"
+    },
+    "tools": [
+      {
+        "name": "get_my_profile",
+        "title": "Менің профилім",
+        "description": "Ағымдағы қосылған пайдаланушының BilimApp профилін (аты-жөні, рөлі, мектебі, сыныбы) қайтарады.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "school_stats",
+        "title": "Мектеп статистикасы",
+        "description": "Пайдаланушы мектебінің жалпы статистикасын: оқушы, мұғалім, сынып санын қайтарады.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_classes",
+        "title": "Сыныптарды тізу",
+        "description": "Пайдаланушының мектебіндегі сыныптардың тізімін қайтарады (RLS автоматты қолданылады).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_students",
+        "title": "Оқушыларды тізу",
+        "description": "Мектептегі оқушыларды тізеді. Қосымша: класс атауы бойынша сүзу (мысалы, '7 Г').",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "class_name": {
+              "description": "Класс атауы бойынша сүзгі, мысалы '7 Г'",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Жазба саны (әдепкі 100)",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_schedule",
+        "title": "Сабақ кестесі",
+        "description": "Класс немесе мұғалім бойынша сабақ кестесін қайтарады.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "class_name": {
+              "description": "Класс атауы, мысалы '7 Г'",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_grades",
+        "title": "Бағаларды қарау",
+        "description": "Ағымдағы пайдаланушы үшін көрінетін бағаларды қайтарады (RLS шектеулері).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "student_id": {
+              "description": "Нақты оқушының user_id-і",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_homework",
+        "title": "Үй тапсырмалары",
+        "description": "Класс/пән бойынша үй тапсырмаларының тізімін қайтарады.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "class_name": {
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_announcements",
+        "title": "Хабарландыруларды тізу",
+        "description": "Мектептегі соңғы хабарландыруларды қайтарады.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Жазба саны (әдепкі 20)",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_announcement",
+        "title": "Хабарландыру құру",
+        "description": "Пайдаланушы мектебіне арналған жаңа хабарландыру құрады. Тек рұқсаты бар рөлдер үшін (RLS тексереді).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Хабарландыру тақырыбы"
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Хабарландыру мәтіні"
+            },
+            "target_role": {
+              "description": "Мақсатты рөл (all, teacher, student, parent...)",
+              "type": "string"
+            }
+          },
+          "required": [
+            "title",
+            "body"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
