@@ -379,6 +379,7 @@ export type Database = {
         Row: {
           created_at: string
           grade_level: number
+          group_config: Json | null
           homeroom_teacher_id: string | null
           id: string
           name: string
@@ -389,6 +390,7 @@ export type Database = {
         Insert: {
           created_at?: string
           grade_level: number
+          group_config?: Json | null
           homeroom_teacher_id?: string | null
           id?: string
           name: string
@@ -399,6 +401,7 @@ export type Database = {
         Update: {
           created_at?: string
           grade_level?: number
+          group_config?: Json | null
           homeroom_teacher_id?: string | null
           id?: string
           name?: string
@@ -485,6 +488,7 @@ export type Database = {
       }
       curriculum_rows: {
         Row: {
+          group_name: string | null
           homework: string | null
           homework_type: string | null
           id: string
@@ -492,10 +496,12 @@ export type Database = {
           lesson_type: string | null
           plan_id: string
           row_no: number
+          teacher_names: string | null
           topic: string | null
           topic_count: number | null
         }
         Insert: {
+          group_name?: string | null
           homework?: string | null
           homework_type?: string | null
           id?: string
@@ -503,10 +509,12 @@ export type Database = {
           lesson_type?: string | null
           plan_id: string
           row_no: number
+          teacher_names?: string | null
           topic?: string | null
           topic_count?: number | null
         }
         Update: {
+          group_name?: string | null
           homework?: string | null
           homework_type?: string | null
           id?: string
@@ -514,6 +522,7 @@ export type Database = {
           lesson_type?: string | null
           plan_id?: string
           row_no?: number
+          teacher_names?: string | null
           topic?: string | null
           topic_count?: number | null
         }
