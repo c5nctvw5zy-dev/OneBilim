@@ -40,7 +40,8 @@ import ZavuchHome from "./pages/zavuch/ZavuchHome";
 
 // Teacher
 import TeacherHome from "./pages/teacher/TeacherHome";
-import ClassLeadershipPage from "./pages/teacher/ClassLeadershipPage";
+import MyClassPage from "./pages/teacher/MyClassPage";
+import KtpEditorPage from "./pages/teacher/KtpEditorPage";
 
 // Student
 import StudentHome from "./pages/student/StudentHome";
@@ -217,7 +218,8 @@ const teacherNav: NavEntry[] = [
     icon: GraduationCap,
     children: [
       { title: "Басты бет", path: "/teacher", icon: Home },
-      { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
+      { title: "Менің сыныбым", path: "/teacher/leadership", icon: BookMarked },
+      { title: "КТЖ басқару", path: "/teacher/ktp", icon: ClipboardList },
       { title: "🤖 ЖИ көмекші", path: "/teacher/ai", icon: Sparkles },
       { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
       { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
@@ -405,7 +407,8 @@ const App = () => (
             <Route path="/teacher/ai" element={<AdminAIAssistantPage />} />
             <Route path="/teacher/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/teacher/schedule" element={<SchedulePage />} />
-            <Route path="/teacher/leadership" element={<ClassLeadershipPage />} />
+            <Route path="/teacher/leadership" element={<MyClassPage />} />
+            <Route path="/teacher/ktp" element={<KtpEditorPage />} />
             <Route path="/teacher/homework" element={<HomeworkPage />} />
             <Route path="/teacher/chat" element={<ChatPage />} />
             <Route path="/teacher/assessments" element={<AssessmentGeneratorPage />} />
