@@ -407,7 +407,8 @@ const App = () => (
             <Route path="/teacher/ai" element={<AdminAIAssistantPage />} />
             <Route path="/teacher/monitoring" element={<MonitoringBoardPage />} />
             <Route path="/teacher/schedule" element={<SchedulePage />} />
-            <Route path="/teacher/leadership" element={<ClassLeadershipPage />} />
+            <Route path="/teacher/leadership" element={<MyClassPage />} />
+            <Route path="/teacher/ktp" element={<KtpEditorPage />} />
             <Route path="/teacher/homework" element={<HomeworkPage />} />
             <Route path="/teacher/chat" element={<ChatPage />} />
             <Route path="/teacher/assessments" element={<AssessmentGeneratorPage />} />
