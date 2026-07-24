@@ -218,7 +218,8 @@ const teacherNav: NavEntry[] = [
     icon: GraduationCap,
     children: [
       { title: "Басты бет", path: "/teacher", icon: Home },
-      { title: "Сынып жетекшілік", path: "/teacher/leadership", icon: BookMarked },
+      { title: "Менің сыныбым", path: "/teacher/leadership", icon: BookMarked },
+      { title: "КТЖ басқару", path: "/teacher/ktp", icon: ClipboardList },
       { title: "🤖 ЖИ көмекші", path: "/teacher/ai", icon: Sparkles },
       { title: "Электронды журнал", path: "/teacher/journal", icon: BookOpen },
       { title: "Менің кестем", path: "/teacher/schedule", icon: Calendar },
