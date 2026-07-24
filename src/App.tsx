@@ -40,7 +40,8 @@ import ZavuchHome from "./pages/zavuch/ZavuchHome";
 
 // Teacher
 import TeacherHome from "./pages/teacher/TeacherHome";
-import ClassLeadershipPage from "./pages/teacher/ClassLeadershipPage";
+import MyClassPage from "./pages/teacher/MyClassPage";
+import KtpEditorPage from "./pages/teacher/KtpEditorPage";
 
 // Student
 import StudentHome from "./pages/student/StudentHome";
