@@ -27,6 +27,7 @@ import SuperAdminAnalytics from "./pages/superadmin/SuperAdminAnalytics";
 import SuperAdminLogs from "./pages/superadmin/SuperAdminLogs";
 import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
 import SuperAdminNews from "./pages/superadmin/SuperAdminNews";
+import SuperAdminIntegrations from "./pages/superadmin/SuperAdminIntegrations";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
@@ -90,7 +91,7 @@ import {
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
   FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User, Library,
-  Newspaper, Shield, Building2, Brain, HeartPulse, Accessibility, Stethoscope, Briefcase, FileSignature,
+  Newspaper, Shield, Building2, Brain, HeartPulse, Accessibility, Stethoscope, Briefcase, FileSignature, KeyRound,
 } from "lucide-react";
 
 const superAdminNav: NavEntry[] = [
@@ -115,6 +116,7 @@ const superAdminNav: NavEntry[] = [
   { title: "Пайдаланушылар", path: "/super-admin/users", icon: Users },
   { title: "Аналитика", path: "/super-admin/analytics", icon: BarChart3 },
   { title: "Жаңалықтар", path: "/super-admin/news", icon: Newspaper },
+  { title: "API кілттері және интеграция", path: "/super-admin/integrations", icon: KeyRound },
   {
     title: "Қауіпсіздік",
     icon: Shield,
@@ -340,6 +342,7 @@ const App = () => (
             <Route path="/super-admin/logs" element={<SuperAdminLogs />} />
             <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
             <Route path="/super-admin/news" element={<SuperAdminNews />} />
+            <Route path="/super-admin/integrations" element={<SuperAdminIntegrations />} />
             <Route path="/super-admin/profile" element={<ProfilePage />} />
           </Route>
 

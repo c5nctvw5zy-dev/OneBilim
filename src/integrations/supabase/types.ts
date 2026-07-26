@@ -991,6 +991,57 @@ export type Database = {
         }
         Relationships: []
       }
+      integrations: {
+        Row: {
+          api_key: string | null
+          api_secret: string | null
+          base_url: string | null
+          created_at: string
+          created_by: string | null
+          direction: string
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          provider: string | null
+          scopes: string | null
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          api_secret?: string | null
+          base_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          provider?: string | null
+          scopes?: string | null
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          api_secret?: string | null
+          base_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          provider?: string | null
+          scopes?: string | null
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       journals: {
         Row: {
           class_id: string
