@@ -91,7 +91,7 @@ import {
 import {
   Home, School, ClipboardList, BookOpen, Users, BarChart3, FileText, Settings, GraduationCap, Calendar,
   FileCheck, BookMarked, CheckCircle, LayoutDashboard, MessageSquare, Sparkles, BookOpenCheck, User, Library,
-  Newspaper, Shield, Building2, Brain, HeartPulse, Accessibility, Stethoscope, Briefcase, FileSignature,
+  Newspaper, Shield, Building2, Brain, HeartPulse, Accessibility, Stethoscope, Briefcase, FileSignature, KeyRound,
 } from "lucide-react";
 
 const superAdminNav: NavEntry[] = [
