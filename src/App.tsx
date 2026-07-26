@@ -27,6 +27,7 @@ import SuperAdminAnalytics from "./pages/superadmin/SuperAdminAnalytics";
 import SuperAdminLogs from "./pages/superadmin/SuperAdminLogs";
 import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
 import SuperAdminNews from "./pages/superadmin/SuperAdminNews";
+import SuperAdminIntegrations from "./pages/superadmin/SuperAdminIntegrations";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
