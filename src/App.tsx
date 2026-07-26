@@ -341,6 +341,7 @@ const App = () => (
             <Route path="/super-admin/logs" element={<SuperAdminLogs />} />
             <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
             <Route path="/super-admin/news" element={<SuperAdminNews />} />
+            <Route path="/super-admin/integrations" element={<SuperAdminIntegrations />} />
             <Route path="/super-admin/profile" element={<ProfilePage />} />
           </Route>
 
