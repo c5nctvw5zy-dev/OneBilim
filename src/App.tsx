@@ -116,6 +116,7 @@ const superAdminNav: NavEntry[] = [
   { title: "Пайдаланушылар", path: "/super-admin/users", icon: Users },
   { title: "Аналитика", path: "/super-admin/analytics", icon: BarChart3 },
   { title: "Жаңалықтар", path: "/super-admin/news", icon: Newspaper },
+  { title: "API кілттері және интеграция", path: "/super-admin/integrations", icon: KeyRound },
   {
     title: "Қауіпсіздік",
     icon: Shield,
