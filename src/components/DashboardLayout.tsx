@@ -38,6 +38,9 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+  const [showWelcome, setShowWelcome] = useState<boolean>(() => {
+    try { return sessionStorage.getItem("bilim_show_welcome") === "1"; } catch { return false; }
+  });
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
