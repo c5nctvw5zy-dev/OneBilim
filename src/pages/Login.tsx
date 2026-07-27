@@ -66,6 +66,7 @@ export default function Login() {
   };
 
   const navigateByRole = async (userId?: string | null) => {
+    try { sessionStorage.setItem("bilim_show_welcome", "1"); } catch {}
     if (safeNext) { navigate(safeNext, { replace: true }); return; }
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) { navigate("/login"); return; }
