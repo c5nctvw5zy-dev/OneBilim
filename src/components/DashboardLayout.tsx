@@ -7,6 +7,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import AnnouncementCenter from "@/components/AnnouncementCenter";
+import WelcomeAnimation from "@/components/WelcomeAnimation";
 
 export interface NavItem {
   title: string;
