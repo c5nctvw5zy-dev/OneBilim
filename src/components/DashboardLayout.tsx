@@ -264,6 +264,14 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
         </main>
         <AnnouncementCenter />
       </div>
+      {showWelcome && (
+        <WelcomeAnimation
+          onDone={() => {
+            try { sessionStorage.removeItem("bilim_show_welcome"); } catch {}
+            setShowWelcome(false);
+          }}
+        />
+      )}
     </div>
   );
 }
