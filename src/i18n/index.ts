@@ -135,8 +135,11 @@ i18n.use(initReactI18next).init({
 });
 
 export const setLanguage = (lng: string) => {
-  i18n.changeLanguage(lng);
   localStorage.setItem("bilim_lang", lng);
+  i18n.changeLanguage(lng);
+  document.documentElement.lang = lng;
+  // Толық интерфейсті таңдалған тілде қайта жүктеу
+  setTimeout(() => window.location.reload(), 300);
 };
 
 export default i18n;
