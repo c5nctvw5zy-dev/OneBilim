@@ -8,6 +8,7 @@ import { Download, Upload, FileSpreadsheet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import * as XLSX from "xlsx";
+import i18n from "@/i18n";
 
 // 📖 Алфавиттік кітап (бұл кесте Оқушылар мен сыныптар бетіне автоматты түрде түседі)
 // (PROGRAM_OPTIONS moved to AlphabetBookWizard)
