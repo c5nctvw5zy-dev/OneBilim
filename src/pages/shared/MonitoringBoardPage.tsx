@@ -43,7 +43,8 @@ export default function MonitoringBoardPage() {
       supabase.from("profiles").select("id, full_name, user_id").eq("school_id", prof.school_id),
     ]);
     const tids = new Set((teacherRoles || []).map(r => r.user_id));
-    setTeachers((profs || []).filter(p => tids.has(p.user_id)));
+    const onlyTeachers = (profs || []).filter(p => tids.has(p.user_id));
+    setTeachers(onlyTeachers.length > 0 ? onlyTeachers : (profs || []));
     setRows(hours || []);
     setLoading(false);
   };

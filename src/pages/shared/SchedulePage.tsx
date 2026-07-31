@@ -73,10 +73,12 @@ export default function SchedulePage() {
     setClasses(cls || []);
     setSubjects(subs || []);
 
-    const { data: teacherRoles } = await supabase.from("user_roles").select("user_id").eq("role", "teacher");
-    const teacherUserIds = (teacherRoles || []).map(r => r.user_id);
+    const { data: teacherRoles } = await supabase.from("user_roles").select("user_id, role").in("role", ["teacher", "zavuch", "director"]);
+    const teacherUserIds = new Set((teacherRoles || []).filter(r => r.role === "teacher").map(r => r.user_id));
     const { data: allProfs } = await supabase.from("profiles").select("id, full_name, user_id").eq("school_id", prof.school_id);
-    setTeachers((allProfs || []).filter(p => teacherUserIds.includes(p.user_id)));
+    const onlyTeachers = (allProfs || []).filter(p => teacherUserIds.has(p.user_id));
+    // Егер рөл бойынша мұғалім табылмаса, мектептің барлық қызметкерлерін көрсетеміз (тізім бос қалмауы үшін)
+    setTeachers(onlyTeachers.length > 0 ? onlyTeachers : (allProfs || []));
     setLoading(false);
   };
 
@@ -199,7 +201,20 @@ export default function SchedulePage() {
                   </div>
                   <div className="space-y-1"><Label>Сынып</Label><Input placeholder="9А" value={form.class_name} onChange={e => setForm(p => ({ ...p, class_name: e.target.value }))} /></div>
                   <div className="space-y-1"><Label>Пән</Label><Input placeholder="Математика" value={form.subject_name} onChange={e => setForm(p => ({ ...p, subject_name: e.target.value }))} /></div>
-                  <div className="space-y-1"><Label>Мұғалім</Label><Input placeholder="Ахметов А." value={form.teacher_name} onChange={e => setForm(p => ({ ...p, teacher_name: e.target.value }))} /></div>
+                  <div className="space-y-1">
+                    <Label>Мұғалім</Label>
+                    {teachers.length > 0 ? (
+                      <Select value={form.teacher_name || "none"} onValueChange={v => setForm(p => ({ ...p, teacher_name: v === "none" ? "" : v }))}>
+                        <SelectTrigger><SelectValue placeholder="Мұғалімді таңдаңыз" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">— Тағайындалмаған —</SelectItem>
+                          {teachers.map(t => <SelectItem key={t.id} value={t.full_name}>{t.full_name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input placeholder="Ахметов А." value={form.teacher_name} onChange={e => setForm(p => ({ ...p, teacher_name: e.target.value }))} />
+                    )}
+                  </div>
                   <div className="space-y-1">
                     <Label>Сабақ реті</Label>
                     <Select value={form.lesson_order} onValueChange={v => {
