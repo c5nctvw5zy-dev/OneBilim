@@ -229,6 +229,57 @@ export type Database = {
           },
         ]
       }
+      assessment_results: {
+        Row: {
+          assessment_type: string
+          class_name: string | null
+          created_at: string
+          created_by: string
+          id: string
+          max_score: number | null
+          note: string | null
+          quarter: number | null
+          school_id: string
+          score: number | null
+          section_name: string | null
+          student_id: string | null
+          student_name: string
+          subject_name: string
+        }
+        Insert: {
+          assessment_type: string
+          class_name?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          max_score?: number | null
+          note?: string | null
+          quarter?: number | null
+          school_id: string
+          score?: number | null
+          section_name?: string | null
+          student_id?: string | null
+          student_name: string
+          subject_name: string
+        }
+        Update: {
+          assessment_type?: string
+          class_name?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          max_score?: number | null
+          note?: string | null
+          quarter?: number | null
+          school_id?: string
+          score?: number | null
+          section_name?: string | null
+          student_id?: string | null
+          student_name?: string
+          subject_name?: string
+        }
+        Relationships: []
+      }
       attendance: {
         Row: {
           class_id: string
@@ -372,6 +423,56 @@ export type Database = {
           registered_by?: string
           school_id?: string
           title?: string
+        }
+        Relationships: []
+      }
+      chat_group_members: {
+        Row: {
+          group_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "chat_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_groups: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          school_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          school_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          school_id?: string | null
         }
         Relationships: []
       }
@@ -528,6 +629,93 @@ export type Database = {
         }
         Relationships: []
       }
+      data_access_requests: {
+        Row: {
+          created_at: string
+          data_type: string
+          decided_at: string | null
+          duration_days: number | null
+          expires_at: string | null
+          id: string
+          parent_id: string | null
+          purpose: string | null
+          requester_id: string
+          requester_role: string | null
+          school_id: string | null
+          status: string
+          student_name: string
+        }
+        Insert: {
+          created_at?: string
+          data_type: string
+          decided_at?: string | null
+          duration_days?: number | null
+          expires_at?: string | null
+          id?: string
+          parent_id?: string | null
+          purpose?: string | null
+          requester_id: string
+          requester_role?: string | null
+          school_id?: string | null
+          status?: string
+          student_name: string
+        }
+        Update: {
+          created_at?: string
+          data_type?: string
+          decided_at?: string | null
+          duration_days?: number | null
+          expires_at?: string | null
+          id?: string
+          parent_id?: string | null
+          purpose?: string | null
+          requester_id?: string
+          requester_role?: string | null
+          school_id?: string | null
+          status?: string
+          student_name?: string
+        }
+        Relationships: []
+      }
+      device_link_requests: {
+        Row: {
+          approved_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          requester_browser: string | null
+          requester_device: string | null
+          requester_os: string | null
+          status: string
+          token: string
+          user_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          requester_browser?: string | null
+          requester_device?: string | null
+          requester_os?: string | null
+          status?: string
+          token: string
+          user_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          requester_browser?: string | null
+          requester_device?: string | null
+          requester_os?: string | null
+          status?: string
+          token?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       direct_messages: {
         Row: {
           body: string
@@ -610,6 +798,7 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          deleted_at: string | null
           file_name: string | null
           file_size: string | null
           file_url: string | null
@@ -625,6 +814,7 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
           file_name?: string | null
           file_size?: string | null
           file_url?: string | null
@@ -640,6 +830,7 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
           file_name?: string | null
           file_size?: string | null
           file_url?: string | null
@@ -782,6 +973,67 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_message_reads: {
+        Row: {
+          id: string
+          message_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_message_reads_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "group_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_messages: {
+        Row: {
+          body: string
+          created_at: string
+          from_user: string
+          group_id: string
+          id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          from_user: string
+          group_id: string
+          id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          from_user?: string
+          group_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "chat_groups"
             referencedColumns: ["id"]
           },
         ]
@@ -1139,6 +1391,39 @@ export type Database = {
         }
         Relationships: []
       }
+      login_history: {
+        Row: {
+          browser: string | null
+          created_at: string
+          device_name: string | null
+          id: string
+          ip_address: string | null
+          os: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string
+          device_name?: string | null
+          id?: string
+          ip_address?: string | null
+          os?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string
+          device_name?: string | null
+          id?: string
+          ip_address?: string | null
+          os?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       materials: {
         Row: {
           created_at: string
@@ -1370,9 +1655,11 @@ export type Database = {
           gender: string | null
           id: string
           iin: string | null
+          login: string | null
           phone: string | null
           preferred_language: string
           school_id: string | null
+          signature_url: string | null
           updated_at: string
           user_id: string
         }
@@ -1387,9 +1674,11 @@ export type Database = {
           gender?: string | null
           id?: string
           iin?: string | null
+          login?: string | null
           phone?: string | null
           preferred_language?: string
           school_id?: string | null
+          signature_url?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1404,9 +1693,11 @@ export type Database = {
           gender?: string | null
           id?: string
           iin?: string | null
+          login?: string | null
           phone?: string | null
           preferred_language?: string
           school_id?: string | null
+          signature_url?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1453,6 +1744,77 @@ export type Database = {
         }
         Relationships: []
       }
+      psych_test_results: {
+        Row: {
+          answers: Json | null
+          created_at: string
+          id: string
+          score: number | null
+          student_id: string
+          student_name: string | null
+          test_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          score?: number | null
+          student_id: string
+          student_name?: string | null
+          test_id: string
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          score?: number | null
+          student_id?: string
+          student_name?: string | null
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "psych_test_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "psych_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      psych_tests: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          published: boolean
+          questions: Json
+          school_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          published?: boolean
+          questions?: Json
+          school_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          published?: boolean
+          questions?: Json
+          school_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       schedules: {
         Row: {
           class_id: string
@@ -1461,8 +1823,11 @@ export type Database = {
           end_time: string | null
           id: string
           lesson_order: number
+          lesson_status: string
+          room: string | null
           school_id: string
           start_time: string | null
+          status_changed_at: string | null
           subject_id: string
           teacher_id: string | null
         }
@@ -1473,8 +1838,11 @@ export type Database = {
           end_time?: string | null
           id?: string
           lesson_order: number
+          lesson_status?: string
+          room?: string | null
           school_id: string
           start_time?: string | null
+          status_changed_at?: string | null
           subject_id: string
           teacher_id?: string | null
         }
@@ -1485,8 +1853,11 @@ export type Database = {
           end_time?: string | null
           id?: string
           lesson_order?: number
+          lesson_status?: string
+          room?: string | null
           school_id?: string
           start_time?: string | null
+          status_changed_at?: string | null
           subject_id?: string
           teacher_id?: string | null
         }
@@ -1567,6 +1938,39 @@ export type Database = {
           stamp_url?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      shifts: {
+        Row: {
+          break_minutes: number
+          created_at: string
+          id: string
+          lesson_minutes: number
+          lessons_count: number
+          name: string
+          school_id: string
+          start_time: string
+        }
+        Insert: {
+          break_minutes?: number
+          created_at?: string
+          id?: string
+          lesson_minutes?: number
+          lessons_count?: number
+          name: string
+          school_id: string
+          start_time: string
+        }
+        Update: {
+          break_minutes?: number
+          created_at?: string
+          id?: string
+          lesson_minutes?: number
+          lessons_count?: number
+          name?: string
+          school_id?: string
+          start_time?: string
         }
         Relationships: []
       }
@@ -1798,6 +2202,39 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestions: {
+        Row: {
+          body: string
+          category: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          status: string
+        }
+        Insert: {
+          body: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          body?: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       test_questions: {
         Row: {
           correct_answer: string | null
@@ -1920,6 +2357,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_devices: {
+        Row: {
+          created_at: string
+          device_name: string
+          device_type: string | null
+          id: string
+          is_primary: boolean
+          last_seen_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_name: string
+          device_type?: string | null
+          id?: string
+          is_primary?: boolean
+          last_seen_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_name?: string
+          device_type?: string | null
+          id?: string
+          is_primary?: boolean
+          last_seen_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -1975,6 +2442,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_same_school: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
