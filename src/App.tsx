@@ -112,7 +112,7 @@ const superAdminNav: NavEntry[] = [
       { title: "Мектептер", path: "/super-admin/schools", icon: School },
     ],
   },
-  { title: "Профиль", path: "/super-admin/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/super-admin/profile", icon: User },
   { title: "Пайдаланушылар", path: "/super-admin/users", icon: Users },
   { title: "Аналитика", path: "/super-admin/analytics", icon: BarChart3 },
   { title: "Жаңалықтар", path: "/super-admin/news", icon: Newspaper },
@@ -142,7 +142,7 @@ const directorNav: NavEntry[] = [
       { title: "🤖 ҚМЖ/КТЖ генератор", path: "/director/curriculum-ai", icon: Sparkles },
     ],
   },
-  { title: "Профиль", path: "/director/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/director/profile", icon: User },
   {
     title: "Басқарулар",
     icon: Settings,
@@ -186,7 +186,7 @@ const zavuchNav: NavEntry[] = [
       { title: "🤖 ҚМЖ/КТЖ генератор", path: "/zavuch/curriculum-ai", icon: Sparkles },
     ],
   },
-  { title: "Профиль", path: "/zavuch/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/zavuch/profile", icon: User },
   {
     title: "Басқарулар",
     icon: Settings,
@@ -234,7 +234,7 @@ const teacherNav: NavEntry[] = [
   { title: "Оқушылармен байланыс", path: "/teacher/chat", icon: MessageSquare },
   { title: "Құжаттар", path: "/teacher/documents", icon: FileCheck },
   { title: "БЖБ / ТЖБ", path: "/teacher/assessments", icon: Sparkles },
-  { title: "Профиль", path: "/teacher/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/teacher/profile", icon: User },
 ];
 
 const studentNav: NavEntry[] = [
@@ -243,7 +243,7 @@ const studentNav: NavEntry[] = [
   { title: "Менің бағаларым", path: "/student/grades", icon: BarChart3 },
   { title: "Мұғаліммен байланыс", path: "/student/chat", icon: MessageSquare },
   { title: "Үй тапсырмасы", path: "/student/homework", icon: ClipboardList },
-  { title: "Профиль", path: "/student/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/student/profile", icon: User },
 ];
 
 const parentNav: NavEntry[] = [
@@ -252,7 +252,7 @@ const parentNav: NavEntry[] = [
   { title: "Мұғаліммен байланыс", path: "/parent/chat", icon: MessageSquare },
   { title: "Бағалар", path: "/parent/grades", icon: BarChart3 },
   { title: "Үй тапсырмасы", path: "/parent/homework", icon: ClipboardList },
-  { title: "Профиль", path: "/parent/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/parent/profile", icon: User },
 ];
 
 const librarianNav: NavEntry[] = [
@@ -265,7 +265,7 @@ const librarianNav: NavEntry[] = [
       { title: "Онлайн кітапхана", path: "/librarian/library", icon: Library },
     ],
   },
-  { title: "Профиль", path: "/librarian/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/librarian/profile", icon: User },
 ];
 
 const psychologistNav: NavEntry[] = [
@@ -273,21 +273,21 @@ const psychologistNav: NavEntry[] = [
   { title: "🧪 Тест жүргізу", path: "/psychologist/tests", icon: ClipboardList },
   { title: "📁 Оқушылармен жұмыс", path: "/psychologist/work", icon: FileText },
   { title: "💬 Чат", path: "/psychologist/chat", icon: MessageSquare },
-  { title: "Профиль", path: "/psychologist/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/psychologist/profile", icon: User },
 ];
 
 const socialNav: NavEntry[] = [
   { title: "📊 Әлеуметтік бақылау", path: "/social/monitoring", icon: BarChart3 },
   { title: "👨‍👩‍👧 Отбасымен байланыс", path: "/social/family", icon: Users },
   { title: "💬 Чат", path: "/social/chat", icon: MessageSquare },
-  { title: "Профиль", path: "/social/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/social/profile", icon: User },
 ];
 
 const speechNav: NavEntry[] = [
   { title: "🧑‍🏫 Жеке сабақ", path: "/speech/individual", icon: BookOpen },
   { title: "♿ Инклюзивті білім", path: "/speech/inclusive", icon: Accessibility },
   { title: "💬 Чат", path: "/speech/chat", icon: MessageSquare },
-  { title: "Профиль", path: "/speech/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/speech/profile", icon: User },
 ];
 
 const nurseNav: NavEntry[] = [
@@ -295,14 +295,14 @@ const nurseNav: NavEntry[] = [
   { title: "📕 Алғашқы көмек", path: "/nurse/first-aid", icon: HeartPulse },
   { title: "📁 Медициналық карталар", path: "/nurse/cards", icon: FileText },
   { title: "💬 Чат", path: "/nurse/chat", icon: MessageSquare },
-  { title: "Профиль", path: "/nurse/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/nurse/profile", icon: User },
 ];
 
 const hrNav: NavEntry[] = [
   { title: "👥 Қызметкерлер", path: "/hr/staff", icon: Users },
   { title: "📄 Жұмысқа қабылдау", path: "/hr/hiring", icon: Briefcase },
   { title: "💬 Чат", path: "/hr/chat", icon: MessageSquare },
-  { title: "Профиль", path: "/hr/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/hr/profile", icon: User },
 ];
 
 const secretaryNav: NavEntry[] = [
@@ -311,7 +311,7 @@ const secretaryNav: NavEntry[] = [
   { title: "📂 Құжаттарды тіркеу", path: "/secretary/register-docs", icon: FileCheck },
   { title: "📁 Құжаттармен жұмыс", path: "/secretary/docs-work", icon: FileText },
   { title: "💬 Чат", path: "/secretary/chat", icon: MessageSquare },
-  { title: "Профиль", path: "/secretary/profile", icon: User },
+  { title: "Жеке кабинетім", path: "/secretary/profile", icon: User },
 ];
 
 const queryClient = new QueryClient();
