@@ -1544,6 +1544,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          school_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          school_id?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          school_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders_book: {
         Row: {
           created_at: string
@@ -1826,6 +1862,7 @@ export type Database = {
           lesson_status: string
           room: string | null
           school_id: string
+          shift_id: string | null
           start_time: string | null
           status_changed_at: string | null
           subject_id: string
@@ -1841,6 +1878,7 @@ export type Database = {
           lesson_status?: string
           room?: string | null
           school_id: string
+          shift_id?: string | null
           start_time?: string | null
           status_changed_at?: string | null
           subject_id: string
@@ -1856,6 +1894,7 @@ export type Database = {
           lesson_status?: string
           room?: string | null
           school_id?: string
+          shift_id?: string | null
           start_time?: string | null
           status_changed_at?: string | null
           subject_id?: string
@@ -2359,30 +2398,42 @@ export type Database = {
       }
       user_devices: {
         Row: {
+          browser: string | null
           created_at: string
           device_name: string
           device_type: string | null
           id: string
+          ip_address: string | null
           is_primary: boolean
+          last_active_at: string
           last_seen_at: string
+          os: string | null
           user_id: string
         }
         Insert: {
+          browser?: string | null
           created_at?: string
           device_name: string
           device_type?: string | null
           id?: string
+          ip_address?: string | null
           is_primary?: boolean
+          last_active_at?: string
           last_seen_at?: string
+          os?: string | null
           user_id: string
         }
         Update: {
+          browser?: string | null
           created_at?: string
           device_name?: string
           device_type?: string | null
           id?: string
+          ip_address?: string | null
           is_primary?: boolean
+          last_active_at?: string
           last_seen_at?: string
+          os?: string | null
           user_id?: string
         }
         Relationships: []
