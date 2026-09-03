@@ -165,7 +165,7 @@ export default function ProfileSecurity() {
         </div>
       </Section>
 
-      <Section icon={QrCode} title="QR арқылы кіруді растау" desk="" desc="Басқа құрылғыдан келген сұраныстар (3 минут жарамды)">
+      <Section icon={QrCode} title="QR арқылы кіруді растау" desc="Басқа құрылғыдан келген сұраныстар (3 минут жарамды)">
         {reqs.length === 0 ? (
           <p className="text-sm text-muted-foreground">Растауды күтетін сұраныс жоқ.</p>
         ) : (

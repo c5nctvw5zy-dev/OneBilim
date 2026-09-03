@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { setLanguage } from "@/i18n";
+import ProfileSecurity from "@/components/ProfileSecurity";
 import { User, Lock, Camera, Save, Eye, EyeOff, ScanFace, CheckCircle2, XCircle, Globe, ArrowRight } from "lucide-react";
 
 const ROLE_HOME: Record<string, string> = {
@@ -367,6 +368,8 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      <ProfileSecurity />
     </div>
   );
 }
