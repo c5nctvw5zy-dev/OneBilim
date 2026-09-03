@@ -223,10 +223,7 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
               <Search className="h-4 w-4 text-muted-foreground" />
               <input placeholder="Іздеу..." className="w-40 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
             </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
-            </Button>
+            <NotificationBell />
             <div className="relative" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
