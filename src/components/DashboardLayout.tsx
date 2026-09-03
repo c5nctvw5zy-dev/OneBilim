@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  Menu, X, Bell, Search, ChevronDown, ChevronRight, LogOut, GraduationCap, User, Settings,
+  Menu, X, Search, ChevronDown, ChevronRight, LogOut, GraduationCap, User, Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import AnnouncementCenter from "@/components/AnnouncementCenter";
+import NotificationBell from "@/components/NotificationBell";
 
 export interface NavItem {
   title: string;
@@ -223,10 +224,7 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
               <Search className="h-4 w-4 text-muted-foreground" />
               <input placeholder="Іздеу..." className="w-40 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
             </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
-            </Button>
+            <NotificationBell />
             <div className="relative" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
@@ -245,7 +243,7 @@ export default function DashboardLayout({ roleName, navItems, userName = "Пай
                     <p className="text-xs text-muted-foreground">{profile?.email || ""}</p>
                   </div>
                   <Link to={`${basePath}/profile`} onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors">
-                    <User className="h-4 w-4" /> Профиль
+                    <User className="h-4 w-4" /> Жеке кабинетім
                   </Link>
                   <button onClick={handleSignOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors">
                     <LogOut className="h-4 w-4" /> Шығу
