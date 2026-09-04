@@ -5,7 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
   History, Smartphone, QrCode, PenTool, Trophy, Check, X, Star, ShieldCheck, Trash2,
+  Camera, Lock, Unlock, LogOut,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useSearchParams } from "react-router-dom";
+import { getDeviceKey } from "@/lib/deviceInfo";
 
 interface LoginRow {
   id: string; device_name: string | null; os: string | null; browser: string | null;
@@ -33,6 +37,13 @@ export default function ProfileSecurity() {
   const [achv, setAchv] = useState<{ label: string; value: string; icon: string }[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkToken = searchParams.get("link");
+  const [code, setCode] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const myKey = getDeviceKey();
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -53,6 +64,32 @@ export default function ProfileSecurity() {
   }, [user?.id, (profile as any)?.signature_url]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Жаңа QR сұраныстары мен сеанс өзгерістері — тікелей эфирде
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase
+      .channel("profile-security-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "device_link_requests" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_devices", filter: `user_id=eq.${user.id}` }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user?.id, load]);
+
+  // QR сілтемесі арқылы келсе — токенді бірден көрсету
+  useEffect(() => {
+    if (!linkToken || !user) return;
+    (async () => {
+      const { data } = await supabase.from("device_link_requests").select("*").eq("token", linkToken).maybeSingle();
+      if (data) setReqs((p) => (p.some((r) => r.id === (data as any).id) ? p : [data as any, ...p]));
+      const next = new URLSearchParams(searchParams);
+      next.delete("link");
+      setSearchParams(next, { replace: true });
+      document.getElementById("qr-approve")?.scrollIntoView({ behavior: "smooth" });
+    })();
+  }, [linkToken, user?.id]);
+
+  useEffect(() => () => stopScanRef.current?.(), []);
 
   // Жетістіктерім — нақты деректерден
   useEffect(() => {
@@ -97,6 +134,65 @@ export default function ProfileSecurity() {
     if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
     setReqs((p) => p.filter((r) => r.id !== id));
     toast({ title: approve ? "QR кіру расталды ✓" : "Сұраныс қабылданбады" });
+  };
+
+  // Кодпен немесе сканерленген токенмен растау
+  const approveByToken = async (raw: string, approve = true) => {
+    if (!user) return;
+    let value = raw.trim();
+    const m = value.match(/[?&]link=([^&\s]+)/);
+    if (m) value = m[1];
+    const isToken = value.includes("-") && value.length > 20;
+    let q = supabase.from("device_link_requests").select("id, status, expires_at").eq("status", "pending").gt("expires_at", new Date().toISOString());
+    q = isToken ? q.eq("token", value) : q.eq("short_code", value.toUpperCase());
+    const { data } = await q.maybeSingle();
+    if (!data) { toast({ title: "Сұраныс табылмады", description: "Код қате немесе мерзімі бітті.", variant: "destructive" }); return false; }
+    await decide((data as any).id, approve);
+    setCode("");
+    return true;
+  };
+
+  // QR сканерлеу (камера + BarcodeDetector)
+  const startScan = async () => {
+    const Detector = (window as any).BarcodeDetector;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      streamRef.current = stream;
+      setScanning(true);
+      setTimeout(() => { if (videoRef.current) videoRef.current.srcObject = stream; }, 0);
+      if (!Detector) {
+        toast({ title: "Сканер қолжетімсіз", description: "Браузер QR оқуды қолдамайды — 6 таңбалы кодты қолданыңыз." });
+        return;
+      }
+      const detector = new Detector({ formats: ["qr_code"] });
+      const loop = async () => {
+        if (!streamRef.current || !videoRef.current) return;
+        try {
+          const codes = await detector.detect(videoRef.current);
+          if (codes?.length) {
+            const ok = await approveByToken(codes[0].rawValue);
+            if (ok) { stopScan(); return; }
+          }
+        } catch { /* ignore frame errors */ }
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    } catch {
+      toast({ title: "Қате", description: "Камераға қол жеткізу мүмкін болмады.", variant: "destructive" });
+    }
+  };
+
+  const stopScan = () => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    setScanning(false);
+  };
+
+  const toggleBlock = async (d: DeviceRow) => {
+    const { error } = await supabase.from("user_devices").update({ blocked: !d.blocked } as any).eq("id", d.id);
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setDevices((p) => p.map((x) => (x.id === d.id ? { ...x, blocked: !d.blocked } : x)));
+    toast({ title: !d.blocked ? "Сеанс бұғатталды" : "Бұғаттау алынды" });
   };
 
   const start = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -165,7 +261,21 @@ export default function ProfileSecurity() {
         </div>
       </Section>
 
-      <Section icon={QrCode} title="QR арқылы кіруді растау" desc="Басқа құрылғыдан келген сұраныстар (3 минут жарамды)">
+      <Section icon={QrCode} title="QR арқылы кіру" desc="Басқа құрылғыдағы QR кодын сканерлеп немесе кодты енгізіп рұқсат беріңіз (3 минут жарамды)">
+        <div id="qr-approve" className="space-y-3">
+          {scanning ? (
+            <div className="space-y-2">
+              <video ref={videoRef} autoPlay playsInline muted className="w-full max-w-sm rounded-xl border border-border" />
+              <Button variant="outline" size="sm" onClick={stopScan} className="gap-1"><X className="h-3.5 w-3.5" /> Сканерді жабу</Button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="sm" className="gap-2" onClick={startScan}><Camera className="h-4 w-4" /> QR сканерлеу</Button>
+              <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="6 таңбалы код" className="h-9 w-40 tracking-widest" maxLength={6} />
+              <Button size="sm" variant="outline" onClick={() => approveByToken(code)} disabled={code.length < 6}>Кодпен растау</Button>
+            </div>
+          )}
+        </div>
         {reqs.length === 0 ? (
           <p className="text-sm text-muted-foreground">Растауды күтетін сұраныс жоқ.</p>
         ) : (
@@ -186,7 +296,7 @@ export default function ProfileSecurity() {
         )}
       </Section>
 
-      <Section icon={Smartphone} title="Байланыстырылған құрылғылар">
+      <Section icon={Smartphone} title="Белсенді сеанстар мен құрылғылар" desc="Аккаунт иесі сеанстарды жаба және бұғаттай алады">
         {devices.length === 0 ? (
           <p className="text-sm text-muted-foreground">Құрылғылар тіркелмеген.</p>
         ) : (
@@ -197,18 +307,31 @@ export default function ProfileSecurity() {
                   <p className="font-medium text-foreground flex items-center gap-2">
                     {d.device_name}
                     {d.is_primary && <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-medium text-success">Негізгі</span>}
+                    {d.device_key === myKey && <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">Осы құрылғы</span>}
+                    {d.blocked && <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">Бұғатталған</span>}
+                    {d.login_method === "qr" && <span className="rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-medium text-warning">QR сеансы</span>}
                   </p>
                   <p className="text-xs text-muted-foreground">{d.os} · {d.browser} · {fmt(d.last_active_at)}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {!d.is_primary && (
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => setPrimary(d.id)}>
                       <Star className="h-3.5 w-3.5" /> Негізгі
                     </Button>
                   )}
-                  <Button size="sm" variant="ghost" className="gap-1 text-destructive" onClick={() => unlink(d.id)}>
-                    <Trash2 className="h-3.5 w-3.5" /> Ажырату
+                  <Button size="sm" variant="outline" className="gap-1" onClick={() => toggleBlock(d)}>
+                    {d.blocked ? <><Unlock className="h-3.5 w-3.5" /> Ашу</> : <><Lock className="h-3.5 w-3.5" /> Бұғаттау</>}
                   </Button>
+                  {d.device_key !== myKey && (
+                    <Button size="sm" variant="ghost" className="gap-1 text-destructive" onClick={() => unlink(d.id)}>
+                      <LogOut className="h-3.5 w-3.5" /> Сеансты жабу
+                    </Button>
+                  )}
+                  {d.device_key === myKey && (
+                    <Button size="sm" variant="ghost" className="gap-1 text-destructive" onClick={() => unlink(d.id)}>
+                      <Trash2 className="h-3.5 w-3.5" /> Ажырату
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

@@ -1,9 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GraduationCap, Eye, EyeOff, ScanFace, XCircle } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, ScanFace, XCircle, QrCode, Loader2 } from "lucide-react";
+import QRCode from "qrcode";
+import { detectDevice, getDeviceKey } from "@/lib/deviceInfo";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +39,12 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [faceIdMode, setFaceIdMode] = useState(false);
+  const [qrMode, setQrMode] = useState(false);
+  const [qrImg, setQrImg] = useState<string | null>(null);
+  const [qrCode, setQrCode] = useState<string>("");
+  const [qrSeconds, setQrSeconds] = useState(180);
+  const [qrStatus, setQrStatus] = useState<string>("pending");
+  const qrTokenRef = useRef<string | null>(null);
   const [faceDetected, setFaceDetected] = useState(false);
   const [faceVerifying, setFaceVerifying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -46,8 +54,24 @@ export default function Login() {
   const nextParam = searchParams.get("next");
   const safeNext =
     nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : null;
+  const linkToken = searchParams.get("link");
+  const sessionNotice = searchParams.get("session");
   const { signIn } = useAuth();
   const { toast } = useToast();
+
+  // Егер QR сілтемесі ашылса: сеансы бар құрылғы бірден растау бетіне өтеді
+  useEffect(() => {
+    if (!linkToken) return;
+    sessionStorage.setItem("bilim_link_token", linkToken);
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate(`/profile?link=${linkToken}`, { replace: true });
+    });
+  }, [linkToken]);
+
+  useEffect(() => {
+    if (sessionNotice === "blocked") toast({ title: "Сеанс бұғатталды", description: "Аккаунт иесі бұл құрылғының сеансын бұғаттады.", variant: "destructive" });
+    if (sessionNotice === "closed") toast({ title: "Сеанс жабылды", description: "Аккаунт иесі бұл құрылғының сеансын жапты.", variant: "destructive" });
+  }, [sessionNotice]);
 
   const roleRoutes: Record<string, string> = {
     super_admin: "/super-admin",
@@ -66,6 +90,12 @@ export default function Login() {
   };
 
   const navigateByRole = async (userId?: string | null) => {
+    const pendingLink = sessionStorage.getItem("bilim_link_token");
+    if (pendingLink) {
+      sessionStorage.removeItem("bilim_link_token");
+      navigate(`/profile?link=${pendingLink}`, { replace: true });
+      return;
+    }
     if (safeNext) { navigate(safeNext, { replace: true }); return; }
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) { navigate("/login"); return; }
@@ -94,6 +124,69 @@ export default function Login() {
     await navigateByRole(user?.id);
     setLoading(false);
   };
+
+
+  // ==== QR арқылы кіру (сұраныс жасайтын құрылғы) ====
+  const startQrLogin = async () => {
+    const device = detectDevice();
+    const token = crypto.randomUUID();
+    const short = Math.random().toString(36).replace(/[^a-z0-9]/g, "").slice(0, 6).toUpperCase();
+    const expires = new Date(Date.now() + 180_000).toISOString();
+    const { error } = await supabase.from("device_link_requests").insert({
+      token,
+      short_code: short,
+      requester_device: device.device_name,
+      requester_os: device.os,
+      requester_browser: device.browser,
+      device_key: getDeviceKey(),
+      status: "pending",
+      expires_at: expires,
+    } as any);
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    qrTokenRef.current = token;
+    const url = `${window.location.origin}/login?link=${token}`;
+    setQrImg(await QRCode.toDataURL(url, { width: 260, margin: 1 }));
+    setQrCode(short);
+    setQrSeconds(180);
+    setQrStatus("pending");
+    setQrMode(true);
+  };
+
+  const stopQrLogin = () => {
+    qrTokenRef.current = null;
+    setQrMode(false);
+    setQrImg(null);
+  };
+
+  useEffect(() => {
+    if (!qrMode) return;
+    const tick = setInterval(() => setQrSeconds((s) => (s > 0 ? s - 1 : 0)), 1000);
+    const poll = setInterval(async () => {
+      const token = qrTokenRef.current;
+      if (!token) return;
+      const { data, error } = await supabase.functions.invoke("qr-login", { body: { token } });
+      if (error) return;
+      const res = data as any;
+      if (res?.status === "approved" && res.token_hash && res.email) {
+        clearInterval(poll); clearInterval(tick);
+        localStorage.setItem("bilim_login_method", "qr");
+        const { error: vErr } = await supabase.auth.verifyOtp({ type: "magiclink", token_hash: res.token_hash });
+        if (vErr) { toast({ title: "Қате", description: vErr.message, variant: "destructive" }); setQrStatus("error"); return; }
+        toast({ title: "QR арқылы кіру расталды ✓", description: "Сеанс басталды" });
+        stopQrLogin();
+        await navigateByRole();
+      } else if (res?.status === "denied") {
+        setQrStatus("denied"); clearInterval(poll);
+      } else if (res?.status === "expired") {
+        setQrStatus("expired"); clearInterval(poll);
+      }
+    }, 2500);
+    return () => { clearInterval(tick); clearInterval(poll); };
+  }, [qrMode]);
+
+  useEffect(() => {
+    if (qrMode && qrSeconds === 0) setQrStatus("expired");
+  }, [qrSeconds, qrMode]);
 
   const startFaceId = async () => {
     if (!email.trim()) {
@@ -198,7 +291,27 @@ export default function Login() {
           <h2 className="mb-2 text-2xl font-bold text-foreground">Жүйеге кіру</h2>
           <p className="mb-8 text-sm text-muted-foreground">Аккаунтыңызға кіріңіз</p>
 
-          {faceIdMode ? (
+          {qrMode ? (
+            <div className="space-y-4 text-center">
+              <div className="mx-auto w-fit rounded-2xl border border-border bg-white p-4">
+                {qrImg ? <img src={qrImg} alt="QR арқылы кіру коды" className="h-[240px] w-[240px]" /> : <Loader2 className="h-10 w-10 animate-spin text-primary" />}
+              </div>
+              <div className="rounded-xl bg-muted p-3 text-sm">
+                <p className="text-muted-foreground">Кодты негізгі құрылғыда енгізуге де болады:</p>
+                <p className="mt-1 text-2xl font-bold tracking-[0.3em] text-primary">{qrCode}</p>
+              </div>
+              <p className="text-sm">
+                {qrStatus === "denied" ? <span className="font-medium text-destructive">Сұраныс қабылданбады.</span>
+                  : qrStatus === "expired" ? <span className="font-medium text-destructive">QR коды мерзімі бітті. Қайта жасаңыз.</span>
+                  : qrStatus === "error" ? <span className="font-medium text-destructive">Кіру сәтсіз аяқталды.</span>
+                  : <span className="text-muted-foreground">Негізгі құрылғыдағы «Жеке кабинетім» → «QR арқылы кіру» бөлімінен сканерлеп растаңыз... <b className="text-foreground">{Math.floor(qrSeconds / 60)}:{String(qrSeconds % 60).padStart(2, "0")}</b></span>}
+              </p>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1 gap-2" onClick={startQrLogin}><QrCode className="h-4 w-4" /> Жаңа QR</Button>
+                <Button variant="ghost" onClick={stopQrLogin} className="gap-2"><XCircle className="h-4 w-4" /> Болдырмау</Button>
+              </div>
+            </div>
+          ) : faceIdMode ? (
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted">
                 <video ref={videoRef} autoPlay playsInline muted className="w-full" style={{ transform: "scaleX(-1)" }} />
@@ -253,6 +366,9 @@ export default function Login() {
                 </Button>
                 <Button type="button" variant="outline" className="w-full gap-2" size="lg" onClick={startFaceId}>
                   <ScanFace className="h-5 w-5" /> Face ID арқылы кіру
+                </Button>
+                <Button type="button" variant="outline" className="w-full gap-2" size="lg" onClick={startQrLogin}>
+                  <QrCode className="h-5 w-5" /> QR арқылы кіру
                 </Button>
               </form>
 
