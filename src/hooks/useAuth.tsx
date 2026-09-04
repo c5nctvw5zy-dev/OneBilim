@@ -43,11 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          setTimeout(() => fetchUserData(session.user.id), 0);
+          const uid = session.user.id;
+          setTimeout(() => fetchUserData(uid), 0);
+          if (event === "SIGNED_IN") {
+            setTimeout(() => {
+              recordLogin(uid, "success", localStorage.getItem("bilim_login_method") || "password");
+              localStorage.removeItem("bilim_login_method");
+            }, 0);
+          }
         } else {
           setRole(null);
           setProfile(null);
