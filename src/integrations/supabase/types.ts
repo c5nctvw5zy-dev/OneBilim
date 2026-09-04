@@ -681,11 +681,13 @@ export type Database = {
         Row: {
           approved_at: string | null
           created_at: string
+          device_key: string | null
           expires_at: string
           id: string
           requester_browser: string | null
           requester_device: string | null
           requester_os: string | null
+          short_code: string | null
           status: string
           token: string
           user_id: string | null
@@ -693,11 +695,13 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           created_at?: string
+          device_key?: string | null
           expires_at?: string
           id?: string
           requester_browser?: string | null
           requester_device?: string | null
           requester_os?: string | null
+          short_code?: string | null
           status?: string
           token: string
           user_id?: string | null
@@ -705,11 +709,13 @@ export type Database = {
         Update: {
           approved_at?: string | null
           created_at?: string
+          device_key?: string | null
           expires_at?: string
           id?: string
           requester_browser?: string | null
           requester_device?: string | null
           requester_os?: string | null
+          short_code?: string | null
           status?: string
           token?: string
           user_id?: string | null
@@ -1150,6 +1156,7 @@ export type Database = {
         Row: {
           class_id: string
           created_at: string
+          created_by: string | null
           description: string | null
           due_date: string
           file_url: string | null
@@ -1161,6 +1168,7 @@ export type Database = {
         Insert: {
           class_id: string
           created_at?: string
+          created_by?: string | null
           description?: string | null
           due_date: string
           file_url?: string | null
@@ -1172,6 +1180,7 @@ export type Database = {
         Update: {
           class_id?: string
           created_at?: string
+          created_by?: string | null
           description?: string | null
           due_date?: string
           file_url?: string | null
@@ -2398,8 +2407,10 @@ export type Database = {
       }
       user_devices: {
         Row: {
+          blocked: boolean
           browser: string | null
           created_at: string
+          device_key: string | null
           device_name: string
           device_type: string | null
           id: string
@@ -2407,12 +2418,15 @@ export type Database = {
           is_primary: boolean
           last_active_at: string
           last_seen_at: string
+          login_method: string | null
           os: string | null
           user_id: string
         }
         Insert: {
+          blocked?: boolean
           browser?: string | null
           created_at?: string
+          device_key?: string | null
           device_name: string
           device_type?: string | null
           id?: string
@@ -2420,12 +2434,15 @@ export type Database = {
           is_primary?: boolean
           last_active_at?: string
           last_seen_at?: string
+          login_method?: string | null
           os?: string | null
           user_id: string
         }
         Update: {
+          blocked?: boolean
           browser?: string | null
           created_at?: string
+          device_key?: string | null
           device_name?: string
           device_type?: string | null
           id?: string
@@ -2433,6 +2450,7 @@ export type Database = {
           is_primary?: boolean
           last_active_at?: string
           last_seen_at?: string
+          login_method?: string | null
           os?: string | null
           user_id?: string
         }
