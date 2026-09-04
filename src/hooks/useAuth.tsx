@@ -1,6 +1,8 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { recordLogin, isCurrentDeviceBlocked } from "@/lib/activity";
+import { getDeviceKey } from "@/lib/deviceInfo";
 
 interface AuthContextType {
   user: User | null;
@@ -74,6 +76,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Негізгі аккаунт иесі сеансты жапса/бұғаттаса — осы құрылғы автоматты шығады
+  useEffect(() => {
+    if (!user) return;
+    let stopped = false;
+    const kick = async (reason: "blocked" | "closed") => {
+      if (stopped) return;
+      stopped = true;
+      await supabase.auth.signOut();
+      window.location.href = reason === "blocked"
+        ? "/login?session=blocked"
+        : "/login?session=closed";
+    };
+    isCurrentDeviceBlocked(user.id).then((b) => { if (b) kick("blocked"); });
+
+    const key = getDeviceKey();
+    const channel = supabase
+      .channel(`device-guard-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_devices", filter: `user_id=eq.${user.id}` }, (payload) => {
+        const row: any = payload.eventType === "DELETE" ? payload.old : payload.new;
+        if (row?.device_key !== key) return;
+        if (payload.eventType === "DELETE") kick("closed");
+        else if (row?.blocked) kick("blocked");
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id]);
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
