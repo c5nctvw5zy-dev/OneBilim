@@ -42,3 +42,15 @@ export async function detectIp(): Promise<string | null> {
   }
   return cachedIp;
 }
+
+const DEVICE_KEY_STORAGE = "bilim_device_key";
+
+/** Осы браузер/құрылғы үшін тұрақты бірегей кілт (сеанстарды басқару үшін) */
+export function getDeviceKey(): string {
+  let key = localStorage.getItem(DEVICE_KEY_STORAGE);
+  if (!key) {
+    key = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    localStorage.setItem(DEVICE_KEY_STORAGE, key);
+  }
+  return key;
+}
