@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { detectDevice, detectIp } from "@/lib/deviceInfo";
+import { detectDevice, detectIp, getDeviceKey } from "@/lib/deviceInfo";
 
 /**
  * audit_logs кестесіне нақты әрекетті жазады (login, logout, баға қою, құжат жою, т.б.)
@@ -47,12 +47,12 @@ export async function recordLogin(userId: string, status: "success" | "failed" =
 
     if (status !== "success") return;
 
+    const deviceKey = getDeviceKey();
     const { data: existing } = await supabase
       .from("user_devices")
       .select("id")
       .eq("user_id", userId)
-      .eq("device_name", device.device_name)
-      .eq("browser", device.browser)
+      .eq("device_key", deviceKey)
       .maybeSingle();
 
     const { count } = await supabase
@@ -63,7 +63,7 @@ export async function recordLogin(userId: string, status: "success" | "failed" =
     if (existing?.id) {
       await supabase
         .from("user_devices")
-        .update({ last_active_at: new Date().toISOString() } as any)
+        .update({ last_active_at: new Date().toISOString(), blocked: false, login_method: method, ip_address: ip } as any)
         .eq("id", existing.id);
     } else {
       await supabase.from("user_devices").insert({
@@ -72,6 +72,8 @@ export async function recordLogin(userId: string, status: "success" | "failed" =
         os: device.os,
         browser: device.browser,
         ip_address: ip,
+        device_key: deviceKey,
+        login_method: method,
         is_primary: (count ?? 0) === 0,
         last_active_at: new Date().toISOString(),
       } as any);
@@ -80,5 +82,23 @@ export async function recordLogin(userId: string, status: "success" | "failed" =
     await logAction("login", { targetType: "auth", targetId: userId, metadata: { method } });
   } catch {
     /* silent */
+  }
+}
+
+/**
+ * Осы құрылғының сеансы бұғатталған/жабылған ба — тексереді.
+ */
+export async function isCurrentDeviceBlocked(userId: string): Promise<boolean> {
+  try {
+    const { data } = await supabase
+      .from("user_devices")
+      .select("id, blocked")
+      .eq("user_id", userId)
+      .eq("device_key", getDeviceKey())
+      .maybeSingle();
+    if (!data) return false;
+    return Boolean((data as any).blocked);
+  } catch {
+    return false;
   }
 }
