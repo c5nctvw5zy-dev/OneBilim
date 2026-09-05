@@ -193,7 +193,51 @@ const content = {
         { icon: Smartphone, title: "Mobile Ready", desc: "Convenient on any device" },
       ],
     },
-    roles: { title: "Panel for Every Role", items: ["Super Admin — full platform management", "Director — complete school management", "Vice Principal — education monitoring", "Teacher — gradebook, tests", "Student — grades, assignments, materials", "Parent — track child's progress", "Librarian — book management"] },
+    roles: {
+      title: "Who it is for and what you can do",
+      groups: [
+        {
+          icon: Shield,
+          title: "For school administration",
+          desc: "Director, vice principals for academics and student life",
+          items: [
+            "Alphabet book: enrolment, exit, order number, Excel import",
+            "Orders book and staff records (positions, appointments, history)",
+            "AI-built timetable, shifts, teacher/class/room conflict checks",
+            "Timesheets, approval of taught hours, gradebook completion rate",
+            "Documents: upload, online signing, 30-day restore",
+            "Analytics: performance, attendance, class and subject reports",
+            "AI assistant: draft orders and letters, analysis, methodology tips",
+          ],
+        },
+        {
+          icon: GraduationCap,
+          title: "For teachers",
+          desc: "Subject teachers and homeroom teachers",
+          items: [
+            "Digital gradebook: grades, attendance, quarter summaries",
+            "AI-generated lesson and long-term plans, PDF/Word/PPTX export",
+            "Homework reaches students instantly, parents get notified",
+            "Assessment builder and online tests",
+            "My class: students, parents, attendance, personal files",
+            "Materials library and staff chat",
+          ],
+        },
+        {
+          icon: Users,
+          title: "For students and parents",
+          desc: "Full transparency of the learning process",
+          items: [
+            "Own class timetable and daily grades",
+            "Homework with deadlines and answer upload",
+            "Quarter report, performance trends, achievements",
+            "Direct messaging with teachers and administration",
+            "Notifications for new grades, tasks and announcements",
+            "Online library and study materials",
+          ],
+        },
+      ],
+    },
     cta: { title: "Register Your School Now", subtitle: "Application reviewed within 1–2 business days", button: "Register" },
     news: {
       title: "Education News",
