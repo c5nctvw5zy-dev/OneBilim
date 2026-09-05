@@ -369,16 +369,27 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Roles */}
+      {/* Audiences */}
       <section className="bg-card border-y border-border">
         <div className="mx-auto max-w-6xl px-4 py-24">
           <Section><h2 className="mb-10 text-center text-3xl font-bold text-foreground text-balance">{t.roles.title}</h2></Section>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {t.roles.items.map((r, i) => (
-              <Section key={r} delay={i * 70}>
-                <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-4">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-                  <span className="text-sm text-foreground">{r}</span>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {t.roles.groups.map((g, i) => (
+              <Section key={g.title} delay={i * 90}>
+                <div className="h-full rounded-2xl border border-border bg-background p-6 shadow-sm">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <g.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">{g.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{g.desc}</p>
+                  <ul className="mt-4 space-y-2.5">
+                    {g.items.map((it) => (
+                      <li key={it} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                        <span className="text-sm leading-relaxed text-foreground">{it}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </Section>
             ))}
