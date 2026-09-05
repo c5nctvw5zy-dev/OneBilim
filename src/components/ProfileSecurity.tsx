@@ -89,7 +89,7 @@ export default function ProfileSecurity() {
     })();
   }, [linkToken, user?.id]);
 
-  useEffect(() => () => stopScanRef.current?.(), []);
+  useEffect(() => () => { try { stopScan(); } catch { /* компонент жабылды */ } }, []);
 
   // Жетістіктерім — нақты деректерден
   useEffect(() => {
