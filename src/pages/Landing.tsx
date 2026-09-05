@@ -48,15 +48,48 @@ const content = {
       ],
     },
     roles: {
-      title: "Әр рөлге арналған панель",
-      items: [
-        "Super Admin — бүкіл платформаны басқару",
-        "Директор — мектепті толық басқару",
-        "Завуч — оқу процесін бақылау",
-        "Мұғалім — журнал жүргізу, тесттер жасау",
-        "Оқушы — бағалар, тапсырмалар, материалдар",
-        "Ата-ана — баланың үлгерімін бақылау",
-        "Кітапханашы — кітаптарды басқару",
+      title: "Кімге арналған және не істей алады",
+      groups: [
+        {
+          icon: Shield,
+          title: "Мектеп әкімшілігіне",
+          desc: "Директор, оқу және тәрбие ісінің меңгерушілері",
+          items: [
+            "Алфавиттік кітап: оқушыны тіркеу, шығару, бұйрық нөмірі, Excel импорт",
+            "Бұйрықтар кітабы мен қызметкерлер анкеталары (штат, тағайындау, тарих)",
+            "Сабақ кестесін ЖИ арқылы құру, ауысымдар, мұғалім/сынып/кабинет қақтығысын тексеру",
+            "Табельдер, өткен сағаттарды бекіту, журнал толтыру пайызы",
+            "Құжат айналымы: жүктеу, онлайн қол қою, 30 күндік қалпына келтіру",
+            "Аналитика: үлгерім, қатысу, сынып және пән бойынша есептер",
+            "ЖИ көмекші: бұйрық/хат жобасы, талдау, әдістемелік кеңес",
+          ],
+        },
+        {
+          icon: GraduationCap,
+          title: "Мұғалімдерге",
+          desc: "Пән мұғалімдері және сынып жетекшілері",
+          items: [
+            "Электронды журнал: баға қою, қатысу, тоқсандық қорытынды",
+            "ҚМЖ және КТЖ-ны ЖИ арқылы жасау, PDF/Word/PPTX жүктеу",
+            "Үй тапсырмасын беру — оқушыға бірден түседі, ата-анаға хабарлама",
+            "БЖБ/ТЖБ тапсырмаларын құру және онлайн тест",
+            "Менің сыныбым: оқушылар, ата-аналар, қатысу, жеке іс-қағаздар",
+            "Материалдар банкі және әріптестермен чат",
+          ],
+        },
+        {
+          icon: Users,
+          title: "Оқушылар мен ата-аналарға",
+          desc: "Оқу процесін ашық қадағалау",
+          items: [
+            "Өз сыныбының сабақ кестесі және күнделікті бағалар",
+            "Үй тапсырмалары, мерзімі және жауап жүктеу",
+            "Тоқсандық есеп, үлгерім динамикасы, жетістіктер",
+            "Мұғаліммен және әкімшілікпен тікелей хабарласу",
+            "Жаңа баға, тапсырма, хабарландыру туралы push-хабарлама",
+            "Онлайн кітапхана және оқу материалдары",
+          ],
+        },
       ],
     },
     cta: { title: "Мектебіңізді қазір тіркеңіз", subtitle: "1–2 жұмыс күні ішінде өтінім қаралады", button: "Тіркелу" },
@@ -87,7 +120,51 @@ const content = {
         { icon: Smartphone, title: "Мобильная версия", desc: "Удобно с любого устройства" },
       ],
     },
-    roles: { title: "Панель для каждой роли", items: ["Super Admin — управление платформой", "Директор — полное управление школой", "Завуч — контроль учебного процесса", "Учитель — журнал, тесты", "Ученик — оценки, задания, материалы", "Родитель — отслеживание успеваемости", "Библиотекарь — управление книгами"] },
+    roles: {
+      title: "Кому подходит и что можно делать",
+      groups: [
+        {
+          icon: Shield,
+          title: "Администрации школы",
+          desc: "Директор, завучи по учебной и воспитательной работе",
+          items: [
+            "Алфавитная книга: зачисление, выбытие, номер приказа, импорт Excel",
+            "Книга приказов и анкеты сотрудников (штат, назначения, история)",
+            "Расписание с помощью ИИ, смены, проверка конфликтов учитель/класс/кабинет",
+            "Табели, утверждение проведённых часов, процент заполнения журнала",
+            "Документооборот: загрузка, онлайн-подпись, восстановление 30 дней",
+            "Аналитика: успеваемость, посещаемость, отчёты по классам и предметам",
+            "ИИ-помощник: проект приказа/письма, анализ, методические советы",
+          ],
+        },
+        {
+          icon: GraduationCap,
+          title: "Учителям",
+          desc: "Предметники и классные руководители",
+          items: [
+            "Электронный журнал: оценки, посещаемость, итоги четверти",
+            "КСП и ССП с помощью ИИ, экспорт в PDF/Word/PPTX",
+            "Домашние задания — сразу у ученика, уведомление родителю",
+            "Создание СОР/СОЧ и онлайн-тестов",
+            "Мой класс: ученики, родители, посещаемость, личные дела",
+            "Банк материалов и чат с коллегами",
+          ],
+        },
+        {
+          icon: Users,
+          title: "Ученикам и родителям",
+          desc: "Прозрачный контроль учебного процесса",
+          items: [
+            "Расписание своего класса и ежедневные оценки",
+            "Домашние задания, сроки и загрузка ответов",
+            "Отчёт за четверть, динамика успеваемости, достижения",
+            "Прямая связь с учителем и администрацией",
+            "Уведомления о новых оценках, заданиях и объявлениях",
+            "Онлайн-библиотека и учебные материалы",
+          ],
+        },
+      ],
+    },
     cta: { title: "Зарегистрируйте вашу школу", subtitle: "Заявка рассматривается в течение 1–2 рабочих дней", button: "Регистрация" },
     news: {
       title: "Новости образования",
@@ -116,7 +193,51 @@ const content = {
         { icon: Smartphone, title: "Mobile Ready", desc: "Convenient on any device" },
       ],
     },
-    roles: { title: "Panel for Every Role", items: ["Super Admin — full platform management", "Director — complete school management", "Vice Principal — education monitoring", "Teacher — gradebook, tests", "Student — grades, assignments, materials", "Parent — track child's progress", "Librarian — book management"] },
+    roles: {
+      title: "Who it is for and what you can do",
+      groups: [
+        {
+          icon: Shield,
+          title: "For school administration",
+          desc: "Director, vice principals for academics and student life",
+          items: [
+            "Alphabet book: enrolment, exit, order number, Excel import",
+            "Orders book and staff records (positions, appointments, history)",
+            "AI-built timetable, shifts, teacher/class/room conflict checks",
+            "Timesheets, approval of taught hours, gradebook completion rate",
+            "Documents: upload, online signing, 30-day restore",
+            "Analytics: performance, attendance, class and subject reports",
+            "AI assistant: draft orders and letters, analysis, methodology tips",
+          ],
+        },
+        {
+          icon: GraduationCap,
+          title: "For teachers",
+          desc: "Subject teachers and homeroom teachers",
+          items: [
+            "Digital gradebook: grades, attendance, quarter summaries",
+            "AI-generated lesson and long-term plans, PDF/Word/PPTX export",
+            "Homework reaches students instantly, parents get notified",
+            "Assessment builder and online tests",
+            "My class: students, parents, attendance, personal files",
+            "Materials library and staff chat",
+          ],
+        },
+        {
+          icon: Users,
+          title: "For students and parents",
+          desc: "Full transparency of the learning process",
+          items: [
+            "Own class timetable and daily grades",
+            "Homework with deadlines and answer upload",
+            "Quarter report, performance trends, achievements",
+            "Direct messaging with teachers and administration",
+            "Notifications for new grades, tasks and announcements",
+            "Online library and study materials",
+          ],
+        },
+      ],
+    },
     cta: { title: "Register Your School Now", subtitle: "Application reviewed within 1–2 business days", button: "Register" },
     news: {
       title: "Education News",
@@ -248,16 +369,27 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Roles */}
+      {/* Audiences */}
       <section className="bg-card border-y border-border">
         <div className="mx-auto max-w-6xl px-4 py-24">
           <Section><h2 className="mb-10 text-center text-3xl font-bold text-foreground text-balance">{t.roles.title}</h2></Section>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {t.roles.items.map((r, i) => (
-              <Section key={r} delay={i * 70}>
-                <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-4">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-                  <span className="text-sm text-foreground">{r}</span>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {t.roles.groups.map((g, i) => (
+              <Section key={g.title} delay={i * 90}>
+                <div className="h-full rounded-2xl border border-border bg-background p-6 shadow-sm">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <g.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">{g.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{g.desc}</p>
+                  <ul className="mt-4 space-y-2.5">
+                    {g.items.map((it) => (
+                      <li key={it} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                        <span className="text-sm leading-relaxed text-foreground">{it}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </Section>
             ))}

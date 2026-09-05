@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, Shield, ShieldOff, Ban, CheckCircle, Trash2, Filter } from "lucide-react";
+import { Search, Loader2, Shield, ShieldOff, Ban, CheckCircle, Trash2, Pencil } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
@@ -26,6 +28,12 @@ const ROLE_LABELS: Record<string, string> = {
   student: "Оқушы",
   parent: "Ата-ана",
   librarian: "Кітапханашы",
+  psychologist: "Психолог",
+  social_pedagogue: "Әлеуметтік педагог",
+  speech_therapist: "Логопед",
+  nurse: "Медбике",
+  hr: "HR",
+  secretary: "Хатшы",
 };
 
 export default function SuperAdminUsers() {
@@ -36,6 +44,10 @@ export default function SuperAdminUsers() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [confirm, setConfirm] = useState<{ user: UserRow; type: "delete" | "block" | "unblock" | "protect" | "unprotect" } | null>(null);
+  const [schools, setSchools] = useState<{ id: string; name: string }[]>([]);
+  const [edit, setEdit] = useState<UserRow | null>(null);
+  const [form, setForm] = useState({ full_name: "", email: "", phone: "", role: "", school_id: "" });
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -61,6 +73,7 @@ export default function SuperAdminUsers() {
       protected: statusMap.get(p.user_id)?.protected || false,
     }));
     setUsers(rows);
+    setSchools(schools || []);
     setLoading(false);
   };
 
@@ -99,6 +112,42 @@ export default function SuperAdminUsers() {
     });
     if (error) toast({ title: "Қате", description: error.message, variant: "destructive" });
     else { toast({ title: value ? "Қорғау қосылды" : "Қорғау өшірілді" }); load(); }
+  };
+
+  const openEdit = (u: UserRow) => {
+    setEdit(u);
+    setForm({
+      full_name: u.full_name || "",
+      email: u.email || "",
+      phone: u.phone || "",
+      role: u.role && u.role !== "—" ? u.role : "",
+      school_id: u.school_id || "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!edit) return;
+    setSaving(true);
+    const { error: pErr } = await supabase.from("profiles").update({
+      full_name: form.full_name.trim(),
+      email: form.email.trim() || null,
+      phone: form.phone.trim() || null,
+      school_id: form.school_id || null,
+    }).eq("id", edit.id);
+
+    let rErr: any = null;
+    const currentRole = edit.role && edit.role !== "—" ? edit.role : "";
+    if (!pErr && form.role !== currentRole) {
+      await supabase.from("user_roles").delete().eq("user_id", edit.user_id);
+      if (form.role) {
+        const { error } = await supabase.from("user_roles").insert({ user_id: edit.user_id, role: form.role as any });
+        rErr = error;
+      }
+    }
+    setSaving(false);
+    const err = pErr || rErr;
+    if (err) toast({ title: "Қате", description: err.message, variant: "destructive" });
+    else { toast({ title: "Сақталды", description: "Пайдаланушы деректері жаңартылды" }); setEdit(null); load(); }
   };
 
   const deleteUser = async (u: UserRow) => {
@@ -173,6 +222,9 @@ export default function SuperAdminUsers() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" title="Өзгерту" onClick={() => openEdit(u)}>
+                        <Pencil className="h-4 w-4 text-primary" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8" title={u.protected ? "Қорғауды өшіру" : "Қорғау"}
                         onClick={() => setProtected(u, !u.protected)}>
                         {u.protected ? <ShieldOff className="h-4 w-4 text-muted-foreground" /> : <Shield className="h-4 w-4 text-primary" />}
@@ -198,6 +250,56 @@ export default function SuperAdminUsers() {
           </table>
         </div>
       )}
+
+      <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Пайдаланушыны өзгерту</DialogTitle>
+            <DialogDescription>Аты-жөні, байланысы, рөлі және мектебі</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Аты-жөні</Label>
+              <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Email</Label>
+                <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Телефон</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Рөл</Label>
+                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm">
+                  <option value="">Рөл жоқ</option>
+                  {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Мектеп</Label>
+                <select value={form.school_id} onChange={(e) => setForm({ ...form, school_id: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm">
+                  <option value="">Мектеп жоқ</option>
+                  {schools.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+            </div>
+            {edit?.protected && <p className="text-xs text-warning">Бұл пайдаланушы қорғалған — өзгерту сақтықпен жүргізіледі.</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEdit(null)} disabled={saving}>Болдырмау</Button>
+            <Button onClick={saveEdit} disabled={saving || !form.full_name.trim()}>
+              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Сақтау
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
         <DialogContent>
