@@ -1937,55 +1937,88 @@ export type Database = {
           address: string | null
           bin: string | null
           city: string | null
+          classes_count: number | null
           created_at: string
           director_id_url: string | null
+          director_name: string | null
+          director_phone: string | null
           email: string | null
+          founded_year: number | null
           id: string
+          internal_notes: string | null
+          language_of_instruction: string | null
           license_url: string | null
           name: string
           phone: string | null
+          public_description: string | null
           region: string | null
           registration_cert_url: string | null
           school_type: string | null
+          shifts_count: number | null
+          staff_count: number | null
           stamp_url: string | null
           status: string
+          students_count: number | null
           updated_at: string
+          website: string | null
         }
         Insert: {
           address?: string | null
           bin?: string | null
           city?: string | null
+          classes_count?: number | null
           created_at?: string
           director_id_url?: string | null
+          director_name?: string | null
+          director_phone?: string | null
           email?: string | null
+          founded_year?: number | null
           id?: string
+          internal_notes?: string | null
+          language_of_instruction?: string | null
           license_url?: string | null
           name: string
           phone?: string | null
+          public_description?: string | null
           region?: string | null
           registration_cert_url?: string | null
           school_type?: string | null
+          shifts_count?: number | null
+          staff_count?: number | null
           stamp_url?: string | null
           status?: string
+          students_count?: number | null
           updated_at?: string
+          website?: string | null
         }
         Update: {
           address?: string | null
           bin?: string | null
           city?: string | null
+          classes_count?: number | null
           created_at?: string
           director_id_url?: string | null
+          director_name?: string | null
+          director_phone?: string | null
           email?: string | null
+          founded_year?: number | null
           id?: string
+          internal_notes?: string | null
+          language_of_instruction?: string | null
           license_url?: string | null
           name?: string
           phone?: string | null
+          public_description?: string | null
           region?: string | null
           registration_cert_url?: string | null
           school_type?: string | null
+          shifts_count?: number | null
+          staff_count?: number | null
           stamp_url?: string | null
           status?: string
+          students_count?: number | null
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -2280,6 +2313,51 @@ export type Database = {
           full_name?: string | null
           id?: string
           status?: string
+        }
+        Relationships: []
+      }
+      system_settings: {
+        Row: {
+          academic_year: string
+          datetime_format: string
+          default_language: string
+          favicon_url: string | null
+          id: number
+          logo_url: string | null
+          maintenance_message: string | null
+          maintenance_mode: boolean
+          system_name: string
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          academic_year?: string
+          datetime_format?: string
+          default_language?: string
+          favicon_url?: string | null
+          id?: number
+          logo_url?: string | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
+          system_name?: string
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          academic_year?: string
+          datetime_format?: string
+          default_language?: string
+          favicon_url?: string | null
+          id?: number
+          logo_url?: string | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
+          system_name?: string
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
