@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FileText, Download, Eye, Trash2, Plus, Loader2, PenTool, Check } from "lucide-react";
+import { FileText, Download, Trash2, Plus, Loader2, PenTool, Check, RotateCcw, Archive } from "lucide-react";
+import { logAction } from "@/lib/activity";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,7 @@ export default function DocumentsPage() {
   const { user, role } = useAuth();
   const { toast } = useToast();
   const [docs, setDocs] = useState<any[]>([]);
+  const [tab, setTab] = useState<"active" | "trash">("active");
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
   const [showSign, setShowSign] = useState<string | null>(null);
@@ -47,6 +49,17 @@ export default function DocumentsPage() {
     if (!prof?.school_id) { setLoading(false); return; }
     setProfileId(prof.id);
     setSchoolId(prof.school_id);
+
+    // 30 күннен асқан себет құжаттарын толық жою
+    const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+    const { data: expired } = await (supabase as any)
+      .from("documents").select("id, file_url").eq("school_id", prof.school_id).lt("deleted_at", cutoff);
+    if (expired && expired.length) {
+      const paths = expired.map((d: any) => d.file_url).filter(Boolean);
+      if (paths.length) await supabase.storage.from("documents").remove(paths);
+      await supabase.from("documents").delete().in("id", expired.map((d: any) => d.id));
+    }
+
     const { data } = await supabase.from("documents").select("*, uploader:uploaded_by(full_name), signer:signed_by(full_name)").eq("school_id", prof.school_id).order("created_at", { ascending: false });
     setDocs(data || []);
     setLoading(false);
