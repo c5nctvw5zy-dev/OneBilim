@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FileText, Download, Eye, Trash2, Plus, Loader2, PenTool, Check } from "lucide-react";
+import { FileText, Download, Trash2, Plus, Loader2, PenTool, Check, RotateCcw, Archive } from "lucide-react";
+import { logAction } from "@/lib/activity";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,7 @@ export default function DocumentsPage() {
   const { user, role } = useAuth();
   const { toast } = useToast();
   const [docs, setDocs] = useState<any[]>([]);
+  const [tab, setTab] = useState<"active" | "trash">("active");
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
   const [showSign, setShowSign] = useState<string | null>(null);
@@ -47,6 +49,17 @@ export default function DocumentsPage() {
     if (!prof?.school_id) { setLoading(false); return; }
     setProfileId(prof.id);
     setSchoolId(prof.school_id);
+
+    // 30 күннен асқан себет құжаттарын толық жою
+    const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+    const { data: expired } = await (supabase as any)
+      .from("documents").select("id, file_url").eq("school_id", prof.school_id).lt("deleted_at", cutoff);
+    if (expired && expired.length) {
+      const paths = expired.map((d: any) => d.file_url).filter(Boolean);
+      if (paths.length) await supabase.storage.from("documents").remove(paths);
+      await supabase.from("documents").delete().in("id", expired.map((d: any) => d.id));
+    }
+
     const { data } = await supabase.from("documents").select("*, uploader:uploaded_by(full_name), signer:signed_by(full_name)").eq("school_id", prof.school_id).order("created_at", { ascending: false });
     setDocs(data || []);
     setLoading(false);
@@ -72,11 +85,35 @@ export default function DocumentsPage() {
     loadData();
   };
 
+  // Себетке жіберу (30 күн сақталады)
   const handleDelete = async (id: string) => {
-    await supabase.from("documents").delete().eq("id", id);
-    setDocs(p => p.filter(d => d.id !== id));
-    toast({ title: "Жойылды" });
+    const deletedAt = new Date().toISOString();
+    const { error } = await (supabase as any).from("documents").update({ deleted_at: deletedAt }).eq("id", id);
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setDocs(p => p.map(d => (d.id === id ? { ...d, deleted_at: deletedAt } : d)));
+    await logAction("document_trashed", { targetType: "document", targetId: id });
+    toast({ title: "Себетке жіберілді", description: "30 күн ішінде қайтаруға болады." });
   };
+
+  const handleRestore = async (id: string) => {
+    const { error } = await (supabase as any).from("documents").update({ deleted_at: null }).eq("id", id);
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setDocs(p => p.map(d => (d.id === id ? { ...d, deleted_at: null } : d)));
+    await logAction("document_restored", { targetType: "document", targetId: id });
+    toast({ title: "Қайтарылды" });
+  };
+
+  const handlePurge = async (doc: any) => {
+    if (!confirm("Құжат толық жойылады. Растайсыз ба?")) return;
+    if (doc.file_url) await supabase.storage.from("documents").remove([doc.file_url]);
+    await supabase.from("documents").delete().eq("id", doc.id);
+    setDocs(p => p.filter(d => d.id !== doc.id));
+    await logAction("document_deleted", { targetType: "document", targetId: doc.id });
+    toast({ title: "Толық жойылды" });
+  };
+
+  const daysLeft = (deletedAt: string) =>
+    Math.max(0, 30 - Math.floor((Date.now() - new Date(deletedAt).getTime()) / 86400000));
 
   // Canvas signature
   const startDraw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -163,11 +200,22 @@ export default function DocumentsPage() {
         )}
       </div>
 
-      {docs.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">Құжаттар жоқ</div>
+      <div className="flex gap-2">
+        <Button variant={tab === "active" ? "default" : "outline"} size="sm" className="gap-2" onClick={() => setTab("active")}>
+          <FileText className="h-4 w-4" /> Құжаттар ({activeDocs.length})
+        </Button>
+        <Button variant={tab === "trash" ? "default" : "outline"} size="sm" className="gap-2" onClick={() => setTab("trash")}>
+          <Archive className="h-4 w-4" /> Себет ({trashDocs.length})
+        </Button>
+      </div>
+
+      {visibleDocs.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+          {tab === "trash" ? "Себет бос" : "Құжаттар жоқ"}
+        </div>
       ) : (
         <div className="space-y-3">
-          {docs.map(d => {
+          {visibleDocs.map(d => {
             const st = statusLabels[d.status] || statusLabels.pending;
             return (
               <div key={d.id} className="rounded-xl border border-border bg-card p-4 shadow-sm">

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { GraduationCap, Eye, EyeOff, ScanFace, XCircle, QrCode, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import { detectDevice, getDeviceKey } from "@/lib/deviceInfo";
+import { enforceAccountStatus } from "@/lib/accountStatus";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,7 +90,21 @@ export default function Login() {
     secretary: "/secretary",
   };
 
+  // Бұғатталған аккаунт кіре алмайды
+  const blockedGuard = async () => {
+    const blocked = await enforceAccountStatus();
+    if (blocked) {
+      toast({
+        title: "Аккаунт бұғатталған",
+        description: "Сіздің аккаунтыңыз әкімші тарапынан бұғатталды. Мектеп әкімшілігіне хабарласыңыз.",
+        variant: "destructive",
+      });
+    }
+    return blocked;
+  };
+
   const navigateByRole = async (userId?: string | null) => {
+    if (await blockedGuard()) return;
     const pendingLink = sessionStorage.getItem("bilim_link_token");
     if (pendingLink) {
       sessionStorage.removeItem("bilim_link_token");
