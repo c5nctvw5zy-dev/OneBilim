@@ -200,11 +200,22 @@ export default function DocumentsPage() {
         )}
       </div>
 
-      {docs.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">Құжаттар жоқ</div>
+      <div className="flex gap-2">
+        <Button variant={tab === "active" ? "default" : "outline"} size="sm" className="gap-2" onClick={() => setTab("active")}>
+          <FileText className="h-4 w-4" /> Құжаттар ({activeDocs.length})
+        </Button>
+        <Button variant={tab === "trash" ? "default" : "outline"} size="sm" className="gap-2" onClick={() => setTab("trash")}>
+          <Archive className="h-4 w-4" /> Себет ({trashDocs.length})
+        </Button>
+      </div>
+
+      {visibleDocs.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+          {tab === "trash" ? "Себет бос" : "Құжаттар жоқ"}
+        </div>
       ) : (
         <div className="space-y-3">
-          {docs.map(d => {
+          {visibleDocs.map(d => {
             const st = statusLabels[d.status] || statusLabels.pending;
             return (
               <div key={d.id} className="rounded-xl border border-border bg-card p-4 shadow-sm">
