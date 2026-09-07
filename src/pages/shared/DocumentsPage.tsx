@@ -85,11 +85,35 @@ export default function DocumentsPage() {
     loadData();
   };
 
+  // Себетке жіберу (30 күн сақталады)
   const handleDelete = async (id: string) => {
-    await supabase.from("documents").delete().eq("id", id);
-    setDocs(p => p.filter(d => d.id !== id));
-    toast({ title: "Жойылды" });
+    const deletedAt = new Date().toISOString();
+    const { error } = await (supabase as any).from("documents").update({ deleted_at: deletedAt }).eq("id", id);
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setDocs(p => p.map(d => (d.id === id ? { ...d, deleted_at: deletedAt } : d)));
+    await logAction("document_trashed", { targetType: "document", targetId: id });
+    toast({ title: "Себетке жіберілді", description: "30 күн ішінде қайтаруға болады." });
   };
+
+  const handleRestore = async (id: string) => {
+    const { error } = await (supabase as any).from("documents").update({ deleted_at: null }).eq("id", id);
+    if (error) { toast({ title: "Қате", description: error.message, variant: "destructive" }); return; }
+    setDocs(p => p.map(d => (d.id === id ? { ...d, deleted_at: null } : d)));
+    await logAction("document_restored", { targetType: "document", targetId: id });
+    toast({ title: "Қайтарылды" });
+  };
+
+  const handlePurge = async (doc: any) => {
+    if (!confirm("Құжат толық жойылады. Растайсыз ба?")) return;
+    if (doc.file_url) await supabase.storage.from("documents").remove([doc.file_url]);
+    await supabase.from("documents").delete().eq("id", doc.id);
+    setDocs(p => p.filter(d => d.id !== doc.id));
+    await logAction("document_deleted", { targetType: "document", targetId: doc.id });
+    toast({ title: "Толық жойылды" });
+  };
+
+  const daysLeft = (deletedAt: string) =>
+    Math.max(0, 30 - Math.floor((Date.now() - new Date(deletedAt).getTime()) / 86400000));
 
   // Canvas signature
   const startDraw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
