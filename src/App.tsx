@@ -28,6 +28,7 @@ import SuperAdminLogs from "./pages/superadmin/SuperAdminLogs";
 import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
 import SuperAdminNews from "./pages/superadmin/SuperAdminNews";
 import SuperAdminIntegrations from "./pages/superadmin/SuperAdminIntegrations";
+import SuperAdminSchoolProfiles from "./pages/superadmin/SuperAdminSchoolProfiles";
 
 // Director
 import DirectorHome from "./pages/director/DirectorHome";
@@ -110,6 +111,7 @@ const superAdminNav: NavEntry[] = [
     icon: Building2,
     children: [
       { title: "Мектептер", path: "/super-admin/schools", icon: School },
+      { title: "Мектеп профильдері", path: "/super-admin/school-profiles", icon: Building2 },
     ],
   },
   { title: "Жеке кабинетім", path: "/super-admin/profile", icon: User },
@@ -335,6 +337,7 @@ const App = () => (
           <Route element={<ProtectedRoute allowedRoles={["super_admin"]}><DashboardLayout roleName="Super Admin" navItems={superAdminNav} userName="Admin" /></ProtectedRoute>}>
             <Route path="/super-admin" element={<SuperAdminHome />} />
             <Route path="/super-admin/schools" element={<SuperAdminSchools />} />
+            <Route path="/super-admin/school-profiles" element={<SuperAdminSchoolProfiles />} />
             <Route path="/super-admin/applications" element={<SuperAdminApplications />} />
             <Route path="/super-admin/subjects" element={<SuperAdminSubjects />} />
             <Route path="/super-admin/users" element={<SuperAdminUsers />} />
