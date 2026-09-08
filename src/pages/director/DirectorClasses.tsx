@@ -336,6 +336,35 @@ export default function DirectorClasses() {
         })}
       </div>
 
+      {/* Тіркеу нәтижесі — логиндер */}
+      <Dialog open={!!enrollResult} onOpenChange={v => { if (!v) setEnrollResult(null); }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{enrollResult?.key} — журналға тіркеу нәтижесі</DialogTitle></DialogHeader>
+          <div className="space-y-2 text-sm">
+            <p>Барлығы: <b>{enrollResult?.total ?? 0}</b> оқушы · Сыныпқа қосылды: <b>{enrollResult?.linked ?? 0}</b></p>
+            {(enrollResult?.created?.length ?? 0) === 0 ? (
+              <p className="text-muted-foreground">Жаңа аккаунт ашылмады — барлығы бұрыннан тіркелген.</p>
+            ) : (
+              <table className="w-full text-xs">
+                <thead className="bg-muted/40"><tr>
+                  <th className="px-2 py-1 text-left">Оқушы</th><th className="px-2 py-1 text-left">Логин</th><th className="px-2 py-1 text-left">Құпия сөз</th>
+                </tr></thead>
+                <tbody>
+                  {enrollResult.created.map((c: any) => (
+                    <tr key={c.login} className="border-t border-border">
+                      <td className="px-2 py-1">{c.name}</td>
+                      <td className="px-2 py-1"><code className="bg-muted px-1 rounded">{c.login}@bilimapp.kz</code></td>
+                      <td className="px-2 py-1"><code className="bg-muted px-1 rounded">{c.password}</code></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <p className="text-[11px] text-muted-foreground">Осы оқушылар енді сол сыныптың электронды журналдарында автоматты көрінеді.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Жетекші */}
       <Dialog open={!!assignTeacher} onOpenChange={v => { if (!v) setAssignTeacher(null); }}>
         <DialogContent>
