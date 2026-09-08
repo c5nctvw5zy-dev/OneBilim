@@ -256,7 +256,13 @@ export default function DirectorClasses() {
                       {cls?.teacher_name && <Badge variant="outline">👤 {cls.teacher_name}</Badge>}
                     </button>
                   </CollapsibleTrigger>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 items-center">
+                    <Button size="sm" variant="outline" className="gap-1 h-8" disabled={enrolling === key || list.length === 0}
+                      title="Оқушыларға аккаунт ашып, сыныптың электронды журналдарына тіркеу"
+                      onClick={() => enrollClass(key)}>
+                      {enrolling === key ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <KeyRound className="h-3.5 w-3.5" />}
+                      Журналға тіркеу
+                    </Button>
                     {cls && (
                       <>
                         <Button size="icon" variant="ghost" title="Жетекші тағайындау" onClick={() => { setAssignTeacher(cls); setSelectedTeacherId(cls.homeroom_teacher_id || ""); }}>
