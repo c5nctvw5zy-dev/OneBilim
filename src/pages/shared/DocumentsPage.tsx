@@ -157,6 +157,10 @@ export default function DocumentsPage() {
     loadData();
   };
 
+  const activeDocs = docs.filter(d => !d.deleted_at);
+  const trashDocs = docs.filter(d => !!d.deleted_at);
+  const visibleDocs = tab === "trash" ? trashDocs : activeDocs;
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const categoryColors: Record<string, string> = { "ҚМЖ": "bg-primary/10 text-primary", "КТЖ": "bg-warning/10 text-warning", "Жоспар": "bg-success/10 text-success", "Тізім": "bg-muted text-muted-foreground" };
@@ -241,7 +245,20 @@ export default function DocumentsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    {d.file_url && (
+                    {tab === "trash" && (
+                      <span className="text-xs text-muted-foreground mr-1">{daysLeft(d.deleted_at)} күн қалды</span>
+                    )}
+                    {tab === "trash" && canManage && (
+                      <>
+                        <Button variant="outline" size="sm" className="gap-1" onClick={() => handleRestore(d.id)}>
+                          <RotateCcw className="h-3.5 w-3.5" /> Қайтару
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handlePurge(d)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>
+                    )}
+                    {tab === "active" && d.file_url && (
                       <Button variant="ghost" size="icon" onClick={async () => {
                         const { data } = await supabase.storage.from("documents").createSignedUrl(d.file_url, 3600);
                         if (data?.signedUrl) window.open(data.signedUrl, "_blank");
