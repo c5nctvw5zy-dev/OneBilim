@@ -149,6 +149,29 @@ export default function DirectorClasses() {
     setQuickAdd(null); loadData();
   };
 
+  // Сыныптағы оқушыларға аккаунт ашып, сол сыныптың журналдарына тіркеу
+  const enrollClass = async (key: string) => {
+    const m = key.match(/^(\d+)(.*)$/);
+    if (!m) return;
+    setEnrolling(key);
+    try {
+      const { data, error } = await supabase.functions.invoke("enroll-students", {
+        body: { grade_level: parseInt(m[1]), section: m[2] || "" },
+      });
+      if (error) throw error;
+      setEnrollResult({ key, ...(data as any) });
+      toast({
+        title: `${key} сыныбы журналдарға тіркелді`,
+        description: `${(data as any).created?.length || 0} жаңа аккаунт, ${(data as any).linked || 0} оқушы сыныпқа қосылды.`,
+      });
+      loadData();
+    } catch (e: any) {
+      toast({ title: "Қате", description: e.message, variant: "destructive" });
+    } finally {
+      setEnrolling(null);
+    }
+  };
+
   // Жаңа оқу жылына көшіру: барлық 1..10 сыныптағы оқушыларды +1 grade_level. 11 — түлек (status=exited).
   const rolloverYear = async () => {
     if (!confirm("Барлық оқушылар келесі сыныпқа көшіріледі. 11-сынып түлек болады. Жалғастырамыз ба?")) return;
