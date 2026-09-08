@@ -37,6 +37,8 @@ export default function DirectorClasses() {
   const [rolloverOpen, setRolloverOpen] = useState(false);
   const [rolloverBusy, setRolloverBusy] = useState(false);
   const [quickAdd, setQuickAdd] = useState<{ key: string; last_name: string; first_name: string } | null>(null);
+  const [enrolling, setEnrolling] = useState<string | null>(null);
+  const [enrollResult, setEnrollResult] = useState<any | null>(null);
 
   useEffect(() => { if (user) loadData(); }, [user]);
 
