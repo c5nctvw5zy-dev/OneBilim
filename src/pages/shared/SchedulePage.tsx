@@ -15,10 +15,14 @@ interface ScheduleItem {
   lesson_order: number;
   start_time: string | null;
   end_time: string | null;
+  room: string | null;
   classes: { id: string; name: string } | null;
   subjects: { id: string; name: string } | null;
   teacher: { id: string; full_name: string } | null;
 }
+
+const SELECT_COLS =
+  "id, day_of_week, lesson_order, start_time, end_time, room, classes:class_id(id, name), subjects:subject_id(id, name), teacher:teacher_id(id, full_name)";
 
 const dayLabels: Record<number, string> = { 1: "Дүйсенбі", 2: "Сейсенбі", 3: "Сәрсенбі", 4: "Бейсенбі", 5: "Жұма", 6: "Сенбі" };
 const defaultTimes = [

@@ -37,6 +37,8 @@ export default function DirectorClasses() {
   const [rolloverOpen, setRolloverOpen] = useState(false);
   const [rolloverBusy, setRolloverBusy] = useState(false);
   const [quickAdd, setQuickAdd] = useState<{ key: string; last_name: string; first_name: string } | null>(null);
+  const [enrolling, setEnrolling] = useState<string | null>(null);
+  const [enrollResult, setEnrollResult] = useState<any | null>(null);
 
   useEffect(() => { if (user) loadData(); }, [user]);
 
@@ -147,6 +149,29 @@ export default function DirectorClasses() {
     setQuickAdd(null); loadData();
   };
 
+  // Сыныптағы оқушыларға аккаунт ашып, сол сыныптың журналдарына тіркеу
+  const enrollClass = async (key: string) => {
+    const m = key.match(/^(\d+)(.*)$/);
+    if (!m) return;
+    setEnrolling(key);
+    try {
+      const { data, error } = await supabase.functions.invoke("enroll-students", {
+        body: { grade_level: parseInt(m[1]), section: m[2] || "" },
+      });
+      if (error) throw error;
+      setEnrollResult({ key, ...(data as any) });
+      toast({
+        title: `${key} сыныбы журналдарға тіркелді`,
+        description: `${(data as any).created?.length || 0} жаңа аккаунт, ${(data as any).linked || 0} оқушы сыныпқа қосылды.`,
+      });
+      loadData();
+    } catch (e: any) {
+      toast({ title: "Қате", description: e.message, variant: "destructive" });
+    } finally {
+      setEnrolling(null);
+    }
+  };
+
   // Жаңа оқу жылына көшіру: барлық 1..10 сыныптағы оқушыларды +1 grade_level. 11 — түлек (status=exited).
   const rolloverYear = async () => {
     if (!confirm("Барлық оқушылар келесі сыныпқа көшіріледі. 11-сынып түлек болады. Жалғастырамыз ба?")) return;
@@ -231,7 +256,13 @@ export default function DirectorClasses() {
                       {cls?.teacher_name && <Badge variant="outline">👤 {cls.teacher_name}</Badge>}
                     </button>
                   </CollapsibleTrigger>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 items-center">
+                    <Button size="sm" variant="outline" className="gap-1 h-8" disabled={enrolling === key || list.length === 0}
+                      title="Оқушыларға аккаунт ашып, сыныптың электронды журналдарына тіркеу"
+                      onClick={() => enrollClass(key)}>
+                      {enrolling === key ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <KeyRound className="h-3.5 w-3.5" />}
+                      Журналға тіркеу
+                    </Button>
                     {cls && (
                       <>
                         <Button size="icon" variant="ghost" title="Жетекші тағайындау" onClick={() => { setAssignTeacher(cls); setSelectedTeacherId(cls.homeroom_teacher_id || ""); }}>
@@ -304,6 +335,35 @@ export default function DirectorClasses() {
           );
         })}
       </div>
+
+      {/* Тіркеу нәтижесі — логиндер */}
+      <Dialog open={!!enrollResult} onOpenChange={v => { if (!v) setEnrollResult(null); }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{enrollResult?.key} — журналға тіркеу нәтижесі</DialogTitle></DialogHeader>
+          <div className="space-y-2 text-sm">
+            <p>Барлығы: <b>{enrollResult?.total ?? 0}</b> оқушы · Сыныпқа қосылды: <b>{enrollResult?.linked ?? 0}</b></p>
+            {(enrollResult?.created?.length ?? 0) === 0 ? (
+              <p className="text-muted-foreground">Жаңа аккаунт ашылмады — барлығы бұрыннан тіркелген.</p>
+            ) : (
+              <table className="w-full text-xs">
+                <thead className="bg-muted/40"><tr>
+                  <th className="px-2 py-1 text-left">Оқушы</th><th className="px-2 py-1 text-left">Логин</th><th className="px-2 py-1 text-left">Құпия сөз</th>
+                </tr></thead>
+                <tbody>
+                  {enrollResult.created.map((c: any) => (
+                    <tr key={c.login} className="border-t border-border">
+                      <td className="px-2 py-1">{c.name}</td>
+                      <td className="px-2 py-1"><code className="bg-muted px-1 rounded">{c.login}@bilimapp.kz</code></td>
+                      <td className="px-2 py-1"><code className="bg-muted px-1 rounded">{c.password}</code></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <p className="text-[11px] text-muted-foreground">Осы оқушылар енді сол сыныптың электронды журналдарында автоматты көрінеді.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Жетекші */}
       <Dialog open={!!assignTeacher} onOpenChange={v => { if (!v) setAssignTeacher(null); }}>
